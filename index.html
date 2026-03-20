@@ -22,7 +22,8 @@
     <link rel="stylesheet" href="mcs-color-design-v8.4.0.css">
     <link rel="stylesheet" href="mobile-navbar-v8.4.1.css">
     
-    <!-- ✅ THÊM mới -->
+    <!-- ✅ THÊM mới Phím Nổi -->
+    <link rel="stylesheet" href="search-layout-mobile-v8.5.7-1.css">
     
     <link rel="stylesheet" href="detail-panel-v8.5.3-8.css">
     <link rel="stylesheet" href="quick-update-module-v8.5.3-4.css">
@@ -221,6 +222,16 @@
                                 <div class="nav-link-text">
                                     <span class="ja">エクスポート</span>
                                     <span class="vi">Xuất dữ liệu</span>
+                                </div>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a href="#" id="sidebarActionSettingsBtn" class="nav-link">
+                                <i class="fas fa-bolt" style="color:#60a5fa;"></i>
+                                <div class="nav-link-text">
+                                    <span class="ja">アクション設定</span>
+                                    <span class="vi">Thiết lập Action</span>
                                 </div>
                             </a>
                         </li>
@@ -480,10 +491,10 @@
     <script src="filter-core-v8.4.1.js"></script>
     <script src="filter-ui-v8.4.1.js"></script>
 
-    <script src="app-v8.5.6-1.js"></script>
+    <script src="app-v8.5.6-2.js"></script>
     <!-- UI Modules (v8.0.4) -->
     <script src="results-card-renderer-v8.5.6-1.js"></script>
-    <script src="results-table-renderer-v8.5.6-1.js"></script>
+    <script src="results-table-renderer-v8.5.7-3.js"></script>
 
     <script src="search-module-v8.4.1.js"></script>
 
@@ -520,15 +531,30 @@
     <link rel="stylesheet" href="extended-editor-v8.5.3-5.css">
     <script src="dp-extended-editor-v8.5.3-6.js"></script>
 
-    <script src="detail-panel-assistive-touch-v8.5.3-2.js"></script>
+    <script src="global-assistive-touch-v8.5.7-3.js"></script>
     <script src="detail-panel-photos-tab-v8.4.4.js"></script>
     <script src="detail-panel-related-tab-v8.5.3-5.js"></script>
+    
+    <!-- Kích hoạt Module Vuốt Load Của Mobile Phase 50 -->
+    <script src="pull-to-refresh-v8.5.7-1.js"></script>
  
     <script>
         document.getElementById('sidebarPhotoManagerBtn')?.addEventListener('click', function(e) {
             e.preventDefault();
             if (window.PhotoManager && typeof window.PhotoManager.open === 'function') {
             window.PhotoManager.open();
+            }
+        });
+        document.getElementById('sidebarActionSettingsBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Đóng sidebar trước khi hiện Settings
+            const sb = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+            if(sb) { sb.classList.remove('open'); sb.classList.add('collapsed'); }
+            if(backdrop) backdrop.classList.remove('show');
+            
+            if (window.GlobalAssistive && typeof window.GlobalAssistive.openSettings === 'function') {
+                window.GlobalAssistive.openSettings();
             }
         });
     </script>
