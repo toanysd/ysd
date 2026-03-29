@@ -1,0 +1,1 @@
+Đọc file v8.5_MASTER_RULES.md, và các file trong các thư mục con của .agents/ và phân tích kỹ .agents/workflows trước khi nhận bất kỳ chỉ thị nào khác.

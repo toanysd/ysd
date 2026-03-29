@@ -1,0 +1,30 @@
+  PhotoManagerModule.prototype._pmSetBaseZ = function (mode) {
+    try {
+      var ov = document.getElementById('pmOverlay');
+      var ct = document.getElementById('pmContainer');
+      if (!ov || !ct) return;
+
+      // DetailPanel đang zIndex = 9999, nên PM phải < 9999 khi muốn panel nổi lên
+      var TOP_OV = 12000;
+      var TOP_CT = 12010;
+
+      var BEHIND_OV = 9980;
+      var BEHIND_CT = 9981;
+
+      if (mode === 'behind') {
+        ov.style.zIndex = String(BEHIND_OV);
+        ct.style.zIndex = String(BEHIND_CT);
+      } else {
+        ov.style.zIndex = String(TOP_OV);
+        ct.style.zIndex = String(TOP_CT);
+      }
+    } catch (e) {}
+  };
+
+  PhotoManagerModule.prototype._pmIsDetailPanelOpen = function () {
+    try {
+      // Không phụ thuộc id, chỉ cần thấy .detail-panel.open là đủ
+      var el = document.querySelector('.detail-panel.open');
+      return !!el;
+    } catch (e) {
+      return false;
