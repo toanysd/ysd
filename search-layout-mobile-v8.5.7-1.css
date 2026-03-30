@@ -1,0 +1,52 @@
+/* search-layout-mobile-v8.5.7-1.css */
+@media (max-width: 768px) {
+  .main-content {
+      position: relative;
+  }
+  
+  .top-bar {
+      position: fixed;
+      /* Mobile navbar height is 60px by default */
+      bottom: var(--mobile-navbar-height, 60px);
+      top: auto !important;
+      left: 0;
+      right: 0;
+      z-index: 998;
+      border-top: 1px solid var(--border-color, #E3E8F3);
+      border-bottom: none;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+      background: var(--bg-white, #FFFFFF);
+  }
+
+  /* When iPhone notch is active */
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      .top-bar {
+          bottom: calc(var(--mobile-navbar-height, 60px) + env(safe-area-inset-bottom));
+      }
+  }
+
+  /* To account for the fixed top-bar at the bottom */
+  .content-area {
+      padding-bottom: 120px; 
+      padding-top: var(--spacing-md);
+  }
+
+  /* Fix Search Suggestions drop-up on mobile */
+  .search-suggestions {
+      top: auto !important;
+      bottom: calc(100% + 4px) !important;
+      margin-top: 0 !important;
+      margin-bottom: 4px !important;
+      border-radius: 16px 16px 4px 4px !important;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.15) !important;
+      transform-origin: bottom center !important;
+  }
+  
+  @keyframes slideUpMobile {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+  }
+  .search-suggestions[style*="display: block"] {
+      animation: slideUpMobile 0.2s ease-out !important;
+  }
+}
