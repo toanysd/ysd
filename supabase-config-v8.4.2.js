@@ -53,7 +53,7 @@
   // 2) PHOTO MAIL SETTINGS (theo yêu cầu)
   // =========================
   var PHOTO_BUCKET_DEFAULT = 'mold-photos';
-  var EDGE_FUNCTION_SEND_PHOTO_AUDIT = 'send-photo-adit';
+  var EDGE_FUNCTION_SEND_PHOTO_AUDIT = 'send-photo-audit';
 
   // Mail TO cố định: KHÔNG hiện trên UI.
   var PHOTO_MAIL_TO_FIXED = 'toan.ysd@gmail.com';
