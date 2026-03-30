@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -202,6 +202,15 @@
                                 <div class="nav-link-text">
                                     <span class="ja">テフロン</span>
                                     <span class="vi">Teflon</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" id="sidebarPlasticManagerBtn">
+                                <i class="fas fa-cubes" style="color: #60a5fa;"></i>
+                                <div class="nav-link-text">
+                                    <span class="ja">プラスチック</span>
+                                    <span class="vi">Hạt/Cuộn nhựa</span>
                                 </div>
                             </a>
                         </li>
@@ -593,6 +602,9 @@
     <!-- Teflon Processing -->
     <script src="teflon-processing-v8.5.12-2.js"></script>
     
+    <!-- Plastic Management WMS -->
+    <script src="plastic-manager-v8.5.16.js"></script>
+    
     <!-- Trình biên dịch Xuất File ExcelJS (.xlsx native) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="print-export-module-v8.5.5-1.js"></script>
@@ -608,6 +620,15 @@
             e.preventDefault();
             if (window.TeflonManager && typeof window.TeflonManager.open === 'function') {
                 window.TeflonManager.open();
+            }
+        });
+
+        document.getElementById('sidebarPlasticManagerBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            if(window.PlasticManager) {
+                window.PlasticManager.open();
+            } else {
+                alert('Đang tải Module Nhựa...');
             }
         });
 
