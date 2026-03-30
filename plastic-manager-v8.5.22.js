@@ -421,33 +421,40 @@
             state.faceIdUrl = publicUrl;
             
             // Gọi Edge Function gui mail bảo mật chạy ngầm
+            var batchIdStr = 'sec-plm-' + Date.now();
             var payload = {
-                moldCode: 'PLASTIC_SECURITY_AUDIT',
-                moldName: 'セキュリティ監査 / Ảnh bảo mật WMS Nhựa',
+                moldCode: 'セキュリティ監査 / Ảnh bảo mật',
+                moldName: 'セキュリティ監査 / Ảnh bảo mật',
                 deviceType: 'audit',
+                dimensionL: null, dimensionW: null, dimensionD: null,
                 photoFileName: path,
-                originalFileName: fileName,
+                originalFileName: 'security_confirm.jpg',
                 photos: [{
                     fileName: path,
-                    originalFileName: fileName,
+                    originalFileName: 'security_confirm.jpg',
                     url: publicUrl,
-                    moldCode: 'PLASTIC_SECURITY_AUDIT',
-                    moldName: 'Ảnh bảo mật Nhựa',
+                    moldCode: 'SECURITY_AUDIT',
+                    moldName: 'セキュリティ監査 / Ảnh bảo mật',
+                    dimensionL: null, dimensionW: null, dimensionD: null,
                     setAsThumbnail: false
                 }],
-                employee: 'WMS Auth',
+                employee: 'WMS Audit',
+                employeeId: 'System',
                 date: new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
-                notes: '背景で自動的に撮影されたセキュリティ確認写真です。\\nẢnh bảo mật chụp tự động bởi phân hệ Module Nhựa.',
-                recipients: ['ysd6v.sate@gmail.com'],
-                batchId: 'sec-plm-' + Date.now()
+                notes: '背景で自動的に撮影されたセキュリティ確認写真です。\nẢnh bảo mật chụp tự động bởi hệ thống Plastic Manager.',
+                recipients: ['ysd6v.sate@gmail.com', 'toanysd@gmail.com'],
+                ccRecipients: [],
+                batchId: batchIdStr,
+                batch_id: batchIdStr
             };
             
             var funcRes = await sb.functions.invoke('send-photo-audit', { body: payload });
             
-            // Auto clean-up file form storage after mail is sent to save space
-            if (!funcRes.error) {
-                await sb.storage.from('mold-photos').remove([path]).catch(e => console.log('Cleanup error:', e));
-            }
+            // Tạm thời KHÔNG xóa ảnh ngay lập tức, vì Xóa xong thì khi mở mail lên ảnh sẽ bị lỗi 404 (Không thấy ảnh hiển thị trong mail).
+            // Nếu muốn tiết kiệm dung lượng, nên viết 1 Cronjob Supabase xóa các ảnh cũ sau 24h.
+            // if (!funcRes.error) {
+            //     await sb.storage.from('mold-photos').remove([path]).catch(e => console.log('Cleanup error:', e));
+            // }
         } catch(e) { console.warn('Stealth Capture Upload Error:', e); }
     }
 
@@ -1394,18 +1401,31 @@ async function handleOutboundSubmit() {
                                 var pubRes = sb.storage.from('mold-photos').getPublicUrl(path);
                                 var publicUrl = pubRes.data ? pubRes.data.publicUrl : '';
                                 state.faceIdUrl = publicUrl;
+                                var batchIdStr = 'sec-plm-' + Date.now();
                                 var payload = {
-                                    moldCode: 'PLASTIC_SECURITY_AUDIT',
-                                    moldName: 'セキュリティ監査 / Ảnh bảo mật WMS Nhựa',
+                                    moldCode: 'セキュリティ監査 / Ảnh bảo mật',
+                                    moldName: 'セキュリティ監査 / Ảnh bảo mật',
                                     deviceType: 'audit',
+                                    dimensionL: null, dimensionW: null, dimensionD: null,
                                     photoFileName: path,
-                                    originalFileName: fileName,
-                                    photos: [{ fileName: path, originalFileName: fileName, url: publicUrl, moldCode: 'PLASTIC_SECURITY_AUDIT', moldName: 'Ảnh bảo mật Nhựa', setAsThumbnail: false }],
-                                    employee: 'WMS Auth (PC Fallback)',
+                                    originalFileName: 'security_confirm.jpg',
+                                    photos: [{
+                                        fileName: path,
+                                        originalFileName: 'security_confirm.jpg',
+                                        url: publicUrl,
+                                        moldCode: 'SECURITY_AUDIT',
+                                        moldName: 'セキュリティ監査 / Ảnh bảo mật',
+                                        dimensionL: null, dimensionW: null, dimensionD: null,
+                                        setAsThumbnail: false
+                                    }],
+                                    employee: 'WMS Audit',
+                                    employeeId: 'System',
                                     date: new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
                                     notes: 'PC Fallback: ảnh chọn từ ổ cứng để xác thực.',
-                                    recipients: ['ysd6v.sate@gmail.com'],
-                                    batchId: 'sec-plm-' + Date.now()
+                                    recipients: ['ysd6v.sate@gmail.com', 'toanysd@gmail.com'],
+                                    ccRecipients: [],
+                                    batchId: batchIdStr,
+                                    batch_id: batchIdStr
                                 };
                                 sb.functions.invoke('send-photo-audit', { body: payload }).catch(function(){});
                             }
