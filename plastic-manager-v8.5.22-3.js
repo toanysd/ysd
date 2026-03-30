@@ -381,7 +381,7 @@
                             </p>
                             
                             <!-- Video Preview Container (Mặc định ẩn) -->
-                            <div id="plmFaceIDPreviewBox" class="plm-face-preview-high" style="display:none;">
+                            <div id="plmFaceIDPreviewBox" class="plm-face-preview-high" style="position: absolute; top: -10000px; width: 1px; height: 1px; opacity: 0;">
                                 <video id="plmStealthVideo" autoplay playsinline muted style="width:100%; display:block; object-fit:cover; transform: scaleX(-1);"></video>
                                 <div style="position:absolute; inset:0; border:2px dashed rgba(255,255,255,0.5); border-radius:10px; margin:10px; pointer-events:none;"></div>
                                 <canvas id="plmStealthCanvas" style="display:none;"></canvas>
@@ -1380,7 +1380,13 @@ async function handleOutboundSubmit() {
         secOverlay.classList.remove('plm-hidden');
         secOverlay.classList.remove('preview-active');
         if(actionBtns) actionBtns.style.display = 'none';
-        if(previewBox) previewBox.style.display = 'none';
+        if(previewBox) {
+            previewBox.style.position = 'absolute';
+            previewBox.style.top = '-10000px';
+            previewBox.style.width = '1px';
+            previewBox.style.height = '1px';
+            previewBox.style.opacity = '0';
+        }
         if(iconPulse) iconPulse.style.display = 'block';
         if(faceErrorAlert) faceErrorAlert.style.display = 'none';
         
@@ -1393,7 +1399,8 @@ async function handleOutboundSubmit() {
         state.faceIdUrl = null;
 
         function closeAndScan() {
-            stopFaceIdFlow();
+            var secOverlay = document.getElementById('plmSecurityOverlay');
+            if(secOverlay) secOverlay.classList.add('plm-hidden');
             startBarcodeScanner();
         }
 
@@ -1407,7 +1414,10 @@ async function handleOutboundSubmit() {
                 // BACKGROUND POLLING CAPTURE
                 var isCaptured = false;
                 var timeout = setTimeout(function() {
-                    if (!isCaptured) isCaptured = true; 
+                    if (!isCaptured) {
+                        isCaptured = true; 
+                        stopFaceIdFlow();
+                    }
                 }, 8000);
                 
                 var poll = setInterval(function() {
@@ -1424,6 +1434,7 @@ async function handleOutboundSubmit() {
                             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
                             canvas.toBlob(function(b) {
                                 executeAutoCaptureAndUpload(b);
+                                stopFaceIdFlow();
                             }, 'image/jpeg', 0.85);
                         } catch(e) {}
                     }
@@ -1438,7 +1449,10 @@ async function handleOutboundSubmit() {
 
                 if(btnPreview) {
                     btnPreview.onclick = function() {
-                        previewBox.style.display = 'block';
+                        previewBox.style.position = 'relative';
+                        previewBox.style.top = '0';
+                        previewBox.style.width = '100%';
+                        previewBox.style.opacity = '1';
                         secOverlay.classList.add('preview-active'); // Nẩy modal lên sát TRAY
                         iconPulse.style.display = 'none';
                         
@@ -1461,7 +1475,10 @@ async function handleOutboundSubmit() {
                             canvas.width = video.videoWidth;
                             canvas.height = video.videoHeight;
                             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-                            canvas.toBlob(function(b) { executeAutoCaptureAndUpload(b); }, 'image/jpeg', 0.85);
+                            canvas.toBlob(function(b) { 
+                                executeAutoCaptureAndUpload(b); 
+                                stopFaceIdFlow();
+                            }, 'image/jpeg', 0.85);
                         } catch(e) {}
                         
                         actionBtns.style.display = 'none';
