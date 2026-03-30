@@ -1,4 +1,4 @@
-/* plastic-manager-v8.5.16.js */
+/* plastic-manager-v8.5.22-3.js */
 
 (function() {
     'use strict';
@@ -11,7 +11,9 @@
         frontStream: null,
         faceIdUrl: null,
         securityPhotoBlob: null,
-        inventoryCache: null
+        inventoryCache: null,
+        securityCleanupQueue: [],
+        securityCleanupRunning: false
     };
 
     var el = {
@@ -20,6 +22,117 @@
         tabs: null,
         panels: {}
     };
+
+
+    var SECURITY_BUCKET = 'mold-photos';
+    var SECURITY_RETENTION_MS = 3 * 24 * 60 * 60 * 1000;
+    var SECURITY_CLEANUP_LS_KEY = 'plm.security.cleanup.queue';
+    var SECURITY_CLEANUP_LAST_RUN_KEY = 'plm.security.cleanup.lastRunAt';
+    var EDGE_FUNCTION_SEND_PHOTO_AUDIT = 'send-photo-audit';
+
+    function getSupabaseClientSafe() {
+        if (window.SupabaseHelper && typeof window.SupabaseHelper.getClient === 'function') {
+            try {
+                return window.SupabaseHelper.getClient();
+            } catch (e) {}
+        }
+        if (window.supabaseClient && typeof window.supabaseClient === 'object') return window.supabaseClient;
+        return null;
+    }
+
+    function readSecurityCleanupQueue() {
+        try {
+            var raw = localStorage.getItem(SECURITY_CLEANUP_LS_KEY);
+            var list = raw ? JSON.parse(raw) : [];
+            return Array.isArray(list) ? list : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function writeSecurityCleanupQueue(list) {
+        var safeList = Array.isArray(list) ? list : [];
+        state.securityCleanupQueue = safeList.slice();
+        try {
+            localStorage.setItem(SECURITY_CLEANUP_LS_KEY, JSON.stringify(safeList));
+        } catch (e) {}
+        return safeList;
+    }
+
+    function appendSecurityCleanupItem(path, bucket, delayMs) {
+        if (!path) return;
+        var waitMs = Number(delayMs);
+        if (!Number.isFinite(waitMs) || waitMs < 60000) waitMs = SECURITY_RETENTION_MS;
+        var list = readSecurityCleanupQueue();
+        list.push({
+            path: path,
+            bucket: bucket || SECURITY_BUCKET,
+            delete_after: Date.now() + waitMs,
+            created_at: new Date().toISOString()
+        });
+        writeSecurityCleanupQueue(list);
+    }
+
+    async function runSecurityCleanup(forceRun) {
+        if (state.securityCleanupRunning) return;
+        state.securityCleanupRunning = true;
+        try {
+            var list = readSecurityCleanupQueue();
+            if (!list.length) return;
+
+            var sb = getSupabaseClientSafe();
+            if (!sb || !sb.storage || !sb.storage.from) return;
+
+            var now = Date.now();
+            var due = [];
+            var keep = [];
+            list.forEach(function(item) {
+                if (!item || !item.path) return;
+                if (forceRun || Number(item.delete_after || 0) <= now) due.push(item);
+                else keep.push(item);
+            });
+
+            if (!due.length) return;
+
+            var grouped = {};
+            due.forEach(function(item) {
+                var bucket = item.bucket || SECURITY_BUCKET;
+                if (!grouped[bucket]) grouped[bucket] = [];
+                grouped[bucket].push(item.path);
+            });
+
+            var failed = [];
+            for (var bucketName in grouped) {
+                if (!Object.prototype.hasOwnProperty.call(grouped, bucketName)) continue;
+                try {
+                    var removeRes = await sb.storage.from(bucketName).remove(grouped[bucketName]);
+                    if (removeRes && removeRes.error) {
+                        grouped[bucketName].forEach(function(path) {
+                            failed.push({ path: path, bucket: bucketName, delete_after: now + (6 * 60 * 60 * 1000), created_at: new Date().toISOString() });
+                        });
+                    }
+                } catch (e) {
+                    grouped[bucketName].forEach(function(path) {
+                        failed.push({ path: path, bucket: bucketName, delete_after: now + (6 * 60 * 60 * 1000), created_at: new Date().toISOString() });
+                    });
+                }
+            }
+
+            writeSecurityCleanupQueue(keep.concat(failed));
+            try { localStorage.setItem(SECURITY_CLEANUP_LAST_RUN_KEY, String(now)); } catch (e) {}
+        } finally {
+            state.securityCleanupRunning = false;
+        }
+    }
+
+    function scheduleSecurityCleanupWarmup() {
+        state.securityCleanupQueue = readSecurityCleanupQueue();
+        var lastRunAt = 0;
+        try { lastRunAt = Number(localStorage.getItem(SECURITY_CLEANUP_LAST_RUN_KEY) || '0'); } catch (e) {}
+        if (!lastRunAt || (Date.now() - lastRunAt) > (30 * 60 * 1000)) {
+            setTimeout(function() { runSecurityCleanup(false).catch(function() {}); }, 1200);
+        }
+    }
 
     // ==========================================
     // Core Utilities & CDN
@@ -409,18 +522,17 @@
 
     async function executeAutoCaptureAndUpload(blob) {
         var sb = api.check();
-        if(!sb) return;
+        if(!sb || !blob) return;
         try {
             var fileName = 'sec_plm_' + Date.now() + '_' + Math.floor(Math.random()*1000) + '.jpg';
             var path = 'employee_verifications/' + fileName;
-            var upRes = await sb.storage.from('mold-photos').upload(path, blob, { contentType: 'image/jpeg', upsert: false });
-            
+            var upRes = await sb.storage.from(SECURITY_BUCKET).upload(path, blob, { contentType: 'image/jpeg', upsert: false });
+
             if(upRes.error) throw upRes.error;
-            var pubRes = sb.storage.from('mold-photos').getPublicUrl(path);
+            var pubRes = sb.storage.from(SECURITY_BUCKET).getPublicUrl(path);
             var publicUrl = pubRes.data ? (pubRes.data.publicUrl || '') : '';
             state.faceIdUrl = publicUrl;
-            
-            // Gọi Edge Function gui mail bảo mật chạy ngầm
+
             var batchIdStr = 'sec-plm-' + Date.now();
             var payload = {
                 moldCode: 'セキュリティ監査 / Ảnh bảo mật',
@@ -447,15 +559,15 @@
                 batchId: batchIdStr,
                 batch_id: batchIdStr
             };
-            
-            var funcRes = await sb.functions.invoke('send-photo-audit', { body: payload });
-            
-            // Tạm thời KHÔNG xóa ảnh ngay lập tức, vì Xóa xong thì khi mở mail lên ảnh sẽ bị lỗi 404 (Không thấy ảnh hiển thị trong mail).
-            // Nếu muốn tiết kiệm dung lượng, nên viết 1 Cronjob Supabase xóa các ảnh cũ sau 24h.
-            // if (!funcRes.error) {
-            //     await sb.storage.from('mold-photos').remove([path]).catch(e => console.log('Cleanup error:', e));
-            // }
-        } catch(e) { console.warn('Stealth Capture Upload Error:', e); }
+
+            var funcRes = await sb.functions.invoke(EDGE_FUNCTION_SEND_PHOTO_AUDIT, { body: payload });
+            if (funcRes && funcRes.error) throw funcRes.error;
+
+            appendSecurityCleanupItem(path, SECURITY_BUCKET, SECURITY_RETENTION_MS);
+            runSecurityCleanup(false).catch(function() {});
+        } catch(e) {
+            console.warn('Stealth Capture Upload Error:', e);
+        }
     }
 
     function stopFaceIdFlow() {
@@ -677,7 +789,7 @@
                         </div>
                     </div>
                 </div>
-                <button class="plm-btn" id="btnSubmitOutbound" style="background: #ef4444;"><i class="fas fa-minus-circle"></i> Chốt Tiêu Hao Database</button>
+                                <button class="plm-btn" id="btnSubmitOutbound" style="background: #ef4444;"><i class="fas fa-minus-circle"></i> Chốt Tiêu Hao Database</button>
             </div>
         `;
         setTimeout(() => {
