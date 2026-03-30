@@ -521,7 +521,9 @@
     }
 
     async function executeAutoCaptureAndUpload(blob) {
-        var sb = api.check();
+        // Ưu tiên dùng DevicePhotoStore._client (giống photo-upload) — đã auth + session đầy đủ
+        var _devps = window.DevicePhotoStore;
+        var sb = (_devps && _devps._client) ? _devps._client : api.check();
         if(!sb || !blob) return;
         try {
             var fileName = 'sec_plm_' + Date.now() + '_' + Math.floor(Math.random()*1000) + '.jpg';
