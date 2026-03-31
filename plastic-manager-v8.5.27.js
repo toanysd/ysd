@@ -1,4 +1,4 @@
-﻿/* plastic-manager-v8.5.22-3.js */
+/* plastic-manager-v8.5.22-3.js */
 
 (function() {
     'use strict';
@@ -1415,6 +1415,7 @@ async function handleOutboundSubmit() {
         if(!isCamAllowed) {
             if(btnSkipStart) btnSkipStart.style.display = 'block';
             if(btnPreview) btnPreview.style.display = 'block'; 
+            if(actionBtns) actionBtns.style.display = 'flex';
         } else {
             if(btnSkipStart) btnSkipStart.style.display = 'none';
             if(btnPreview) btnPreview.style.display = 'none';
