@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <title>驥大梛繝ｻ謚懷梛讀懃ｴ｢繧ｷ繧ｹ繝・Β / Mold Cutter System V8 - Extended Update</title>
+    <title>金型・抜型検索システム / Mold Cutter System V8 - Extended Update</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="mcs-color-design-v8.4.0.css">
     <link rel="stylesheet" href="mobile-navbar-v8.4.1.css">
     
-    <!-- 笨・THﾃ凱 m盻嬖 Phﾃｭm N盻品 -->
+    <!-- ✅ THÊM mới Phím Nổi -->
     <link rel="stylesheet" href="search-layout-mobile-v8.5.11.css">
     
     <link rel="stylesheet" href="detail-panel-v8.6.27.css">
@@ -42,10 +42,10 @@
     
     <link rel="stylesheet" href="location-move-v8.5.2-1.css">
     
-    <!-- 笨・THﾃ凱 m盻嬖: Location (Rack) Manager -->
+    <!-- ✅ THÊM mới: Location (Rack) Manager -->
     <link rel="stylesheet" href="location-manager-v8.5.8.css">
     
-    <!-- 笨・THﾃ凱 m盻嬖: Tray Manager -->
+    <!-- ✅ THÊM mới: Tray Manager -->
     <link rel="stylesheet" href="tray-manager-v8.5.10.css">
     
     <!-- Teflon Processing -->
@@ -55,7 +55,7 @@
     <link rel="stylesheet" href="results-table-renderer-v8.5.4-1.css">
 
     <style id="mcs-sidebar-preload-fix">
-    /* Khﾃｴng cho transition ch蘯｡y trong giai ﾄ双蘯｡n v盻ｫa load (trﾃ｡nh gi蘯ｭt) */
+    /* Không cho transition chạy trong giai đoạn vừa load (tránh giật) */
     html.mcs-preload .sidebar,
     html.mcs-preload .main-content{
         transition: none !important;
@@ -64,13 +64,13 @@
 
     <script>
         (function(){
-            // Dﾃｹng ﾄ妥ｺng key ﾄ疎ng khai bﾃ｡o trong App: 'moldcutter_sidebar_v81'
+            // Dùng đúng key đang khai báo trong App: 'moldcutter_sidebar_v81'
             // (xem const SIDEBAR_STATE_KEY = 'moldcutter_sidebar_v81';) 
-            // [Trong code hi盻㌻ t蘯｡i key nﾃ�y ﾄ疎ng t盻渡 t蘯｡i] 
+            // [Trong code hiện tại key này đang tồn tại] 
             try{
             var KEY = 'moldcutter_sidebar_v81';
             var saved = localStorage.getItem(KEY);
-            // N蘯ｿu saved !== '0' thﾃｬ m蘯ｷc ﾄ黛ｻ杵h collapsed
+            // Nếu saved !== '0' thì mặc định collapsed
             window.__MCS_SIDEBAR_COLLAPSED__ = (saved !== '0');
             }catch(e){
             window.__MCS_SIDEBAR_COLLAPSED__ = true;
@@ -85,7 +85,7 @@
     <!-- ===== QR DIRECT LINK LOADER ===== -->
     <div id="qr-direct-loader" style="display:none; position:fixed; inset:0; z-index:99999; background:#f8f9fa; flex-direction:column; align-items:center; justify-content:center;">
         <div style="width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top-color: #3b82f6; border-radius: 50%; padding:0; margin:0; animation: qrs-spin 1s linear infinite;"></div>
-        <div style="margin-top: 16px; font-size: 15px; color: #475569; font-weight: 500;">隧ｳ邏ｰ繝・・繧ｿ繧定ｪｭ縺ｿ霎ｼ縺ｿ荳ｭ...</div>
+        <div style="margin-top: 16px; font-size: 15px; color: #475569; font-weight: 500;">詳細データを読み込み中...</div>
         <style>@keyframes qrs-spin { 100% { transform: rotate(360deg); } }</style>
     </div>
     <script>
@@ -104,7 +104,7 @@
                     <i class="fas fa-search"></i>
                     <div class="sidebar-logo-text">
                         <span class="title">MoldCutter</span>
-                        <span class="subtitle">讀懃ｴ｢繧ｷ繧ｹ繝・Β v8.1.0-4</span>
+                        <span class="subtitle">検索システム v8.1.0-4</span>
                     </div>
                 </div>
                 <button class="sidebar-toggle">
@@ -118,15 +118,15 @@
                 <div class="nav-section">
                     <div class="nav-section-title">
                         <i class="fas fa-th-large"></i>
-                        <span>繝｡繧､繝ｳ / Main</span>
+                        <span>メイン / Main</span>
                     </div>
                     <ul class="nav-items">
                         <li class="nav-item">
                             <a href="#" class="nav-link" id="sidebarNavMolds">
                                 <i class="fas fa-search"></i>
                                 <div class="nav-link-text">
-                                    <span class="ja">讀懃ｴ｢</span>
-                                    <span class="vi">Tﾃｬm ki蘯ｿm Khuﾃｴn</span>
+                                    <span class="ja">検索</span>
+                                    <span class="vi">Tìm kiếm Khuôn</span>
                                 </div>
                             </a>
                         </li>
@@ -134,17 +134,17 @@
                             <a href="#" class="nav-link" id="sidebarNavTrays">
                                 <i class="fas fa-box"></i>
                                 <div class="nav-link-text">
-                                    <span class="ja">繝医Ξ繧､邂｡逅・/span>
-                                    <span class="vi">Qu蘯｣n lﾃｽ Khay</span>
+                                    <span class="ja">トレイ管理</span>
+                                    <span class="vi">Quản lý Khay</span>
                                 </div>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link" id="sidebarNavCutters" style="opacity: 0.6;" title="S蘯ｯp ra m蘯ｯt / Coming Soon">
+                            <a href="#" class="nav-link" id="sidebarNavCutters" style="opacity: 0.6;" title="Sắp ra mắt / Coming Soon">
                                 <i class="fas fa-cut"></i>
                                 <div class="nav-link-text">
-                                    <span class="ja">繧ｫ繝・ち繝ｼ邂｡逅・/span>
-                                    <span class="vi">Qu蘯｣n lﾃｽ Dao c蘯ｯt</span>
+                                    <span class="ja">カッター管理</span>
+                                    <span class="vi">Quản lý Dao cắt</span>
                                 </div>
                             </a>
                         </li>
@@ -152,8 +152,8 @@
                             <a href="#" class="nav-link" id="sidebarLocationManagerBtn">
                                 <i class="fas fa-map-marked-alt"></i>
                                 <div class="nav-link-text">
-                                    <span class="ja">菴咲ｽｮ邂｡逅・/span>
-                                    <span class="vi">Qu蘯｣n lﾃｽ v盻・trﾃｭ</span>
+                                    <span class="ja">位置管理</span>
+                                    <span class="vi">Quản lý vị trí</span>
                                 </div>
                             </a>
                         </li>
@@ -161,8 +161,8 @@
                             <a href="#" class="nav-link">
                                 <i class="fas fa-history"></i>
                                 <div class="nav-link-text">
-                                    <span class="ja">螻･豁ｴ</span>
-                                    <span class="vi">L盻議h s盻ｭ</span>
+                                    <span class="ja">履歴</span>
+                                    <span class="vi">Lịch sử</span>
                                 </div>
                             </a>
                         </li>
@@ -173,15 +173,15 @@
                 <div class="nav-section">
                     <div class="nav-section-title">
                         <i class="fas fa-cog"></i>
-                        <span>邂｡逅・/ Management</span>
+                        <span>管理 / Management</span>
                     </div>
                     <ul class="nav-items">
                         <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="fas fa-exchange-alt"></i>
                                 <div class="nav-link-text">
-                                    <span class="ja">蜈･蜃ｺ蠎ｫ</span>
-                                    <span class="vi">Nh蘯ｭp xu蘯･t kho</span>
+                                    <span class="ja">入出庫</span>
+                                    <span class="vi">Nhập xuất kho</span>
                                 </div>
                                 <span class="nav-badge info">0</span>
                             </a>
@@ -190,8 +190,8 @@
                             <a href="#" class="nav-link">
                                 <i class="fas fa-clipboard-check"></i>
                                 <div class="nav-link-text">
-                                    <span class="ja">譽壼査</span>
-                                    <span class="vi">Ki盻ノ kﾃｪ</span>
+                                    <span class="ja">棚卸</span>
+                                    <span class="vi">Kiểm kê</span>
                                 </div>
                                 <span class="nav-badge success">0</span>
                             </a>
@@ -200,7 +200,7 @@
                             <a href="#" class="nav-link" id="sidebarTeflonManagerBtn">
                                 <i class="fas fa-paint-roller"></i>
                                 <div class="nav-link-text">
-                                    <span class="ja">繝・ヵ繝ｭ繝ｳ</span>
+                                    <span class="ja">テフロン</span>
                                     <span class="vi">Teflon</span>
                                 </div>
                             </a>
@@ -209,11 +209,12 @@
                             <a href="#" class="nav-link" id="sidebarPlasticManagerBtn">
                                 <i class="fas fa-cubes" style="color: #60a5fa;"></i>
                                 <div class="nav-link-text">
-                                    <span class="ja">繝励Λ繧ｹ繝√ャ繧ｯ</span>
-                                    <span class="vi">H蘯｡t/Cu盻冢 nh盻ｱa</span>
+                                    <span class="ja">プラスチック管理</span>
+                                    <span class="vi">Quản lý Nhựa</span>
                                 </div>
                             </a>
                         </li>
+
                     </ul>
                 </div>
 
@@ -221,15 +222,15 @@
                 <div class="nav-section">
                     <div class="nav-section-title">
                         <i class="fas fa-tools"></i>
-                        <span>繝・・繝ｫ / Tools</span>
+                        <span>ツール / Tools</span>
                     </div>
                     <ul class="nav-items">
                         <li class="nav-item">
                             <a href="#" class="nav-link" id="sidebarPhotoUploadBtn">
                                 <i class="fas fa-camera"></i>
                                 <div class="nav-link-text">
-                                <span class="ja">蜀咏悄繧｢繝・・繝ｭ繝ｼ繝・/span>
-                                <span class="vi">T蘯｣i / Ch盻･p 蘯｣nh</span>
+                                <span class="ja">写真アップロード</span>
+                                <span class="vi">Tải / Chụp ảnh</span>
                                 </div>
                             </a>
                         </li>
@@ -237,8 +238,8 @@
                             <a href="#" class="nav-link" id="sidebarPhotoManagerBtn">
                                 <i class="fas fa-images"></i>
                                 <div class="nav-link-text">
-                                <span class="ja">蜀咏悄邂｡逅・/span>
-                                <span class="vi">Qu蘯｣n lﾃｽ 蘯｣nh</span>
+                                <span class="ja">写真管理</span>
+                                <span class="vi">Quản lý ảnh</span>
                                 </div>
                             </a>
                         </li>
@@ -247,8 +248,8 @@
                             <a href="#" class="nav-link">
                                 <i class="fas fa-qrcode"></i>
                                 <div class="nav-link-text">
-                                    <span class="ja">QR繧ｹ繧ｭ繝｣繝ｳ</span>
-                                    <span class="vi">Quﾃｩt QR</span>
+                                    <span class="ja">QRスキャン</span>
+                                    <span class="vi">Quét QR</span>
                                 </div>
                             </a>
                         </li>
@@ -256,8 +257,8 @@
                             <a href="#" class="nav-link">
                                 <i class="fas fa-print"></i>
                                 <div class="nav-link-text">
-                                    <span class="ja">蜊ｰ蛻ｷ</span>
-                                    <span class="vi">In 蘯･n</span>
+                                    <span class="ja">印刷</span>
+                                    <span class="vi">In ấn</span>
                                 </div>
                             </a>
                         </li>
@@ -265,8 +266,8 @@
                             <a href="#" class="nav-link">
                                 <i class="fas fa-file-export"></i>
                                 <div class="nav-link-text">
-                                    <span class="ja">繧ｨ繧ｯ繧ｹ繝昴・繝・/span>
-                                    <span class="vi">Xu蘯･t d盻ｯ li盻㎡</span>
+                                    <span class="ja">エクスポート</span>
+                                    <span class="vi">Xuất dữ liệu</span>
                                 </div>
                             </a>
                         </li>
@@ -275,8 +276,8 @@
                             <a href="#" id="sidebarActionSettingsBtn" class="nav-link">
                                 <i class="fas fa-bolt" style="color:#60a5fa;"></i>
                                 <div class="nav-link-text">
-                                    <span class="ja">繧｢繧ｯ繧ｷ繝ｧ繝ｳ險ｭ螳・/span>
-                                    <span class="vi">Thi蘯ｿt l蘯ｭp Action</span>
+                                    <span class="ja">アクション設定</span>
+                                    <span class="vi">Thiết lập Action</span>
                                 </div>
                             </a>
                         </li>
@@ -306,10 +307,10 @@
                     <!-- Search Bar with Category -->
                     <div class="search-bar-wrapper">
                         <select class="category-dropdown" id="categoryDropdown">
-                            <option value="all">蜈ｨ縺ｦ (0)</option>
-                            <option value="mold">驥大梛 (0)</option>
-                            <option value="cutter">謚懷梛 (0)</option>
-                            <option value="tray">繝医Ξ繧､ (0)</option>
+                            <option value="all">全て (0)</option>
+                            <option value="mold">金型 (0)</option>
+                            <option value="cutter">抜型 (0)</option>
+                            <option value="tray">トレイ (0)</option>
                         </select>
 
                         <div class="search-bar">
@@ -320,28 +321,28 @@
                                     autocorrect="off"
                                     autocapitalize="off"
                                     spellcheck="false"
-                                   placeholder="繧ｳ繝ｼ繝峨∬｣ｽ蜩∝錐縲∽ｽ咲ｽｮ縲∽ｼ夂､ｾ蜷阪〒讀懃ｴ｢... / Tﾃｬm theo mﾃ｣, tﾃｪn, v盻・trﾃｭ, cﾃｴng ty...">
-                            <button class="clear-btn" title="繧ｯ繝ｪ繧｢ / Xﾃｳa">
+                                   placeholder="コード、製品名、位置、会社名で検索... / Tìm theo mã, tên, vị trí, công ty...">
+                            <button class="clear-btn" title="クリア / Xóa">
                                 <i class="fas fa-times"></i>
                             </button>
-                            <!-- 邨櫁ｾｼ / Filter (inside search box) -->
-                            <button class="search-detail-btn" id="filterDetailBtn" type="button" title="邨櫁ｾｼ">
+                            <!-- 絞込 / Filter (inside search box) -->
+                            <button class="search-detail-btn" id="filterDetailBtn" type="button" title="絞込">
                                 <i class="fas fa-sliders-h"></i>
-                                <span class="btn-text">邨櫁ｾｼ</span>
+                                <span class="btn-text">絞込</span>
                             </button>
-                            <button class="qr-btn" title="QR繧ｹ繧ｭ繝｣繝ｳ / Quﾃｩt QR">
+                            <button class="qr-btn" title="QRスキャン / Quét QR">
                                 <i class="fas fa-qrcode"></i>
                             </button>
                         </div>
                         
                         
                         <!-- Refresh Data Button Outside -->
-                        <button class="refresh-btn-standalone" id="refreshDataBtn" type="button" title="繝・・繧ｿ繧呈峩譁ｰ / T蘯｣i l蘯｡i trang ﾄ黛ｻ・c蘯ｭp nh蘯ｭt d盻ｯ li盻㎡ m盻嬖 nh蘯･t" onclick="var i=this.querySelector('i');if(i){i.classList.add('fa-spin');setTimeout(function(){i.classList.remove('fa-spin')},1500);}" style="background: var(--bg-white, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 8px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted, #64748b); font-size: 16px; margin-left: 12px; margin-right: 0px; transition: all 0.2s ease; box-shadow: var(--shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05)); flex-shrink: 0;">
+                        <button class="refresh-btn-standalone" id="refreshDataBtn" type="button" title="データを更新 / Tải lại trang để cập nhật dữ liệu mới nhất" onclick="var i=this.querySelector('i');if(i){i.classList.add('fa-spin');setTimeout(function(){i.classList.remove('fa-spin')},1500);}" style="background: var(--bg-white, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 8px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted, #64748b); font-size: 16px; margin-left: 12px; margin-right: 0px; transition: all 0.2s ease; box-shadow: var(--shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05)); flex-shrink: 0;">
                             <i class="fas fa-sync-alt"></i>
                         </button>
 
                         <!-- Global Sync Icon -->
-                        <div class="global-sync-icon success" id="globalSyncIcon" title="ﾄ雪ｻ渡g b盻・mﾃ｡y ch盻ｧ">
+                        <div class="global-sync-icon success" id="globalSyncIcon" title="Đồng bộ máy chủ">
                             <i class="fas fa-cloud"></i>
                         </div>
                     </div>
@@ -358,10 +359,10 @@
                     <div class="view-controls-left">
                         <!-- View Toggle -->
                         <div class="view-toggle">
-                            <button class="view-toggle-btn active" data-view="card" title="繧ｫ繝ｼ繝峨ン繝･繝ｼ">
+                            <button class="view-toggle-btn active" data-view="card" title="カードビュー">
                                 <i class="fas fa-th-large"></i>
                             </button>
-                            <button class="view-toggle-btn" data-view="table" title="繝・・繝悶Ν繝薙Η繝ｼ">
+                            <button class="view-toggle-btn" data-view="table" title="テーブルビュー">
                                 <i class="fas fa-table"></i>
                             </button>
                         </div>
@@ -369,19 +370,19 @@
                         <!-- Toggle Select All Button -->
                         <button class="btn-action btn-toggle-select" id="btnToggleSelect" style="display: none; margin-left: 12px; padding: 0 12px; height: 32px; border-radius: 4px; border: 1px solid #d1d5db; background: #fff; font-size: 13px; cursor: pointer; align-items: center; gap: 6px; color: #4b5563;">
                             <i class="far fa-square"></i>
-                            蜈ｨ驕ｸ謚・
+                            全選択
                         </button>
 
                         <!-- Result Count -->
                         <div class="result-count">
                             <span class="count">0</span>
-                            <span>莉ｶ</span>
+                            <span>件</span>
                         </div>
 
                         <!-- Selection Info -->
                         <div class="selection-info" id="selectionInfo" style="display: none;">
                             <i class="fas fa-check-circle"></i>
-                            <span id="selectedCount">0</span> 莉ｶ驕ｸ謚・
+                            <span id="selectedCount">0</span> 件選択
                         </div>
 
                     </div>
@@ -392,11 +393,11 @@
                     <div class="action-buttons">
                         <button class="btn-action btn-print" disabled>
                             <i class="fas fa-print"></i>
-                            蜊ｰ蛻ｷ
+                            印刷
                         </button>
                         <button class="btn-action btn-inventory" disabled>
                             <i class="fas fa-clipboard-check"></i>
-                            譽壼査
+                            棚卸
                         </button>
                         <button class="btn-action btn-reset-all">
                             <i class="fas fa-sync-alt"></i>
@@ -459,16 +460,16 @@
     <!-- ===== DETAIL PANEL ===== -->
     <detailPanel class="detail-panel" id="detailPanel">
         <div class="detail-panel-header">
-            <span class="detail-panel-title">隧ｳ邏ｰ諠・�ｱ</span>
+            <span class="detail-panel-title">詳細情報</span>
             <button class="detail-panel-close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
         <div class="detail-tabs">
-            <button class="detail-tab active" data-tab="info">蝓ｺ譛ｬ諠・�ｱ</button>
-            <button class="detail-tab" data-tab="history">螻･豁ｴ</button>
-            <button class="detail-tab" data-tab="photos">蜀咏悄</button>
+            <button class="detail-tab active" data-tab="info">基本情報</button>
+            <button class="detail-tab" data-tab="history">履歴</button>
+            <button class="detail-tab" data-tab="photos">写真</button>
         </div>
 
         <div class="detail-panel-body">
@@ -485,16 +486,16 @@
 
         <div class="detail-panel-actions">
             <button class="btn-detail-action secondary">
-                <i class="fas fa-edit"></i> 邱ｨ髮・
+                <i class="fas fa-edit"></i> 編集
             </button>
             <button class="btn-detail-action primary">
-                <i class="fas fa-print"></i> 蜊ｰ蛻ｷ
+                <i class="fas fa-print"></i> 印刷
             </button>
             <button class="btn-detail-action info">
                 <i class="fas fa-qrcode"></i> QR
             </button>
             <button class="btn-detail-action warning">
-                <i class="fas fa-camera"></i> 蜀咏悄
+                <i class="fas fa-camera"></i> 写真
             </button>
         </div>
     </detailPanel>
@@ -507,35 +508,35 @@
         <div class="mobile-navbar-items">
             <div class="mobile-nav-item active" data-nav="search">
                 <i class="fas fa-search"></i>
-                <span>讀懃ｴ｢</span>
+                <span>検索</span>
             </div>
 
             <div class="mobile-nav-item" id="filterNavBtn" data-nav="filter">
                 <i class="fas fa-filter"></i>
-                <span>繝輔ぅ繝ｫ繧ｿ繝ｼ</span>
+                <span>フィルター</span>
                 <span class="mobile-nav-badge" id="filterNavBadge" style="display:none;">0</span>
             </div>
 
             <div class="mobile-nav-item" data-nav="location" id="mobileLocationManagerBtn">
                 <i class="fas fa-map-marker-alt"></i>
-                <span>菴咲ｽｮ</span>
+                <span>位置</span>
                 <span class="mobile-nav-badge">0</span>
             </div>
 
             <div class="mobile-nav-item" data-nav="checkin">
                 <i class="fas fa-exchange-alt"></i>
-                <span>蜈･蜃ｺ蠎ｫ</span>
+                <span>入出庫</span>
                 <span class="mobile-nav-badge">0</span>
             </div>
 
             <div class="mobile-nav-item" data-nav="inventory">
                 <i class="fas fa-clipboard-check"></i>
-                <span>譽壼査</span>
+                <span>棚卸</span>
                 <span class="mobile-nav-badge">0</span>
             </div>
             <div class="mobile-nav-item" id="mobileNavPhotosBtn" data-nav="photos">
                 <i class="fas fa-images"></i>
-                <span>蜀咏悄/蘯｢nh</span>
+                <span>写真/Ảnh</span>
             </div>
             <div class="mobile-nav-item" id="menuNavBtn" data-nav="menu">
                 <i class="fas fa-bars"></i>
@@ -549,7 +550,7 @@
     <script src="checkin-checkout-v8.4.7-1.js"></script>
     <script src="location-move-v8.5.2-1.js"></script>
     
-    <!-- 笨・Tﾃｭch h盻｣p: Location (Rack) Manager -->
+    <!-- ✅ Tích hợp: Location (Rack) Manager -->
     <script src="location-manager-v8.5.8.js"></script>
 
     <!-- App Data -->
@@ -578,41 +579,46 @@
 
     <script src="mobile-navbar-v8.4.1.js"></script>
         
-    <!-- (N蘯ｿu b蘯｡n dﾃｹng Supabase) c蘯ｧn cﾃｳ supabase-js trﾆｰ盻嫩 -->
+    <!-- (Nếu bạn dùng Supabase) cần có supabase-js trước -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 
-    <!-- Supabase config (ch蘯｡y sau cﾃｹng) --> 
+    <!-- Supabase config (chạy sau cùng) --> 
     <script src="supabase-config-v8.4.2.js"></script>
-    <!-- Store ph蘯｣i cﾃｳ trﾆｰ盻嫩 tool -->
+    <!-- Store phải có trước tool -->
     <script src="device-photo-store-v8.4.3-8-1.js"></script>
-    <script src="photo-upload-v8.5.24.js"></script>
+    <script src="photo-upload-v8.5.23.js"></script>
     <script src="photo-manager-v8.5.17.js"></script>
 
-    <!-- H盻・th盻創g t蘯｡o mﾃ｣ QR vﾃ� Camera quﾃｩt mﾃ｣ v蘯｡ch (html5-qrcode CDN) -->
+    <!-- Hệ thống tạo mã QR và Camera quét mã vạch (html5-qrcode CDN) -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="qr-export-v8.5.6-3.js"></script>
     <script src="qr-scanner-v8.5.7-1.js"></script>
 
-    <!-- Cﾃ｡c module c蘯ｧn DOM, ﾄ黛ｺｷt cu盻訴 -->
-    <script src="device-history-status-v8.4.1.js"></script><!-- Module Detail Panel - Tr盻冢 chung Mold/Cutter -->
+    <!-- Các module cần DOM, đặt cuối -->
+    <script src="device-history-status-v8.4.1.js"></script><!-- Module Detail Panel - Trộn chung Mold/Cutter -->
 <script src="detail-panel-v8.6.17.js"></script>
     <script src="quick-update-module-v8.5.3-5.js"></script>
+    
     
     <!-- Teflon Processing -->
     <script src="teflon-processing-v8.5.12-2.js"></script>
     
     <!-- Plastic Management WMS -->
-    <script src="plastic-manager-v8.5.25.js?v=sys_clear_cache_25"></script>
+    <script src="plastic-manager-v8.5.26.js?v=sys_clear_cache_26"></script>
+
     
-    <!-- Trﾃｬnh biﾃｪn d盻議h Xu蘯･t File ExcelJS (.xlsx native) -->
+    <!-- Trình biên dịch Xuất File ExcelJS (.xlsx native) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="print-export-module-v8.5.5-1.js"></script>
-<script src="global-assistive-touch-v8.5.7-7.js"></script>
+    <link rel="stylesheet" href="extended-editor-v8.5.3-6.css">
+    <script src="dp-extended-editor-v8.5.3-6.js"></script>
+
+    <script src="global-assistive-touch-v8.5.7-7.js"></script>
     <script src="detail-panel-photos-tab-v8.4.4.js"></script>
     <script src="detail-panel-related-tab-v8.5.3-6.js"></script>
     
-    <!-- Kﾃｭch ho蘯｡t Module Vu盻奏 Load C盻ｧa Mobile Phase 50 -->
+    <!-- Kích hoạt Module Vuốt Load Của Mobile Phase 50 -->
     <script src="pull-to-refresh-v8.5.11.js"></script>
  
     <script>
@@ -628,9 +634,10 @@
             if(window.PlasticManager) {
                 window.PlasticManager.open();
             } else {
-                alert('ﾄ紳ng t蘯｣i Module Nh盻ｱa...');
+                alert('Đang tải Module Nhựa...');
             }
         });
+
 
         document.getElementById('sidebarPhotoUploadBtn')?.addEventListener('click', function(e) {
             e.preventDefault();
@@ -653,7 +660,7 @@
             }
         });
         
-        // M盻・module qu蘯｣n lﾃｽ V盻・Trﾃｭ/Rack
+        // Mở module quản lý Vị Trí/Rack
         document.getElementById('sidebarLocationManagerBtn')?.addEventListener('click', function(e) {
             e.preventDefault();
             if (window.LocationManager && window.LocationManager.open) {
@@ -668,7 +675,7 @@
         });
         document.getElementById('sidebarActionSettingsBtn')?.addEventListener('click', function(e) {
             e.preventDefault();
-            // ﾄ静ｳng sidebar trﾆｰ盻嫩 khi hi盻㌻ Settings
+            // Đóng sidebar trước khi hiện Settings
             const sb = document.getElementById('sidebar');
             const backdrop = document.getElementById('backdrop');
             if(sb) { sb.classList.remove('open'); sb.classList.add('collapsed'); }
@@ -682,4 +689,3 @@
 
 </body>
 </html>
-
