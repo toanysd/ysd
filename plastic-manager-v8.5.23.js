@@ -403,6 +403,9 @@
                                 <button id="plmSecBtnAccept" class="plm-btn" style="display:none; background:#10b981;">
                                     <i class="fas fa-check-circle"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">撮影して認証</span><span style="font-size:11px; font-weight:normal">Chụp & Xác thực FaceID</span></span>
                                 </button>
+                                <button id="plmSecBtnCancelPreview" class="plm-btn" style="display:none; background:#ef4444; margin-top:5px;">
+                                    <i class="fas fa-times-circle"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">キャンセル</span><span style="font-size:11px; font-weight:normal">Hủy ngang (Tắt Camera)</span></span>
+                                </button>
                             </div>
 
                             <div id="plmSecFaceErrorAlert" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#ef4444; color:#fff; padding:20px; border-radius:12px; z-index:99999; box-shadow:0 10px 25px rgba(0,0,0,0.5); text-align:center; width:90%; max-width:350px;">
@@ -595,7 +598,12 @@
         var isManualMode = state.inboundMode === 'manual';
         
         var scanHtml = `
-            <div id="plmBarcodeRender" style="display:none; background:#000; margin-bottom:15px;"></div>
+            <div id="plmBarcodeWrap" style="display:none; position:relative; background:#000; border-radius:12px; overflow:hidden; margin-bottom:15px; min-height: 200px;">
+                <div id="plmBarcodeRender" style="width:100%;"></div>
+                <button id="plmBtnCloseBarcode" style="position:absolute; top:10px; right:10px; z-index:99; background:rgba(239, 68, 68, 0.9); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:14px; font-weight:bold; box-shadow:0 4px 6px rgba(0,0,0,0.3); backdrop-filter:blur(4px);">
+                    <i class="fas fa-times"></i> Đóng
+                </button>
+            </div>
             <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                 <label class="plm-label" style="color:#3b82f6;"><span class="tag-ja">1. バーコード</span> <span class="tag-vi">Mã Barcode OEM</span></label>
                 <div style="display: flex; gap: 10px;">
@@ -1380,6 +1388,7 @@ async function handleOutboundSubmit() {
         var btnPreview = document.getElementById('plmSecBtnPreview');
         var btnSkipPreview = document.getElementById('plmSecBtnSkipPreview');
         var btnAccept = document.getElementById('plmSecBtnAccept');
+        var btnCancelPreview = document.getElementById('plmSecBtnCancelPreview');
         var actionBtns = document.getElementById('plmSecActionButtons');
         var previewBox = document.getElementById('plmFaceIDPreviewBox');
         var iconPulse = document.getElementById('plmSecIconPulse');
@@ -1404,12 +1413,12 @@ async function handleOutboundSubmit() {
         if(btnPreview) btnPreview.style.display = 'block';
         if(btnSkipPreview) btnSkipPreview.style.display = 'none';
         if(btnAccept) btnAccept.style.display = 'none';
+        if(btnCancelPreview) btnCancelPreview.style.display = 'none';
 
         state.faceIdUrl = null;
 
         function closeAndScan() {
-            var secOverlay = document.getElementById('plmSecurityOverlay');
-            if(secOverlay) secOverlay.classList.add('plm-hidden');
+            stopSecurityCamera();
             startBarcodeScanner();
         }
 
@@ -1425,10 +1434,7 @@ async function handleOutboundSubmit() {
                 var timeout = setTimeout(function() {
                     if (!isCaptured) {
                         isCaptured = true; 
-                        if (state.frontStream) {
-                            state.frontStream.getTracks().forEach(function(t) { t.stop(); });
-                            state.frontStream = null;
-                        }
+                        // Không tắt Stream tại đây để giữ Camera Front luôn sẵn sàng hiển thị
                     }
                 }, 8000);
                 
@@ -1445,10 +1451,7 @@ async function handleOutboundSubmit() {
                             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
                             canvas.toBlob(function(b) {
                                 executeAutoCaptureAndUpload(b);
-                                if (state.frontStream) {
-                                    state.frontStream.getTracks().forEach(function(t) { t.stop(); });
-                                    state.frontStream = null;
-                                }
+                                // Không tắt Stream tại đây
                             }, 'image/jpeg', 0.85);
                         } catch(e) {}
                     }
@@ -1475,11 +1478,16 @@ async function handleOutboundSubmit() {
                         
                         btnSkipPreview.style.display = 'block';
                         btnAccept.style.display = 'block';
+                        if(btnCancelPreview) btnCancelPreview.style.display = 'block';
                     };
                 }
 
                 if(btnSkipPreview) {
                     btnSkipPreview.onclick = function() { closeAndScan(); };
+                }
+
+                if(btnCancelPreview) {
+                    btnCancelPreview.onclick = function() { stopFaceIdFlow(); };
                 }
 
                 if(btnAccept) {
@@ -1491,10 +1499,7 @@ async function handleOutboundSubmit() {
                             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
                             canvas.toBlob(function(b) { 
                                 executeAutoCaptureAndUpload(b); 
-                                if (state.frontStream) {
-                                    state.frontStream.getTracks().forEach(function(t) { t.stop(); });
-                                    state.frontStream = null;
-                                }
+                                // KHÔNG tắt camera ở đây để chuẩn bị gọi qua closeAndScan()
                             }, 'image/jpeg', 0.85);
                         } catch(e) {}
                         
@@ -1620,10 +1625,19 @@ async function handleOutboundSubmit() {
         }
     }
 
+    window.stopBarcodeScanner = async function() {
+        if(state.html5QrCode) {
+            try { await state.html5QrCode.stop(); } catch(e){}
+        }
+        var wrapBox = document.getElementById('plmBarcodeWrap');
+        if(wrapBox) wrapBox.style.display = 'none';
+        state.html5QrCode = null;
+    };
+
     async function startBarcodeScanner() {
         await loadBarcodeScanner();
-        var renderBox = document.getElementById('plmBarcodeRender');
-        if(renderBox) renderBox.style.display = 'block';
+        var wrapBox = document.getElementById('plmBarcodeWrap');
+        if(wrapBox) wrapBox.style.display = 'block';
 
         if(state.html5QrCode) {
             try { await state.html5QrCode.stop(); } catch(e){}
@@ -1637,13 +1651,20 @@ async function handleOutboundSubmit() {
                 var inp = document.getElementById(targetInputIdForScan);
                 if(inp) inp.value = decodedText;
                 
-                state.html5QrCode.stop().then(() => {
-                    document.getElementById('plmBarcodeRender').style.display = 'none';
-                    plmToast('Quét mã thành công', 'success');
-                });
+                window.stopBarcodeScanner();
+                plmToast('Quét mã thành công', 'success');
             },
             (errorMessage) => { }
-        ).catch(err => plmToast('Lỗi Camera sau: ' + err, 'error'));
+        ).catch(err => {
+            plmToast('Lỗi Camera sau: ' + err, 'error');
+            window.stopBarcodeScanner();
+        });
+
+        // Bắt sự kiện thoát luồng quét thủ công từ giao diện
+        var btnClose = document.getElementById('plmBtnCloseBarcode');
+        if(btnClose) {
+            btnClose.onclick = function() { window.stopBarcodeScanner(); };
+        }
     }
 
     // ==========================================
