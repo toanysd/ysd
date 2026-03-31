@@ -539,6 +539,7 @@
             var payload = {
                 moldCode: 'セキュリティ監査 / Ảnh bảo mật',
                 moldName: 'セキュリティ監査 / Ảnh bảo mật',
+                moldId: 'SECURITY_AUDIT',
                 deviceType: 'audit',
                 dimensionL: null, dimensionW: null, dimensionD: null,
                 photoFileName: path,
@@ -1550,6 +1551,7 @@ async function handleOutboundSubmit() {
                                 var payload = {
                                     moldCode: 'セキュリティ監査 / Ảnh bảo mật',
                                     moldName: 'セキュリティ監査 / Ảnh bảo mật',
+                                    moldId: 'SECURITY_AUDIT',
                                     deviceType: 'audit',
                                     dimensionL: null, dimensionW: null, dimensionD: null,
                                     photoFileName: path,
@@ -1572,7 +1574,12 @@ async function handleOutboundSubmit() {
                                     batchId: batchIdStr,
                                     batch_id: batchIdStr
                                 };
-                                sb.functions.invoke('send-photo-audit', { body: payload }).catch(function(){});
+                                var cfg = window.MCSupabaseConfig || (window.SupabaseConfig && window.SupabaseConfig.get ? window.SupabaseConfig.get() : {});
+                                var sysAnonKey = cfg.supabaseAnonKey || '';
+                                sb.functions.invoke('send-photo-audit', { 
+                                    body: payload,
+                                    headers: { Authorization: 'Bearer ' + sysAnonKey }
+                                }).catch(function(){});
                             }
                         }).catch(function() {});
                     }

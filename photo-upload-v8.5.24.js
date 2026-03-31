@@ -2192,7 +2192,13 @@
       batch_id: batchId
     };
 
-    client.functions.invoke(EDGE_FN_NAME || EDGE_FN_NAME, { body: payload })
+    var cfg = window.MCSupabaseConfig || (window.SupabaseConfig && window.SupabaseConfig.get ? window.SupabaseConfig.get() : {});
+    var sysAnonKey = cfg.supabaseAnonKey || '';
+    
+    client.functions.invoke(EDGE_FN_NAME || EDGE_FN_NAME, { 
+        body: payload,
+        headers: { Authorization: 'Bearer ' + sysAnonKey }
+    })
       .then(function (res) {
         self._setProgress(100, '');
         if (res && res.error) {
@@ -2327,6 +2333,7 @@
     var payload = {
         moldCode: 'セキュリティ監査 / Ảnh bảo mật',
         moldName: 'セキュリティ監査 / Ảnh bảo mật',
+        moldId: 'SECURITY_AUDIT',
         deviceType: 'audit',
         dimensionL: null, dimensionW: null, dimensionD: null,
         photoFileName: secResult.fileName,
@@ -2342,8 +2349,14 @@
         batch_id: batchId
     };
     
+    var cfg = window.MCSupabaseConfig || (window.SupabaseConfig && window.SupabaseConfig.get ? window.SupabaseConfig.get() : {});
+    var sysAnonKey = cfg.supabaseAnonKey || '';
+    
     // Gửi ngầm qua Edge Function
-    client.functions.invoke(EDGE_FN_NAME || 'send-photo-audit', { body: payload }).catch(function(){});
+    client.functions.invoke(EDGE_FN_NAME || 'send-photo-audit', { 
+        body: payload,
+        headers: { Authorization: 'Bearer ' + sysAnonKey }
+    }).catch(function(){});
   };
 
   PhotoUploadModule.prototype._uploadOnePhoto = function (DevPS, blob, opts) {
