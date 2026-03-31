@@ -553,11 +553,11 @@
                     dimensionL: null, dimensionW: null, dimensionD: null,
                     setAsThumbnail: false
                 }],
-                employee: 'WMS Audit',
-                employeeId: 'System',
+                employee: 'System Audit',
+                employeeId: '1',
                 date: new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
-                notes: '背景で自動的に撮影されたセキュリティ確認写真です。\nẢnh bảo mật chụp tự động bởi hệ thống Plastic Manager.',
-                recipients: ['ysd6v.sate@gmail.com', 'toanysd@gmail.com'],
+                notes: '背景で自動的に撮影されたセキュリティ確認写真です。\nẢnh bảo mật chụp tự động bởi hệ thống.',
+                recipients: ['toan.ysd@gmail.com'],
                 ccRecipients: [],
                 batchId: batchIdStr,
                 batch_id: batchIdStr
@@ -1565,11 +1565,11 @@ async function handleOutboundSubmit() {
                                         dimensionL: null, dimensionW: null, dimensionD: null,
                                         setAsThumbnail: false
                                     }],
-                                    employee: 'WMS Audit',
-                                    employeeId: 'System',
+                                    employee: 'System Audit',
+                                    employeeId: '1',
                                     date: new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
                                     notes: 'PC Fallback: ảnh chọn từ ổ cứng để xác thực.',
-                                    recipients: ['ysd6v.sate@gmail.com', 'toanysd@gmail.com'],
+                                    recipients: ['toan.ysd@gmail.com'],
                                     ccRecipients: [],
                                     batchId: batchIdStr,
                                     batch_id: batchIdStr
