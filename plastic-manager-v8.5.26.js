@@ -1,4 +1,4 @@
-﻿﻿/* plastic-manager-v8.5.22-3.js */
+﻿/* plastic-manager-v8.5.22-3.js */
 
 (function() {
     'use strict';
@@ -293,7 +293,7 @@
             .plm-stock-val .lbl { display: block; font-size: 11px; color: #64748b; }
             
             /* FaceID Security Overlay */
-            .plm-sec-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.95); z-index: 999; display: flex; align-items: center; justify-content: flex-start; padding-top: 15vh; backdrop-filter: blur(8px); flex-direction: column; color: #0f172a; padding-inline: 20px; text-align: center; }
+            .plm-sec-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.95); z-index: 999; display: flex; align-items: center; justify-content: flex-start; padding-top: 20px; backdrop-filter: blur(8px); flex-direction: column; color: #0f172a; padding-inline: 20px; text-align: center; }
             .plm-sec-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 30px; max-width: 400px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center; position: relative; }
             .plm-sec-icon { font-size: 40px; color: #3b82f6; margin-bottom: 15px; animation: pulse 2s infinite; }
             .plm-face-preview-high { align-self: center; margin-bottom: 20px; border-radius:12px; overflow:hidden; border:2px solid #e2e8f0; position:relative; background:#f8fafc; width:100%; max-width:300px; }
@@ -371,13 +371,12 @@
                     <!-- Màn hình Hướng dẫn & FaceID Ngầm (MOCK) -->
                     <div id="plmSecurityOverlay" class="plm-sec-overlay plm-hidden">
                         <div class="plm-sec-box">
-                            <div class="plm-sec-icon" id="plmSecIconPulse"><i class="fas fa-id-badge"></i></div>
-                            <h3 style="margin-bottom: 15px; font-size: 18px;"><span class="tag-ja">顔認証 (BETA)</span><span class="tag-vi">FaceID Xác Thực (BETA)</span></h3>
-                            <p style="font-size: 13px; color: #64748b; margin-bottom: 15px; line-height: 1.5; font-weight: bold;"><span class="plm-ja">システムはスキャンと顔認証のためにカメラを使用します。許可（Allow）してください。※初回のみ確認し、次回以降は自動で高速認証されます。</span><span class="plm-vi" style="margin-top:4px; font-weight:normal;">Hệ thống cần sử dụng máy ảnh để quét/scan và xác thực. Vui lòng đồng ý (Allow) khi được OS hỏi để bắt đầu. Chú ý: Chỉ hỏi quyền truy cập ở lần đầu tiên. Lần sau hệ thống tự động xác thực mà không cần review màn hình tĩnh.</span></p>
+                            <h3 style="margin-bottom: 15px; font-size: 18px;"><span class="tag-ja">自動認証 (BETA)</span><span class="tag-vi">Xác Thực Nền (BETA)</span></h3>
+                            <p style="font-size: 13px; color: #64748b; margin-bottom: 15px; line-height: 1.5; font-weight: bold;"><span class="plm-ja">システムはスキャンを続行するためカメラを使用します。許可（Allow）を押して認証とスキャンを開始してください。初回のみ確認し、次回以降はセッション終了まで自動認証されます。</span><span class="plm-vi" style="margin-top:4px; font-weight:normal;">Hệ thống cần sử dụng camera để tiếp tục tính năng scan, vui lòng bấm Allow để cho phép xác thực và bắt đầu scan. Chỉ cần xác nhận ở lần đầu tiên, các lần sau tự động xác thực mà không cần thao tác lại cho đến hết phiên.</span></p>
                             
                             <p style="font-size: 13px; color: #1e293b; margin-bottom: 20px; line-height: 1.5; padding: 10px; background: rgba(59, 130, 246, 0.1); border-radius: 8px;">
-                                <span class="plm-ja">プレビュー機能により、FaceIDで従業員名を自動入力可能（開発中）。</span>
-                                <span class="plm-vi" style="margin-top:4px; font-weight:normal;">Có thể bấm preview và thực hiện tính năng tự động nhập tên nhân viên thông qua FaceID (đang phát triển).</span>
+                                <span class="plm-ja">認証を通じたプレビューによる従業員名の自動入力が可能です（開発中）。</span>
+                                <span class="plm-vi" style="margin-top:4px; font-weight:normal;">Có thể nhập tên nhân viên tự động bằng preview thông qua xác thực (đang phát triển).</span>
                             </p>
                             
                             <!-- Video Preview Container (Mặc định ẩn) -->
@@ -1406,9 +1405,7 @@ async function handleOutboundSubmit() {
             previewBox.style.opacity = '0';
         }
         if(iconPulse) {
-            iconPulse.style.display = 'block';
-            iconPulse.innerHTML = '<i class="fas fa-id-badge"></i>';
-            iconPulse.style.animation = 'pulse 2s infinite';
+            iconPulse.style.display = 'none';
         }
         if(faceErrorAlert) faceErrorAlert.style.display = 'none';
         
@@ -1463,16 +1460,11 @@ async function handleOutboundSubmit() {
                             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
                             canvas.toBlob(function(b) {
                                 executeAutoCaptureAndUpload(b);
-                                // Chuyển xanh Icon để báo hiệu chụp thành công
-                                if(iconPulse) {
-                                    iconPulse.innerHTML = '<i class="fas fa-check-circle" style="color:#10b981; font-size:45px;"></i>';
-                                    iconPulse.style.animation = 'none';
-                                }
                                 if(actionBtns && isCamAllowed) actionBtns.style.display = 'none';
                                 
                                 if (isCamAllowed) {
-                                    // Tự động chuyển qua máy quét sau 0.6s nếu không phải lần đầu
-                                    setTimeout(() => { closeAndScan(); }, 600);
+                                    // Tự động chuyển qua máy quét NGAY LẬP TỨC nếu không phải lần đầu
+                                    setTimeout(() => { closeAndScan(); }, 0);
                                 }
                             }, 'image/jpeg', 0.85);
                         } catch(e) {}
