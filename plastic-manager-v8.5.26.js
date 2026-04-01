@@ -279,7 +279,7 @@
             .plm-btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; color: #fff; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
             
             /* Camera Stealth Modal & Overlay Top-Aligned */
-            #plmSecurityOverlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); z-index: 2147483600; display: flex; align-items: flex-start; justify-content: center; padding: 15px; backdrop-filter: blur(4px); flex-direction: column; color: #0f172a; text-align: center; }
+            #plmSecurityOverlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); z-index: 2147483600; display: flex; align-items: center; justify-content: flex-start; padding: 50px 15px 15px 15px; backdrop-filter: blur(4px); flex-direction: column; color: #0f172a; text-align: center; }
             #plmSecurityOverlay.plm-hidden { display: none !important; }
             
             /* Bảng Tồn Kho */
