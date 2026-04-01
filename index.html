@@ -187,6 +187,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="#" class="nav-link" id="sidebarPlasticManagerBtn">
+                                <i class="fas fa-box-open"></i>
+                                <div class="nav-link-text">
+                                    <span class="ja">プラ材料 (WMS)</span>
+                                    <span class="vi">Quản lý Nhựa</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="fas fa-clipboard-check"></i>
                                 <div class="nav-link-text">
@@ -205,16 +214,6 @@
                                 </div>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" id="sidebarPlasticManagerBtn">
-                                <i class="fas fa-cubes" style="color: #60a5fa;"></i>
-                                <div class="nav-link-text">
-                                    <span class="ja">プラスチック管理</span>
-                                    <span class="vi">Quản lý Nhựa</span>
-                                </div>
-                            </a>
-                        </li>
-
                     </ul>
                 </div>
 
@@ -587,7 +586,7 @@
     <script src="supabase-config-v8.4.2.js"></script>
     <!-- Store phải có trước tool -->
     <script src="device-photo-store-v8.4.3-8-1.js"></script>
-    <script src="photo-upload-v8.5.27.js"></script>
+    <script src="photo-upload-v8.5.23.js"></script>
     <script src="photo-manager-v8.5.17.js"></script>
 
     <!-- Hệ thống tạo mã QR và Camera quét mã vạch (html5-qrcode CDN) -->
@@ -597,16 +596,14 @@
 
     <!-- Các module cần DOM, đặt cuối -->
     <script src="device-history-status-v8.4.1.js"></script><!-- Module Detail Panel - Trộn chung Mold/Cutter -->
-<script src="detail-panel-v8.6.17.js"></script>
+<script src="detail-panel-v8.6.16.js"></script>
     <script src="quick-update-module-v8.5.3-5.js"></script>
-    
     
     <!-- Teflon Processing -->
     <script src="teflon-processing-v8.5.12-2.js"></script>
     
     <!-- Plastic Management WMS -->
-    <script src="plastic-manager-v8.5.29.js?v=sys_clear_cache_29"></script>
-
+    <script src="plastic-manager-v8.5.26.js?v=sys_clear_cache_26"></script>
     
     <!-- Trình biên dịch Xuất File ExcelJS (.xlsx native) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
@@ -622,22 +619,19 @@
     <script src="pull-to-refresh-v8.5.11.js"></script>
  
     <script>
+        document.getElementById('sidebarPlasticManagerBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (window.PlasticManager && typeof window.PlasticManager.open === 'function') {
+                window.PlasticManager.open();
+            }
+        });
+
         document.getElementById('sidebarTeflonManagerBtn')?.addEventListener('click', function(e) {
             e.preventDefault();
             if (window.TeflonManager && typeof window.TeflonManager.open === 'function') {
                 window.TeflonManager.open();
             }
         });
-
-        document.getElementById('sidebarPlasticManagerBtn')?.addEventListener('click', function(e) {
-            e.preventDefault();
-            if(window.PlasticManager) {
-                window.PlasticManager.open();
-            } else {
-                alert('Đang tải Module Nhựa...');
-            }
-        });
-
 
         document.getElementById('sidebarPhotoUploadBtn')?.addEventListener('click', function(e) {
             e.preventDefault();

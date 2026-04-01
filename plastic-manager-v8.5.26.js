@@ -1,4 +1,4 @@
-﻿/* plastic-manager-v8.5.22-3.js */
+/* plastic-manager-v8.5.22-3.js */
 
 (function() {
     'use strict';
@@ -278,8 +278,8 @@
             .plm-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
             .plm-btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; color: #fff; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
             
-            /* Camera Stealth Modal */
-            #plmSecurityOverlay { position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+            /* Camera Stealth Modal & Overlay Top-Aligned */
+            #plmSecurityOverlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); z-index: 2147483600; display: flex; align-items: flex-start; justify-content: center; padding: 15px; backdrop-filter: blur(4px); flex-direction: column; color: #0f172a; text-align: center; }
             #plmSecurityOverlay.plm-hidden { display: none !important; }
             
             /* Bảng Tồn Kho */
@@ -292,12 +292,11 @@
             .plm-stock-val .num { display: block; font-size: 18px; font-weight: 800; color: #0f172a; }
             .plm-stock-val .lbl { display: block; font-size: 11px; color: #64748b; }
             
-            /* FaceID Security Overlay */
-            .plm-sec-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.95); z-index: 999; display: flex; align-items: center; justify-content: flex-start; padding-top: 20px; backdrop-filter: blur(8px); flex-direction: column; color: #0f172a; padding-inline: 20px; text-align: center; }
-            .plm-sec-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 30px; max-width: 400px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center; position: relative; }
+            /* FaceID Security Overlay Content */
+            .plm-sec-box { background: #fff; border: none; border-radius: 16px; padding: 24px; max-width: 420px; width: 100%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: center; position: relative; animation: slideDown 0.3s ease-out; margin: 0 auto; }
             .plm-sec-icon { font-size: 40px; color: #3b82f6; margin-bottom: 15px; animation: pulse 2s infinite; }
-            .plm-face-preview-high { align-self: center; margin-bottom: 20px; border-radius:12px; overflow:hidden; border:2px solid #e2e8f0; position:relative; background:#f8fafc; width:100%; max-width:300px; }
-            .plm-sec-overlay.preview-active { align-items: flex-start; padding-top: 40px; }
+            .plm-face-preview-high { align-self: center; margin-bottom: 20px; border-radius:12px; overflow:hidden; border:2px solid #e2e8f0; position:relative; background:#0f172a; width:100%; max-width:100%; }
+            @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
             
             
             /* Camera Scanner Container */
@@ -368,49 +367,53 @@
                     <div id="plm-panel-catalog" class="plm-panel"></div>
                     <div id="plm-panel-mapping" class="plm-panel"></div>
                     
-                    <!-- Màn hình Hướng dẫn & FaceID Ngầm (MOCK) -->
-                    <div id="plmSecurityOverlay" class="plm-sec-overlay plm-hidden">
+                    <!-- Màn hình Hướng dẫn Camera Top-Aligned -->
+                    <div id="plmSecurityOverlay" class="plm-hidden">
                         <div class="plm-sec-box">
-                            <h3 style="margin-bottom: 15px; font-size: 18px;"><span class="tag-ja">自動認証 (BETA)</span><span class="tag-vi">Xác Thực Nền (BETA)</span></h3>
-                            <p style="font-size: 13px; color: #64748b; margin-bottom: 15px; line-height: 1.5; font-weight: bold;"><span class="plm-ja">システムはスキャンを続行するためカメラを使用します。許可（Allow）を押して認証とスキャンを開始してください。初回のみ確認し、次回以降はセッション終了まで自動認証されます。</span><span class="plm-vi" style="margin-top:4px; font-weight:normal;">Hệ thống cần sử dụng camera để tiếp tục tính năng scan, vui lòng bấm Allow để cho phép xác thực và bắt đầu scan. Chỉ cần xác nhận ở lần đầu tiên, các lần sau tự động xác thực mà không cần thao tác lại cho đến hết phiên.</span></p>
-                            
-                            <p style="font-size: 13px; color: #1e293b; margin-bottom: 20px; line-height: 1.5; padding: 10px; background: rgba(59, 130, 246, 0.1); border-radius: 8px;">
-                                <span class="plm-ja">認証を通じたプレビューによる従業員名の自動入力が可能です（開発中）。</span>
-                                <span class="plm-vi" style="margin-top:4px; font-weight:normal;">Có thể nhập tên nhân viên tự động bằng preview thông qua xác thực (đang phát triển).</span>
+                            <h3 style="margin-bottom: 15px; font-size: 18px; display:flex; align-items:center; justify-content:center; gap:8px;">
+                                <i class="fas fa-video" style="color:#0ea5e9;"></i> 
+                                <span style="display:flex; flex-direction:column; line-height:1.2; align-items:flex-start;">
+                                    <span class="tag-ja" style="font-size:16px;">カメラ使用許可</span>
+                                    <span class="tag-vi" style="font-size:12px; font-weight:normal;">Yêu Cầu Quyền Camera</span>
+                                </span>
+                            </h3>
+                            <p style="font-size: 13px; color: #475569; margin-bottom: 15px; line-height: 1.5; text-align:left; background:#f8fafc; padding:12px; border-radius:8px;">
+                                <span class="plm-ja" style="font-weight:bold;">システムのセキュリティ監査とスキャンのためにカメラを使用します。ブラウザの警告で「許可 / Allow」を押してください。</span><br>
+                                <span class="plm-vi" style="margin-top:4px;">Để thực hiện tính năng này, hệ thống cần quyền truy cập Camera. Vui lòng bấm <b>"Allow" (Cho phép)</b> nếu trình duyệt hỏi quyền. Mọi tiến trình chạy ngầm & bảo mật.</span>
                             </p>
                             
                             <!-- Video Preview Container (Mặc định ẩn) -->
                             <div id="plmFaceIDPreviewBox" class="plm-face-preview-high" style="position: absolute; top: -10000px; width: 1px; height: 1px; opacity: 0;">
                                 <video id="plmAuditVideo" autoplay playsinline muted style="width:100%; display:block; object-fit:cover; transform: scaleX(-1);"></video>
-                                <div style="position:absolute; inset:0; border:2px dashed rgba(255,255,255,0.5); border-radius:10px; margin:10px; pointer-events:none;"></div>
+                                <div style="position:absolute; inset:0; border:2px dashed rgba(255,255,255,0.2); margin:10px; pointer-events:none;"></div>
                                 <canvas id="plmAuditCanvas" style="display:none;"></canvas>
                             </div>
 
                             <div id="plmSecActionButtons" style="display: none; flex-direction: column; gap: 10px;">
                                 <!-- Trạng thái Khởi Điểm Nổi Bật -->
-                                <button id="plmSecBtnPreview" class="plm-btn" style="background:transparent; color:#64748b; border:1px solid #cbd5e1; box-shadow: none;">
-                                    <i class="fas fa-camera"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">プレビューを開く</span><span style="font-size:11px; font-weight:normal">Preview</span></span>
+                                <button id="plmSecBtnPreview" class="plm-btn" style="background:#0ea5e9;">
+                                    <i class="fas fa-camera"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">プレビューを開く</span><span style="font-size:11px; font-weight:normal">Bật Preview & Cấp quyền</span></span>
                                 </button>
-                                <button id="plmSecBtnSkipStart" class="plm-btn" style="background:#0ea5e9;">
-                                    <i class="fas fa-forward"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">理解しました。スキップして続行</span><span style="font-size:11px; font-weight:normal">Tôi đã hiểu, bỏ qua preview & tiếp tục</span></span>
+                                <button id="plmSecBtnSkipStart" class="plm-btn" style="background:transparent; color:#64748b; border:1px solid #cbd5e1; box-shadow: none;">
+                                    <i class="fas fa-forward"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">スキップ</span><span style="font-size:11px; font-weight:normal">Bỏ qua lúc này</span></span>
                                 </button>
                                 
                                 <!-- Trạng thái Đang Preview -->
                                 <button id="plmSecBtnSkipPreview" class="plm-btn" style="display:none; background:#475569; color:#f1f5f9;">
-                                    <i class="fas fa-barcode"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">スキップしてスキャン</span><span style="font-size:11px; font-weight:normal">Bỏ qua chụp và tiếp tục scan</span></span>
+                                    <i class="fas fa-barcode"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">スキップしてスキャン</span><span style="font-size:11px; font-weight:normal">Tôi muốn bỏ qua, chỉ Scan thôi</span></span>
                                 </button>
                                 <button id="plmSecBtnAccept" class="plm-btn" style="display:none; background:#10b981;">
-                                    <i class="fas fa-check-circle"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">撮影して認証</span><span style="font-size:11px; font-weight:normal">Chụp & Xác thực FaceID</span></span>
+                                    <i class="fas fa-shield-alt"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">撮影して認証</span><span style="font-size:11px; font-weight:normal">Chụp ảnh Kiểm Toán & Bắt đầu Scan</span></span>
                                 </button>
                                 <button id="plmSecBtnCancelPreview" class="plm-btn" style="display:none; background:#ef4444; margin-top:5px;">
-                                    <i class="fas fa-times-circle"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">キャンセル</span><span style="font-size:11px; font-weight:normal">Hủy ngang (Tắt Camera)</span></span>
+                                    <i class="fas fa-times-circle"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">キャンセル</span><span style="font-size:11px; font-weight:normal">Hủy ngang</span></span>
                                 </button>
                             </div>
 
-                            <div id="plmSecFaceErrorAlert" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#ef4444; color:#fff; padding:20px; border-radius:12px; z-index:99999; box-shadow:0 10px 25px rgba(0,0,0,0.5); text-align:center; width:90%; max-width:350px;">
-                                <i class="fas fa-exclamation-triangle" style="font-size:40px; margin-bottom:15px;"></i>
-                                <div style="font-weight:bold; font-size:16px; margin-bottom:8px;">顔認証データが見つかりません</div>
-                                <div style="font-size:14px; opacity:0.9;">Chưa có dữ liệu FaceID. Bỏ qua xác thực và tiếp tục!</div>
+                            <div id="plmSecFaceErrorAlert" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#10b981; color:#fff; padding:20px; border-radius:12px; z-index:99999; box-shadow:0 10px 25px rgba(0,0,0,0.5); text-align:center; width:90%; max-width:350px;">
+                                <i class="fas fa-check-circle" style="font-size:40px; margin-bottom:15px;"></i>
+                                <div style="font-weight:bold; font-size:16px; margin-bottom:8px;">認証成功</div>
+                                <div style="font-size:14px; opacity:0.9;">Xác thực thành công! Đang chuyển...</div>
                             </div>
                         </div>
                     </div>
