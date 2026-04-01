@@ -381,8 +381,8 @@
                                 </span>
                             </h3>
                             <p style="font-size: 13px; color: #475569; margin-bottom: 15px; line-height: 1.5; text-align:left; background:#f8fafc; padding:12px; border-radius:8px;">
-                                <span class="plm-ja" style="font-weight:bold;">バーコードの読み取り機能を続行するには、カメラへのアクセス許可が必要です。ブラウザのプロンプトで「許可 / Allow」を押してください。</span><br>
-                                <span class="plm-vi" style="margin-top:4px;">Để thực hiện tính năng quét mã vạch, hệ thống cần được cấp quyền mở máy ảnh. Vui lòng chọn <b>"Allow" (Cho phép)</b> trên thông báo của trình duyệt.</span>
+                                <span class="plm-ja" style="font-weight:bold;">機能を続行し、認証およびデータ処理を行うため、カメラへのアクセス許可が必要です。ブラウザで「許可 / Allow」を押してください。</span><br>
+                                <span class="plm-vi" style="margin-top:4px;">Để tiếp tục tính năng, phục vụ quá trình xác thực và xử lý dữ liệu, hệ thống cần được cấp quyền. Vui lòng chọn <b>"Allow" (Cho phép)</b> trên trình duyệt.</span>
                             </p>
                             
                             <!-- Bật Preview Button -->
