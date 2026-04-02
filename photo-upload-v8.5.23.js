@@ -44,9 +44,8 @@
     '<div class="pu-section pu-section-photo" id="puSectionPhoto">',
     '  <div class="pu-section-header" data-toggle="puSectionPhoto">',
     '    <i class="fas fa-images pu-section-icon"></i>',
-    '    <div class="pu-section-title">',
-    '      <span class="pu-ja">写真 <span id="puPhotoCountBadge" style="font-weight:700;font-size:11px;"></span></span>',
-    '      <span class="pu-vi">Ảnh</span>',
+    '    <div class="pu-section-title" style="display:flex; align-items:center; gap:6px;">',
+    '      <span class="pu-ja" style="font-weight:800; font-size:14px; color:#1e293b;">写真 <span style="font-size:12px; font-weight:600; color:#64748b;">(Ảnh)</span> <span id="puPhotoCountBadge" style="color:#3b82f6; font-size:13px; margin-left:4px;"></span></span>',
     '    </div>',
     '    <i class="fas fa-chevron-down pu-section-chevron"></i>',
     '  </div>',
@@ -90,9 +89,8 @@
     '<div class="pu-section pu-section-device" id="puSectionDevice">',
     '  <div class="pu-section-header" data-toggle="puSectionDevice">',
     '    <i class="fas fa-microchip pu-section-icon"></i>',
-    '    <div class="pu-section-title">',
-    '      <span class="pu-ja">デバイス情報</span>',
-    '      <span class="pu-vi">Thông tin thiết bị</span>',
+    '    <div class="pu-section-title" style="display:flex; align-items:center; gap:6px;">',
+    '      <span class="pu-ja" style="font-weight:800; font-size:14px; color:#1e293b;">デバイス情報 <span style="font-size:12px; font-weight:600; color:#64748b;">(Thông tin thiết bị)</span></span>',
     '    </div>',
     '    <i class="fas fa-chevron-down pu-section-chevron"></i>',
     '  </div>',
@@ -101,8 +99,10 @@
     '    <div class="pu-field-inline" id="puTargetTypeRow">',
     '      <span class="pu-il-label">種類 / Loại</span>',
     '      <select class="pu-input" id="puTargetTypeSelect" style="flex:1;">',
+    '        <option value="other">その他 / Khác</option>',
     '        <option value="device">金型・刃物 / Khuôn & Dao cắt</option>',
     '        <option value="rack">ラック / Giá & Vị trí</option>',
+    '        <option value="tray">トレイ / Khay</option>',
     '      </select>',
     '    </div>',
     /* Device search – standalone */
@@ -110,15 +110,11 @@
     '      <div class="pu-field-inline">',
     '        <span class="pu-il-label">検索</span>',
     '        <div class="pu-device-search-row">',
-    '          <div class="pu-device-search-wrap" style="flex:1">',
+    '          <div class="pu-device-search-wrap" style="flex:1; position:relative;">',
     '            <i class="fas fa-search"></i>',
-    '            <input type="text" class="pu-device-search-input" id="puDeviceSearch" placeholder="コード / 名前を入力... / Nhập mã / tên thiết bị...">',
+    '            <input type="text" class="pu-device-search-input" id="puDeviceSearch" autocomplete="off" placeholder="検索... / Tìm kiếm mã, khay, vị trí...">',
     '            <div class="pu-device-dropdown pu-hidden" id="puDeviceDropdown"></div>',
     '          </div>',
-    '          <button class="pu-quick-name-btn pu-quick-name-btn--compact" id="puQuickNameBtn" type="button" title="無名で送信 / Gửi nhanh không tên">',
-    '            <span class="pu-qn-ja">無名送信</span>',
-    '            <span class="pu-qn-vi">Gửi nhanh<br>không tên</span>',
-    '          </button>',
     '          <button class="pu-clear-link-btn pu-clear-link-btn--compact" id="puClearLinkBtn" type="button" title="リンク解除 / Xóa liên kết">',
     '            <i class="fas fa-unlink"></i>',
     '            <span class="pu-cl-ja">解除</span>',
@@ -126,6 +122,18 @@
     '          </button>',
     '        </div>',
     '      </div>',
+    '    </div>',
+    /* Sender */
+    '    <div class="pu-field-inline">',
+    '      <span class="pu-il-label">作業者 <br> Nhân viên</span>',
+    '      <select class="pu-input pu-sender-select" id="puSenderSelect" style="flex:1;min-width:0"></select>',
+    '      <input type="hidden" id="puSenderId" value="' + DEFAULT_SENDER_ID + '">',
+    '      <span class="pu-ibadge pu-ibadge-auto" id="puSenderBadge" title="自動"><i class="fas fa-users"></i></span>',
+    '      <span class="pu-ibadge pu-ibadge-manual pu-hidden" id="puSenderBadgeM" title="手動"><i class="fas fa-pen"></i></span>',
+    '    </div>',
+    '    <div class="pu-field-inline pu-hidden" id="puSenderManualRow">',
+    '      <span class="pu-il-label"></span>',
+    '      <input type="text" class="pu-input" id="puSenderSearch" style="flex:1" placeholder="手動入力 / Nhập tên thủ công...">',
     '    </div>',
     /* Code + Dims */
     '    <div class="pu-fields-grid">',
@@ -144,6 +152,13 @@
     '        <span class="pu-ibadge pu-ibadge-auto pu-hidden" id="puDimBadge" title="自動"><i class="fas fa-link"></i></span>',
     '        <span class="pu-ibadge pu-ibadge-manual pu-hidden" id="puDimBadgeM" title="手動"><i class="fas fa-pen"></i></span>',
     '      </div>',
+    '    </div>',
+    /* Weight */
+    '    <div class="pu-field-inline" id="puWeightRow">',
+    '      <span class="pu-il-label">重量 (kg)<br>Khối lượng</span>',
+    '      <input type="number" step="0.01" class="pu-input" id="puWeight" placeholder="0.0">',
+    '      <span class="pu-ibadge pu-ibadge-auto pu-hidden" id="puWeightBadge" title="自動"><i class="fas fa-link"></i></span>',
+    '      <span class="pu-ibadge pu-ibadge-manual pu-hidden" id="puWeightBadgeM" title="手動"><i class="fas fa-pen"></i></span>',
     '    </div>',
     /* Notes */
     '    <div class="pu-field-inline">',
@@ -166,28 +181,15 @@
     '<div class="pu-section pu-section-setting" id="puSectionSetting">',
     '  <div class="pu-section-header" data-toggle="puSectionSetting">',
     '    <i class="fas fa-cog pu-section-icon"></i>',
-    '    <div class="pu-section-title">',
-    '      <span class="pu-ja">送信設定</span>',
-    '      <span class="pu-vi">Cài đặt gửi</span>',
+    '    <div class="pu-section-title" style="display:flex; align-items:center; gap:6px;">',
+    '      <span class="pu-ja" style="font-weight:800; font-size:14px; color:#1e293b;">送信設定 <span style="font-size:12px; font-weight:600; color:#64748b;">(Cài đặt gửi)</span></span>',
     '    </div>',
     '    <i class="fas fa-chevron-down pu-section-chevron"></i>',
     '  </div>',
     '  <div class="pu-section-body">',
-    /* Sender */
-    '    <div class="pu-field-inline">',
-    '      <span class="pu-il-label">送信者</span>',
-    '      <select class="pu-input pu-sender-select" id="puSenderSelect" style="flex:1;min-width:0"></select>',
-    '      <input type="hidden" id="puSenderId" value="' + DEFAULT_SENDER_ID + '">',
-    '      <span class="pu-ibadge pu-ibadge-auto" id="puSenderBadge" title="自動"><i class="fas fa-users"></i></span>',
-    '      <span class="pu-ibadge pu-ibadge-manual pu-hidden" id="puSenderBadgeM" title="手動"><i class="fas fa-pen"></i></span>',
-    '    </div>',
-    '    <div class="pu-field-inline pu-hidden" id="puSenderManualRow">',
-    '      <span class="pu-il-label"></span>',
-    '      <input type="text" class="pu-input" id="puSenderSearch" style="flex:1" placeholder="手動入力 / Nhập tên thủ công...">',
-    '    </div>',
     /* CC */
     '    <div class="pu-field-inline">',
-    '      <span class="pu-il-label">CC</span>',
+    '      <span class="pu-il-label" style="font-size: 11px">メール<br>アドレス</span>',
     '      <div class="pu-email-chips-wrap" id="puEmailChipsWrap" style="flex:1">',
     '        <input type="email" class="pu-email-chip-input" id="puEmailInput" placeholder="email@example.com を入力して Enter / ;">',
     '        <div class="pu-keep-row pu-keep-row--cc">',
@@ -529,7 +531,7 @@
     this._showDeviceSearch();
 
     // Load saved target type
-    var savedType = localStorage.getItem('pu_saved_target_type') || 'device';
+    var savedType = localStorage.getItem('pu_saved_target_type') || 'other';
     var typeSel = document.getElementById('puTargetTypeSelect');
     if (typeSel) typeSel.value = savedType;
 
@@ -578,7 +580,7 @@
       '.pu-camera-shutter { width: 72px; height: 72px; border-radius: 50%; background: #fff; border: 4px solid #cbd5e1; box-shadow: 0 0 0 4px #000 inset; cursor:pointer; padding:0; margin:0; outline:none; transition: transform 0.1s; }',
       '.pu-camera-shutter:active { transform: scale(0.95); background: #e2e8f0; }',
       '.pu-camera-side-btn { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.15); color:#fff; font-size:20px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; outline:none; }',
-      '#puOverlay{ z-index: 2147483600 !important; }',
+      '#puOverlay{ z-index: 2147483600 !important; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }',
       '#puDialog{ z-index: 2147483601 !important; }',
       '#puEditorOverlay{ z-index: 2147483602 !important; }',
       '#puCameraOverlay{ z-index: 2147483603 !important; }',
@@ -609,7 +611,16 @@
       '.pu-confirm-btn{ flex:1 1 160px; padding:10px 10px; border-radius:12px; border:1px solid rgba(2,6,23,0.12); background: rgba(248,250,252,0.92); cursor:pointer; font-weight:900; font-size:11.5px; }',
       '.pu-confirm-btn:hover{ background: rgba(2,6,23,0.04); }',
       '.pu-confirm-primary{ border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.12); color:#047857; }',
-      '.pu-confirm-cancel{ border-color: rgba(239,68,68,0.28); background: rgba(239,68,68,0.10); color:#b91c1c; }'
+      '.pu-confirm-cancel{ border-color: rgba(239,68,68,0.28); background: rgba(239,68,68,0.10); color:#b91c1c; }',
+      '.pu-section-body { padding: 8px 12px; }',
+      '.pu-device-dropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; max-height: 280px; overflow-y: auto; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); z-index: 2147483647; width: 100%; min-width: 220px; }',
+      '.pu-device-option { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; cursor: pointer; display: flex; flex-direction: column; gap: 4px; transition: background 0.15s ease; }',
+      '.pu-device-option:last-child { border-bottom: none; }',
+      '.pu-device-option:hover { background: #f8fafc; }',
+      '.pu-device-option:active { background: #f1f5f9; }',
+      '.pu-opt-code { font-weight: 800; font-size: 13.5px; color: #0f172a; line-height: 1.2; }',
+      '.pu-opt-name { font-size: 12px; font-weight: 600; color: #475569; line-height: 1.2; }',
+      '.pu-opt-type { font-size: 10.5px; font-weight: 700; color: #64748b; background: #e2e8f0; border-radius: 4px; padding: 2px 6px; align-self: flex-start; }'
     ].join(String.fromCharCode(10));
     document.head.appendChild(st);
   };
@@ -828,11 +839,21 @@
       badge.classList.remove('pu-hidden'); 
     }
 
-    /* Hide target type & search */
+    /* Cập nhật Dropdown Loại Thiết bị cho khớp, KHÔNG ẨN đi để giữ layout tự nhiên */
     var typeRow = document.getElementById('puTargetTypeRow');
-    if (typeRow) typeRow.classList.add('pu-hidden');
-    var searchBlock = document.getElementById('puDeviceSearchBlock');
-    if (searchBlock) searchBlock.classList.add('pu-hidden');
+    if (typeRow) {
+      // typeRow.classList.add('pu-hidden');
+      var sel = document.getElementById('puTargetTypeSelect');
+      if (sel) {
+        if (d.type === 'mold' || d.type === 'cutter') sel.value = 'device';
+        else if (d.type === 'rack') sel.value = 'rack';
+        else if (d.type === 'tray') sel.value = 'tray';
+        else sel.value = 'other';
+      }
+    }
+    /* KHÔNG ẨN searchBlock. Để ngỏ để người tiếp tục xem mã và có thể nhập lại / Xoá Liền kết */
+    // var searchBlock = document.getElementById('puDeviceSearchBlock');
+    // if (searchBlock) searchBlock.classList.add('pu-hidden');
 
     /* Code */
     var codeInput = document.getElementById('puDeviceCode');
@@ -1129,9 +1150,7 @@
       setTimeout(function() { self._submit(true, true); }, 100);
     });
 
-    /* Quick noname */
-    var quickNameBtn = document.getElementById('puQuickNameBtn');
-    if (quickNameBtn) quickNameBtn.addEventListener('click', function () { self._applyQuickName(); });
+    /* Quick noname removed from row but retained in footer */
 
     var clearLinkBtn = document.getElementById('puClearLinkBtn');
     if (clearLinkBtn) clearLinkBtn.addEventListener('click', function () { self._clearDeviceLink(); });
@@ -1883,38 +1902,70 @@
     if (global.DataManager && typeof global.DataManager.getAllItems === 'function') {
       items = global.DataManager.getAllItems() || [];
     }
+    if (global.DataManager && global.DataManager.data) {
+      if (global.DataManager.data.trays) {
+        items = items.concat(global.DataManager.data.trays.map(function(t) { return { type: 'tray', TrayCode: t.TrayCode, TrayName: t.TrayName, MoldTrayName: t.MoldTrayName, TrayID: t.TrayID, TrayWeight: t.TrayWeight }; }));
+      }
+      if (global.DataManager.data.racks) {
+        items = items.concat(global.DataManager.data.racks.map(function(r) { return { type: 'rack', RackID: r.RackID }; }));
+      }
+    }
     var q = query.toLowerCase();
-    function s(v){ return String(v || '').toLowerCase(); }
+    
+    var filterType = '';
+    var typeSel = document.getElementById('puTargetTypeSelect');
+    if (typeSel && typeSel.value && typeSel.value !== 'other') filterType = typeSel.value;
+
+    function cleanString(str) {
+      return String(str || '').replace(/[\s\-]/g, '').toLowerCase();
+    }
+    var cleanQ = cleanString(q);
 
     var matched = items.filter(function (it) {
-      var hay = [
-        it.MoldCode, it.MoldName, it.MoldID,
-        it.CutterCode, it.CutterName, it.CutterNo, it.CutterDesignName, it.CutterID
-      ].map(s).join(' ');
-      return hay.indexOf(q) >= 0;
+      if (filterType === 'device') {
+        if (it.type !== 'mold' && it.type !== 'cutter') return false;
+      } else if (filterType && filterType !== 'other') {
+        if (it.type !== filterType) return false;
+      }
+      
+      // Giá để khuôn: search trong RackID
+      if (it.type === 'rack') {
+        return String(it.RackID || '').toLowerCase().indexOf(q) >= 0;
+      }
+      // Khay: search theo TrayCode và MoldTrayName
+      if (it.type === 'tray') {
+        var tText = String(it.TrayCode || '').toLowerCase() + ' ' + String(it.MoldTrayName || '').toLowerCase() + ' ' + String(it.TrayName || '').toLowerCase();
+        var tCleanText = cleanString(it.TrayCode) + ' ' + cleanString(it.MoldTrayName);
+        return tText.indexOf(q) >= 0 || tCleanText.indexOf(cleanQ) >= 0;
+      }
+      // Khuôn & Dao cắt: search MoldCode, CutterCode, CutterNo, CutterName
+      var dText = [
+        it.MoldCode, it.MoldName, it.CutterCode, it.CutterNo, it.CutterName
+      ].map(function(v){ return String(v || '').toLowerCase(); }).join(' ');
+      var dCleanText = cleanString(it.MoldCode) + ' ' + cleanString(it.CutterCode) + ' ' + cleanString(it.CutterNo);
+      return dText.indexOf(q) >= 0 || dCleanText.indexOf(cleanQ) >= 0;
     }).slice(0, 10);
-
 
     var dd = document.getElementById('puDeviceDropdown');
     if (!dd) return;
     if (!matched.length) { dd.classList.add('pu-hidden'); return; }
 
     dd.innerHTML = matched.map(function (it) {
-      var code = it.MoldCode || it.CutterCode || it.CutterNo || '';
-      var name = it.MoldName || it.CutterName || it.CutterDesignName || '';
-
-      var type = it.type === 'mold' ? '🔧 Khuôn' : '✂️ Dao cắt';
-      var id   = it.MoldID || it.CutterID || '';
-      var dims = it.displayDimensions || it.dimensions || it.displaySize || it.Size || it.Dimensions || '';
+      var id   = it.MoldID || it.CutterID || it.TrayID || it.RackID || '';
+      var name = it.MoldName || it.CutterName || it.CutterDesignName || it.TrayName || it.MoldTrayName || '';
+      var rawCode = it.MoldCode || it.CutterCode || it.CutterNo || it.TrayCode || it.RackID || '';
+      var code = rawCode || name || id || 'Unknown';
+      var typeName = it.type === 'mold' ? '🔧 Khuôn' : (it.type === 'cutter' ? '✂️ Dao cắt' : (it.type === 'tray' ? '📦 Khay' : (it.type === 'rack' ? '🏗 Giá' : 'Khác')));
+      var dims = it.displayDimensions || it.dimensions || it.displaySize || it.Size || it.Dimensions || (it.TrayWeight ? it.TrayWeight + ' kg' : '');
       return '<div class="pu-device-option" data-code="'+code+'" data-name="'+name+'" data-type="'+it.type+'" data-id="'+id+'" data-dims="'+dims+'">' +
              '  <span class="pu-opt-code">'+code+'</span>' +
-             '  <span class="pu-opt-name">'+name+'</span>' +
-             '  <span class="pu-opt-type">'+type+'</span>' +
+             (name ? '  <span class="pu-opt-name">'+name+'</span>' : '') +
+             '  <span class="pu-opt-type">'+typeName+'</span>' +
              '</div>';
     }).join('');
     dd.classList.remove('pu-hidden');
     dd.querySelectorAll('.pu-device-option').forEach(function (opt) {
-      opt.addEventListener('mousedown', function () {
+      opt.addEventListener('click', function () {
         self._selectDevice({
           type:   opt.dataset.type,
           id:     opt.dataset.id,
@@ -2089,8 +2140,36 @@
     var DevPS = global.DevicePhotoStore;
     if (!DevPS) { self._showResult(false, 'DevicePhotoStore not found'); return; }
 
-    var total   = self._photos.length;
+    var photosClone = self._photos.slice();
+    var total   = photosClone.length;
     var done    = 0;
+
+    // Background UI Hiding
+    if (closeAfter) {
+      self._toast('info', '正在送信... / Đang gửi ngầm...', 'Photo Upload');
+      var overlay = document.getElementById('puOverlay');
+      if (overlay) {
+        overlay.classList.remove('pu-show');
+        setTimeout(function(){ overlay.classList.add('pu-hidden'); self.unlockPageScroll(); self._reset(); }, 200);
+      }
+      self._stopCamera();
+    }
+
+    // Weight Update
+    var weightInput = (document.getElementById('puWeight') || {}).value || '';
+    if (weightInput && deviceId && (deviceType === 'mold' || deviceType === 'cutter' || deviceType === 'tray')) {
+        var fn = (deviceType === 'tray') ? 'webtray.csv' : (deviceType === 'cutter' ? 'webcutters.csv' : 'webmolds.csv');
+        var idF = (deviceType === 'tray') ? 'TrayID' : (deviceType === 'cutter' ? 'CutterID' : 'MoldID');
+        var wF = (deviceType === 'tray') ? 'TrayWeight' : (deviceType === 'cutter' ? 'CutterWeightModified' : 'MoldWeightModified'); 
+        var fieldsParam = {}; fieldsParam[wF] = weightInput;
+        try {
+            fetch('/api/csv/upsert', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ filename: fn, idField: idF, recordId: deviceId, op: 'update', fields: fieldsParam })
+            }).catch(function(e){ console.warn(e); });
+        } catch (we) { console.warn(we); }
+    }
     var results = [];
     var errors  = [];
 
@@ -2103,7 +2182,7 @@
         self._onAllUploaded(results, errors, meta);
         return;
       }
-      var p         = self._photos[i];
+      var p         = photosClone[i];
       var isFirst   = (i === 0);
       var shouldThumb = setThumb && isFirst; /* chỉ ảnh đầu làm thumbnail */
 
@@ -2266,28 +2345,27 @@
       if (b) { b.disabled = false; b.classList.remove('pu-sending'); }
     });
 
-    if (errors.length && !results.length) {
-      var em = 'エラー: ' + ((errors[0] && errors[0].message) || 'Unknown error');
-      this._showResult(false, em);
-      this._toast('error', em, 'エラー / Lỗi');
-      return;
-    }
-
     var totalRes = results.length;
     var msg = totalRes + ' 枚アップロード完了 / ' + totalRes + ' ảnh đã lưu';
     if (errors.length) msg += ' (' + errors.length + ' lỗi)';
 
-    this._showResult(true, msg);
-    this._toast('success', msg, '成功 / Thành công');
+    if (!meta || !meta.closeAfter) {
+      if (errors.length && !results.length) {
+        var em = 'エラー: ' + ((errors[0] && errors[0].message) || 'Unknown error');
+        this._showResult(false, em);
+        this._toast('error', em, 'エラー / Lỗi');
+      } else {
+        this._showResult(true, msg);
+        this._toast('success', msg, '成功 / Thành công');
+        this._resetAfterSuccess();
+      }
+    } else {
+      if (errors.length) this._toast('error', 'Lỗi: ' + errors.length + ' thao tác thất bại.', 'Photo Upload');
+      else this._toast('success', 'Gửi hoàn tất ' + results.length + ' ảnh.', 'Photo Upload');
+    }
 
     if (this._onDoneCallback) this._onDoneCallback(results);
     document.dispatchEvent(new CustomEvent('photo-upload-done', { detail: { results: results, errors: errors } }));
-
-    if (meta && meta.closeAfter) {
-      this.close();
-    } else {
-      this._resetAfterSuccess();
-    }
   };
 
   /* ──────────────────────────────────────────────────────────
