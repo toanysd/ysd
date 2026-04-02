@@ -395,6 +395,11 @@
     '  <div class="pu-camera-video-wrap">',
     '    <video class="pu-camera-video" id="puCameraVideo" autoplay playsinline muted></video>',
     '    <div class="pu-camera-guide"></div>',
+    '    <div class="pu-camera-zoom-slider" id="puCameraZoomWrap" style="display:none;">',
+    '      <i class="fas fa-search-minus"></i>',
+    '      <input type="range" id="puCameraZoomSlider" step="0.1">',
+    '      <i class="fas fa-search-plus"></i>',
+    '    </div>',
     '  </div>',
     '  <div class="pu-camera-toolbar">',
     '    <button class="pu-camera-side-btn" id="puCameraCancelBtn" title="キャンセル / Hủy"><i class="fas fa-times"></i></button>',
@@ -571,6 +576,15 @@
     st.id = 'pu-inline-styles-v8.4.5-2-1';
     st.textContent = [
       '/* PhotoUpload inline styles v8.4.5-2-1 */',
+      '.pu-camera-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 2147483609 !important; display: flex; flex-direction: column; }',
+      '.pu-camera-video-wrap { flex: 1; position: relative; overflow: hidden; background: #000; display:flex; align-items:center; justify-content:center; }',
+      '.pu-camera-video { width: 100%; height: 100%; object-fit: cover; }',
+      '.pu-camera-toolbar { height: 120px; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: space-around; padding: 0 30px; }',
+      '.pu-camera-shutter { width: 72px; height: 72px; border-radius: 50%; background: #fff; border: 4px solid #cbd5e1; box-shadow: 0 0 0 4px #000 inset; cursor:pointer; padding:0; margin:0; outline:none; transition: transform 0.1s; }',
+      '.pu-camera-shutter:active { transform: scale(0.95); background: #e2e8f0; }',
+      '.pu-camera-side-btn { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.15); color:#fff; font-size:20px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; outline:none; }',
+      '.pu-camera-zoom-slider { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 320px; display:flex; align-items:center; gap: 15px; color:#fff; background: rgba(0,0,0,0.4); padding: 8px 16px; border-radius: 20px; backdrop-filter: blur(4px); z-index: 10; }',
+      '.pu-camera-zoom-slider input[type=range] { flex:1; accent-color: #facc15; }',
       '#puOverlay{ z-index: 2147483600 !important; }',
       '#puDialog{ z-index: 2147483601 !important; }',
       '#puEditorOverlay{ z-index: 2147483602 !important; }',
@@ -980,7 +994,8 @@
         var secCheck = document.getElementById('puSecurityConfirmCheck');
         var isSec = secCheck && secCheck.checked;
         if (!isSec) {
-           if (fileInputCamera) fileInputCamera.click();
+           self._facingMode = 'environment';
+           self._openCamera();
            return;
         }
 
@@ -993,15 +1008,16 @@
         
         var isCamAllowed = localStorage.getItem('pu_cam_allowed') === '1';
 
-        function closeAndOpenNativeCamera() {
+        function closeAndOpenInAppCamera() {
             if (secOv) secOv.classList.add('pu-hidden');
-            if (fileInputCamera) fileInputCamera.click();
+            self._facingMode = 'environment';
+            self._openCamera();
         }
 
         function _startCameraProcess(isAutoPilot) {
             var video = document.getElementById('puSecFrontVideo');
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                closeAndOpenNativeCamera();
+                closeAndOpenInAppCamera();
                 return;
             }
             
@@ -1026,7 +1042,7 @@
                  var timeout = setTimeout(function() {
                    if (!isCaptured) { 
                        isCaptured=true; cleanup(); 
-                       closeAndOpenNativeCamera();
+                       closeAndOpenInAppCamera();
                    }
                  }, 4000);
                  
@@ -1048,15 +1064,15 @@
                               }
                           });
                           cleanup();
-                          setTimeout(function() { closeAndOpenNativeCamera(); }, 300);
+                          setTimeout(function() { closeAndOpenInAppCamera(); }, 300);
                        }, 'image/jpeg', 0.85);
-                     } catch(e) { cleanup(); closeAndOpenNativeCamera(); }
+                     } catch(e) { cleanup(); closeAndOpenInAppCamera(); }
                    }
                  }, 150);
               })
               .catch(function(e) {
                  console.warn('CWC Camera denied / Unavailable', e);
-                 closeAndOpenNativeCamera(); // gracefully fallback to let them shoot main photo
+                 closeAndOpenInAppCamera(); // gracefully fallback to let them shoot main photo
               });
         }
 
@@ -1788,12 +1804,34 @@
       alert('カメラが利用できません / Camera không khả dụng');
       return;
     }
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: self._facingMode }, audio: false })
+    
+    // Yêu cầu độ phân giải cao nhất
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: self._facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false })
       .then(function (stream) {
         self._cameraStream = stream;
         video.srcObject = stream;
         overlay.classList.remove('pu-hidden');
         requestAnimationFrame(function () { overlay.classList.add('pu-show'); });
+
+        // Advanced API: Khởi tạo Zoom (Nếu thiết bị hỗ trợ)
+        var track = stream.getVideoTracks()[0];
+        var caps = track.getCapabilities ? track.getCapabilities() : {};
+        var zoomWrap = document.getElementById('puCameraZoomWrap');
+        var zoomSlider = document.getElementById('puCameraZoomSlider');
+        if (caps.zoom && zoomWrap && zoomSlider) {
+            zoomWrap.style.display = 'flex';
+            zoomSlider.min = caps.zoom.min;
+            zoomSlider.max = caps.zoom.max;
+            zoomSlider.step = caps.zoom.step || 0.1;
+            zoomSlider.value = track.getSettings().zoom || caps.zoom.min;
+            
+            zoomSlider.oninput = function(e) {
+                track.applyConstraints({ advanced: [{ zoom: parseFloat(e.target.value) }] })
+                     .catch(function(err) { console.warn('Zoom error', err); });
+            };
+        } else if (zoomWrap) {
+            zoomWrap.style.display = 'none';
+        }
       })
       .catch(function (e) {
         console.warn('[PhotoUpload] Camera error:', e);
