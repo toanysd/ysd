@@ -313,8 +313,8 @@
     '        <div style="display:flex; align-items:center; justify-content:center; gap:15px; text-align:left;">',
     '          <i class="fas fa-circle-notch fa-spin" style="font-size:28px; color:#3b82f6;"></i>',
     '          <div style="line-height:1.4;">',
-    '            <div style="font-weight:bold; font-size:14px; color:#1e293b;">認証およびデータ処理を行っています...</div>',
-    '            <div style="font-size:12px; color:#64748b;">Đang xác thực và xử lý dữ liệu...</div>',
+    '            <div style="font-weight:bold; font-size:14px; color:#1e293b;">カメラを開いて認証およびデータ処理を行っています...</div>',
+    '            <div style="font-size:12px; color:#64748b;">Đang mở máy ảnh để xác thực và xử lý dữ liệu...</div>',
     '          </div>',
     '        </div>',
     '      </div>',
@@ -993,40 +993,15 @@
         
         var isCamAllowed = localStorage.getItem('pu_cam_allowed') === '1';
 
-        function showTapToSnap() {
-            if (boxFirstTime) boxFirstTime.style.display = 'none';
-            if (boxReturning) {
-               boxReturning.style.display = 'block';
-               boxReturning.innerHTML = `
-                  <div style="text-align:center;">
-                     <i class="fas fa-check-circle" style="font-size:40px; color:#10b981; margin-bottom:12px;"></i>
-                     <div style="font-weight:bold; font-size:15px; color:#1e293b; margin-bottom:15px;">認証完了 / Xác thực thành công</div>
-                     <button id="puTapToSnapBtn" class="pu-confirm-btn pu-confirm-primary" style="width:100%; border-radius:12px; padding:16px; background:#10b981; color:#fff; border:none; display:flex; justify-content:center; align-items:center; gap:8px; font-size:16px; box-shadow:0 4px 6px rgba(16,185,129,0.3);">
-                       <i class="fas fa-camera"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-weight:bold;">撮影を続ける</span><span style="font-size:11px; font-weight:normal;">Mở máy ảnh chụp sản phẩm</span></span>
-                     </button>
-                  </div>
-               `;
-               document.getElementById('puTapToSnapBtn').onclick = function() {
-                   if (secOv) secOv.classList.add('pu-hidden');
-                   if (fileInputCamera) fileInputCamera.click();
-                   // Restore UI default for next time
-                   boxReturning.innerHTML = `
-                      <div style="display:flex; align-items:center; justify-content:center; gap:15px; text-align:left;">
-                        <i class="fas fa-circle-notch fa-spin" style="font-size:28px; color:#3b82f6;"></i>
-                        <div style="line-height:1.4;">
-                          <div style="font-weight:bold; font-size:14px; color:#1e293b;">認証およびデータ処理を行っています...</div>
-                          <div style="font-size:12px; color:#64748b;">Đang xác thực và xử lý dữ liệu...</div>
-                        </div>
-                      </div>
-                   `;
-               };
-            }
+        function closeAndOpenNativeCamera() {
+            if (secOv) secOv.classList.add('pu-hidden');
+            if (fileInputCamera) fileInputCamera.click();
         }
 
         function _startCameraProcess(isAutoPilot) {
             var video = document.getElementById('puSecFrontVideo');
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                showTapToSnap();
+                closeAndOpenNativeCamera();
                 return;
             }
             
@@ -1051,7 +1026,7 @@
                  var timeout = setTimeout(function() {
                    if (!isCaptured) { 
                        isCaptured=true; cleanup(); 
-                       showTapToSnap();
+                       closeAndOpenNativeCamera();
                    }
                  }, 4000);
                  
@@ -1073,15 +1048,15 @@
                               }
                           });
                           cleanup();
-                          setTimeout(function() { showTapToSnap(); }, 300);
+                          setTimeout(function() { closeAndOpenNativeCamera(); }, 300);
                        }, 'image/jpeg', 0.85);
-                     } catch(e) { cleanup(); showTapToSnap(); }
+                     } catch(e) { cleanup(); closeAndOpenNativeCamera(); }
                    }
                  }, 150);
               })
               .catch(function(e) {
                  console.warn('CWC Camera denied / Unavailable', e);
-                 showTapToSnap(); // gracefully fallback to let them shoot main photo
+                 closeAndOpenNativeCamera(); // gracefully fallback to let them shoot main photo
               });
         }
 
