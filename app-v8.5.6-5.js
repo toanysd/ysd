@@ -176,23 +176,38 @@ class App {
 
     // Restore search session
     try {
+      const searchInput = document.getElementById('searchInput');
       const savedQuery = sessionStorage.getItem('moldSearchQuery_v8');
-      if (savedQuery) {
-        this.searchQuery = savedQuery;
-        const searchInput = document.getElementById('searchInput');
+      
+      // Lấy keyword: Ưu tiên giá trị mà browser tự rollback trên UI (nếu có), nếu không có thì lấy từ session.
+      let finalQuery = '';
+      if (searchInput && searchInput.value.trim()) {
+        finalQuery = searchInput.value.trim();
+      } else if (savedQuery) {
+        finalQuery = savedQuery;
+      }
+
+      if (finalQuery) {
+        this.searchQuery = finalQuery;
         if (searchInput) {
-          searchInput.value = savedQuery;
+          searchInput.value = finalQuery;
           const clearBtn = document.querySelector('.clear-btn');
           if (clearBtn) clearBtn.style.display = 'flex';
         }
+        if (this.searchModule) {
+           this.searchModule.currentQuery = finalQuery;
+        }
       }
+
       const savedCat = sessionStorage.getItem('moldSearchCategory_v8');
       if (savedCat) {
         this.selectedCategory = savedCat;
         const categoryDropdown = document.getElementById('categoryDropdown');
         if (categoryDropdown) categoryDropdown.value = savedCat;
       }
-      if (savedQuery || savedCat) {
+
+      if (finalQuery || savedCat) {
+        // Debounce small delay in case child modules are still waking up
         setTimeout(() => this.applyFilters(), 100);
       }
     } catch (e) {}
@@ -421,6 +436,10 @@ class App {
 
       // Chỉ xử lý vuốt ngang (tránh nhầm với cuộn dọc)
       if (MathAbsDeltaY < 50) {
+        // Kiểm tra xem sự kiện vuốt có đang xảy ra bên trong một popup, panel hay drawer không (ví dụ Detail Panel, Filter Drawer)
+        // Nếu có, KHÔNG mở sidebar để dành quyền vuốt đóng cho các panel đó
+        const isInsidePanel = e.target.closest('#detailPanel, #filterDrawer, .filter-fullscreen-modal, .modal, .photo-detail-modal, .app-modal');
+
         // Kiểm tra xem người dùng có đang vuốt trúng vùng cuộn ngang mặc định không (ví dụ Table)
         const isTargetScrollable = e.target.closest('.table-scroll-container') || e.target.closest('table');
         
@@ -428,7 +447,7 @@ class App {
         // Nếu điểm bắt đầu vuốt chạm vào bảng (table), giới hạn lại sát mép (30px) để không cản trở việc cuộn bảng.
         const allowedEdge = isTargetScrollable ? 30 : 100;
         
-        if (deltaX > 50 && touchStartX <= allowedEdge && !sidebarEl.classList.contains('open')) {
+        if (deltaX > 50 && touchStartX <= allowedEdge && !sidebarEl.classList.contains('open') && !isInsidePanel) {
           sidebarEl.classList.add('open');
           this.updateSidebarIcon();
         }
@@ -1695,33 +1714,47 @@ class App {
    */
   resetAll() {
     this.selectedCategory = 'all';
+    this.searchQuery = '';
     this.currentPage = 1;
 
     const categoryDropdown = document.getElementById('categoryDropdown');
     if (categoryDropdown) categoryDropdown.value = 'all';
 
+    // 1. Reset Keyword Search (UI & State)
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    const clearBtn = document.querySelector('.clear-btn');
+    if (clearBtn) clearBtn.style.display = 'none';
+
+    if (this.searchModule) {
+      if (typeof this.searchModule.clearSearch === 'function') {
+         this.searchModule.clearSearch();
+      }
+      this.searchModule.currentQuery = '';
+    }
+
+    // 2. Reset Table Sort & Selection
     if (this.cardRenderer) {
       this.cardRenderer.deselectAll();
     }
-
     if (this.tableRenderer) {
       this.tableRenderer.deselectAll();
       this.tableRenderer.sortColumn = null;
       this.tableRenderer.sortDirection = 'desc';
-      this.tableRenderer.columnFilters = {};
-
-      ['code', 'name', 'dimensions', 'location', 'type', 'date', 'status'].forEach(column => {
-        this.tableRenderer.updateFilterButtonState(column, false);
-      });
-
-      this.tableRenderer.applyFiltersAndSort();
-      this.tableRenderer.calculatePagination();
-      this.tableRenderer.currentPage = 1;
-      this.tableRenderer.renderRows();
-      this.tableRenderer.updateAllFilterButtons();
     }
 
-    if (this.currentView === 'card') {
+    // 3. Reset Global Filter
+    if (window.FilterModule && typeof window.FilterModule.resetAll === 'function') {
+      window.FilterModule.resetAll(); 
+      // FilterModule.resetAll() sẽ tự động bắn event filterapplied, gọi lại app.applyFilters()
+    } else {
+      // Fallback
+      if (this.tableRenderer) {
+        this.tableRenderer.applyFiltersAndSort();
+        this.tableRenderer.calculatePagination();
+        this.tableRenderer.currentPage = 1;
+        this.tableRenderer.renderRows();
+      }
       this.applyFilters();
     }
   }

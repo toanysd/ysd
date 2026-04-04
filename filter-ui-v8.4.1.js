@@ -304,8 +304,8 @@ Version:  v8.1.0-7
           '        <span class="vi">Bộ lọc</span>',
           '      </div>',
           '      <button type="button" class="filter-drawer-clear">',
-          '        <span class="ja">クリア＆折りたたむ</span>',
-          '        <span class="vi">Xóa hết</span>',
+          '        <span class="ja">条件クリア＆縮小</span>',
+          '        <span class="vi">Xóa điều kiện lọc và thu gọn</span>',
           '      </button>',
           '    </div>',
           '    <div class="filter-drawer-body">',
@@ -544,7 +544,7 @@ Version:  v8.1.0-7
 
           '    </div>',
           '    <div class="filter-drawer-footer">',
-          '      <button type="button" class="filter-drawer-btn apply"><span class="ja">リセット</span><span class="vi">Reset</span></button>',
+          '      <button type="button" class="filter-drawer-btn apply"><span class="ja">リセットして閉じる</span><span class="vi">Xóa bộ lọc (reset) và đóng</span></button>',
           '      <button type="button" class="filter-drawer-btn close"><span class="ja">閉じる</span><span class="vi">Đóng</span></button>',
           '    </div>',
           '  </div>',
@@ -962,9 +962,47 @@ Version:  v8.1.0-7
       //if (drawerRefs.backdrop) drawerRefs.backdrop.addEventListener('click', function () { self.closeDrawer(); });
       if (drawerRefs.closeBtn) drawerRefs.closeBtn.addEventListener('click', function () { self.closeDrawer(); });
       if (drawerRefs.footerCloseBtn) drawerRefs.footerCloseBtn.addEventListener('click', function () { self.closeDrawer(); });
-      if (drawerRefs.applyBtn) drawerRefs.applyBtn.addEventListener('click', function () { self.resetAll(); });
+      if (drawerRefs.applyBtn) {
+        drawerRefs.applyBtn.addEventListener('click', function () { 
+          if (window.app && typeof window.app.resetAll === 'function') {
+            window.app.resetAll();
+          } else {
+            self.resetAll(); 
+          }
+          self.collapseAllDrawerFields(); 
+          self.closeDrawer(); 
+        });
+      }
 
-      if (drawerRefs.clearBtn) drawerRefs.clearBtn.addEventListener('click', function () { self.resetAll(); self.collapseAllDrawerFields(); });
+      if (drawerRefs.clearBtn) {
+        drawerRefs.clearBtn.addEventListener('click', function () { 
+          self.resetAll(); 
+          self.collapseAllDrawerFields(); 
+        });
+      }
+
+      // Swipe-to-Right to close Mobile Drawer
+      if (drawerRefs.root) {
+        var fdTouchStartX = 0;
+        var fdTouchStartY = 0;
+        drawerRefs.root.addEventListener('touchstart', function(e) {
+          if (e.touches.length === 1) {
+            fdTouchStartX = e.touches[0].clientX;
+            fdTouchStartY = e.touches[0].clientY;
+          }
+        }, { passive: true });
+        
+        drawerRefs.root.addEventListener('touchmove', function(e) {
+          if (!fdTouchStartX || !fdTouchStartY || e.touches.length !== 1) return;
+          var dx = e.touches[0].clientX - fdTouchStartX;
+          var dy = e.touches[0].clientY - fdTouchStartY;
+          // Vuốt sang phải dứt khoát > 60px và không cuộn dọc nhiều (<40px)
+          if (dx > 60 && Math.abs(dy) < 40 && fdTouchStartX < 100) {
+            self.closeDrawer();
+            fdTouchStartX = 0; // trigger only once
+          }
+        }, { passive: true });
+      }
 
       // Drawer controls
       this.setupDrawerControlEvents();
