@@ -468,7 +468,10 @@
       this._allPhotos = ent.photos;
       this._enrichWithDeviceInfo(this._allPhotos);
       this._applyFilters();
-      this._showToast('info', 'Đang dùng cache (bấm "Tải lại" nếu muốn cập nhật).');
+      if (!this._toastCacheShown) {
+        this._showToast('info', 'Đang dùng ảnh từ Cache. Tắt và tải lại nếu cần.');
+        this._toastCacheShown = true;
+      }
       return;
     }
 
@@ -1512,6 +1515,38 @@
   ────────────────────────────────────────────────────────── */
   PhotoManagerModule.prototype._bindAll = function () {
     var self = this;
+
+    /* Mobile Swipe Right to Close/Back */
+    var pmOverlay = document.getElementById('pmOverlay');
+    if (pmOverlay) {
+      var touchStartX = 0;
+      var touchStartY = 0;
+      pmOverlay.addEventListener('touchstart', function(e) {
+        if(e.touches.length === 1) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        }
+      }, {passive: true});
+      pmOverlay.addEventListener('touchmove', function(e) {
+        if (!touchStartX || !touchStartY || e.touches.length !== 1) return;
+        var deltaX = e.touches[0].clientX - touchStartX;
+        var deltaY = e.touches[0].clientY - touchStartY;
+        
+        // Vuốt dứt khoát sang phải (>80px), không bị cuộn dọc (|Y| < 50px), và xuất phát gần lề (<80px)
+        if (deltaX > 80 && Math.abs(deltaY) < 50 && touchStartX < 80) {
+          // Tránh xung đột nếu các Modal con bên trong đang mở
+          var lb = document.getElementById('pmLightbox');
+          var tp = document.getElementById('pmTransferModal');
+          var cp = document.getElementById('pmConfirmDialog');
+          if (lb && !lb.classList.contains('pm-hidden')) return;
+          if (tp && !tp.classList.contains('pm-hidden')) return;
+          if (cp && !cp.classList.contains('pm-hidden')) return;
+          
+          self.close();
+          touchStartX = 0; // Hủy để không trigger nhiều lần
+        }
+      }, {passive: true});
+    }
 
     /* Mobile Hamburger Menu */
     var hamBtn = document.getElementById('pmHamburgerBtn');

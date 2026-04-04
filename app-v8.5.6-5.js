@@ -395,26 +395,51 @@ class App {
       }
     });
 
-    // Thêm tính năng vuốt sang trái để đóng sidebar trên mobile (Swipe Left to Close)
-    const sidebarEl = document.getElementById('sidebar');
-    if (sidebarEl) {
-      let touchStartX = 0;
-      let touchEndX = 0;
-      sidebarEl.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-      }, { passive: true });
-      sidebarEl.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        const isMobile = window.innerWidth <= 768;
-        if (isMobile && sidebarEl.classList.contains('open')) {
-          // Vuốt sang trái dứt khoát > 50px
-          if (touchStartX - touchEndX > 50) {
-            sidebarEl.classList.remove('open');
-            this.updateSidebarIcon();
-          }
+    // Thêm tính năng vuốt từ viền màn hình để mở/đóng Sidebar trên mobile (Swipe to Toggle)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      touchEndY = e.changedTouches[0].screenY;
+      
+      const isMobile = window.innerWidth <= 768;
+      if (!isMobile) return;
+
+      const sidebarEl = document.getElementById('sidebar');
+      if (!sidebarEl) return;
+
+      const deltaX = touchEndX - touchStartX;
+      const MathAbsDeltaY = Math.abs(touchEndY - touchStartY);
+
+      // Chỉ xử lý vuốt ngang (tránh nhầm với cuộn dọc)
+      if (MathAbsDeltaY < 50) {
+        // Kiểm tra xem người dùng có đang vuốt trúng vùng cuộn ngang mặc định không (ví dụ Table)
+        const isTargetScrollable = e.target.closest('.table-scroll-container') || e.target.closest('table');
+        
+        // 1. Vuốt sang phải dứt khoát > 50px VÀ bắt đầu từ gần cạnh trái (startX < 100px để dễ vuốt hơn) -> MỞ Sidebar
+        // Nếu điểm bắt đầu vuốt chạm vào bảng (table), giới hạn lại sát mép (30px) để không cản trở việc cuộn bảng.
+        const allowedEdge = isTargetScrollable ? 30 : 100;
+        
+        if (deltaX > 50 && touchStartX <= allowedEdge && !sidebarEl.classList.contains('open')) {
+          sidebarEl.classList.add('open');
+          this.updateSidebarIcon();
         }
-      }, { passive: true });
-    }
+        
+        // 2. Vuốt sang trái dứt khoát > 50px (âm) -> ĐÓNG Sidebar
+        else if (deltaX < -50 && sidebarEl.classList.contains('open')) {
+          sidebarEl.classList.remove('open');
+          this.updateSidebarIcon();
+        }
+      }
+    }, { passive: true });
 
     // Filter toggle
     const filterToggle = document.querySelector('.filter-toggle');

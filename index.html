@@ -127,6 +127,16 @@
                     </div>
                     <ul class="nav-items">
                         <li class="nav-item">
+                            <!-- Reload app data in Sidebar (Moved to top to prevent accidental clicks at bottom) -->
+                            <a href="#" id="sidebarRefreshDataBtn" class="nav-link" onclick="location.reload(true);">
+                                <i class="fas fa-sync-alt" style="color:#ef4444;"></i>
+                                <div class="nav-link-text">
+                                    <span class="ja">ハードリセット</span>
+                                    <span class="vi">Tải lại Dữ liệu</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="#" class="nav-link" id="sidebarNavMolds">
                                 <i class="fas fa-search"></i>
                                 <div class="nav-link-text">
@@ -248,33 +258,7 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="fas fa-qrcode"></i>
-                                <div class="nav-link-text">
-                                    <span class="ja">QRスキャン</span>
-                                    <span class="vi">Quét QR</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="fas fa-print"></i>
-                                <div class="nav-link-text">
-                                    <span class="ja">印刷</span>
-                                    <span class="vi">In ấn</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="fas fa-file-export"></i>
-                                <div class="nav-link-text">
-                                    <span class="ja">エクスポート</span>
-                                    <span class="vi">Xuất dữ liệu</span>
-                                </div>
-                            </a>
-                        </li>
+                        <!-- Mục bị xóa (Quét QR, In ấn, Xuất dữ liệu) vì bị trùng lặp hoặc không tương thích web mobile -->
                         
                         <li class="nav-item">
                             <a href="#" id="sidebarActionSettingsBtn" class="nav-link">
@@ -286,16 +270,7 @@
                             </a>
                         </li>
                         
-                        <li class="nav-item">
-                            <!-- Reload app data in Sidebar -->
-                            <a href="#" id="sidebarRefreshDataBtn" class="nav-link" onclick="location.reload(true);">
-                                <i class="fas fa-sync-alt" style="color:#ef4444;"></i>
-                                <div class="nav-link-text">
-                                    <span class="ja">ハードリセット</span>
-                                    <span class="vi">Tải lại Dữ liệu</span>
-                                </div>
-                            </a>
-                        </li>
+                        <!-- Nút Hard Reset đã chuyển lên Main Section -->
                     </ul>
                 </div>
             </nav>

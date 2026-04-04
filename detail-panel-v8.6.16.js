@@ -1,4 +1,4 @@
-﻿/* ============================================================================
+/* ============================================================================
 
 DETAIL PANEL MODULE v8.3.4 (Desktop Mold-Centric + Extended Tab)
 
@@ -207,10 +207,10 @@ Created: 2026-02-04
             <span class="tab-label-ja">コート</span>
             <span class="tab-label-vi">Teflon</span>
           </button>
-          <button class="detail-tab" data-tab="status" type="button">
+          <button class="detail-tab" data-tab="devices" type="button">
             <i class="fas fa-clipboard-check"></i>
-            <span class="tab-label-ja">状態</span>
-            <span class="tab-label-vi">Tình trạng</span>
+            <span class="tab-label-ja">関連デバイス</span>
+            <span class="tab-label-vi">Thiết bị</span>
           </button>
           <button class="detail-tab" data-tab="photos" type="button">
             <i class="fas fa-camera"></i>
@@ -268,7 +268,7 @@ Created: 2026-02-04
           <div class="detail-tab-content" data-tab-content="related"></div>
           <div class="detail-tab-content" data-tab-content="history"></div>
           <div class="detail-tab-content" data-tab-content="teflon"></div>
-          <div class="detail-tab-content" data-tab-content="status"></div>
+          <div class="detail-tab-content" data-tab-content="devices"></div>
           <div class="detail-tab-content" data-tab-content="photos"></div>
           <div class="detail-tab-content" data-tab-content="comments"></div>
           <div class="detail-tab-content" data-tab-content="analytics"></div>
@@ -411,7 +411,38 @@ Created: 2026-02-04
       } catch (e) { /* ignore */ }
     }
 
-    bindEvents() {
+    bindEvents() {
+
+      // Mobile Swipe-to-Close Gesture
+      let dpTouchStartX = 0;
+      let dpTouchStartY = 0;
+      
+      this.panel.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          dpTouchStartX = e.touches[0].clientX;
+          dpTouchStartY = e.touches[0].clientY;
+        }
+      }, { passive: true });
+
+      this.panel.addEventListener('touchmove', (e) => {
+        if (!dpTouchStartX || !dpTouchStartY || e.touches.length !== 1) return;
+        const dx = e.touches[0].clientX - dpTouchStartX;
+        const dy = e.touches[0].clientY - dpTouchStartY;
+        
+        // Vuốt phẳng sang phải (>80px), không bị cuộn dọc (|Y| < 50px), bắt đầu sát lề trái panel (<80px)
+        if (dx > 80 && Math.abs(dy) < 50 && dpTouchStartX < 80) {
+          // Bảo vệ scroll cho bảng
+          const isScrollable = e.target.closest('table, .table-scroll-container, .table-wrapper');
+          if (!isScrollable) {
+            if (this.isPreviewOpen && this.isPreviewOpen()) {
+              this.closePreview();
+            } else {
+              this.close();
+            }
+            dpTouchStartX = 0;
+          }
+        }
+      }, { passive: true });
 
       this.panel.addEventListener('click', (e) => {
         const jumpBtn = e.target.closest('button[data-jump]');
@@ -421,7 +452,8 @@ Created: 2026-02-04
           const target = jumpBtn.dataset.jump;
           let tab = 'extended'; // Mặc định mở tab extended
           
-          if (target === 'history') { tab = 'history'; }
+          if (target === 'history') { tab = 'history'; }
+          else if (target === 'devices') { tab = 'devices'; }
           else if (target === 'teflon') { tab = 'teflon'; }
           else if (target === 'storage') { 
               // Storage usually in related or extended. We will map to extended
@@ -1430,7 +1462,7 @@ document.addEventListener('click', (e) => {
         case 'related': html = this.renderRelatedTab(); break;
         case 'history': html = this.renderHistoryTab(); break;
         case 'teflon': html = this.renderTeflonTab(); break;
-        case 'status': html = this.renderStatusTab(); break;
+        case 'devices': html = this.renderDevicesTab(); break;
         case 'photos': html = this.renderPhotosTab(); break;
         case 'comments': html = this.renderCommentsTab(); break;
         
@@ -2210,7 +2242,8 @@ document.addEventListener('click', (e) => {
     handleJump(key) {
       if (!key) return;
 
-      if (key === 'history') { this.switchTab('history'); return; }
+      if (key === 'history') { this.switchTab('history'); return; }
+      if (key === 'devices') { this.switchTab('devices'); return; }
       if (key === 'teflon') { this.switchTab('teflon'); return; }
       if (key === 'extended') { this.switchTab('extended'); return; }
       if (key === 'transfer') { this.switchTab('extended'); this.scrollToAnchor('dp-ext-transfer'); return; }
@@ -2281,7 +2314,8 @@ document.addEventListener('click', (e) => {
 
       let html = '';
       html += this.renderLocationSection(this.currentItem, this.currentItemType);
-      html += this.renderOverviewSection(this.currentItem, this.currentItemType);
+      html += this.renderOverviewSection(this.currentItem, this.currentItemType);
+      html += this.renderMobileRelatedSection(this.currentItem, this.currentItemType);
       html += this.renderStatusNotesSection(this.currentItem, this.currentItemType);
       html += this.renderAdditionalDataSection(this.currentItem, this.currentItemType);
 
@@ -3152,6 +3186,70 @@ document.addEventListener('click', (e) => {
 
 
 
+    renderDevicesTab() {
+      return `<div class="dp-tab-pane active" style="padding-bottom: 2rem;">
+        <div class="dp-d2-card" style="margin-top: 1rem;">
+           <div class="dp-d2-card-body">
+             ${this.renderDesktopMiniRelated(this.currentItem, this.currentItemType)}
+           </div>
+        </div>
+      </div>`;
+    }
+
+    renderMobileRelatedSection(item, type) {
+      if (this.isDesktopWide()) return '';
+
+      try {
+        const t = String(type || '').toLowerCase();
+        let list = [];
+        let title = '';
+        let rowItemType = '';
+
+        if (t === 'mold') {
+          title = 'Dao cắt liên quan';
+          rowItemType = 'cutter';
+          list = this.getRelatedCuttersForMold(item) || [];
+        } else {
+          title = 'Khuôn liên quan';
+          rowItemType = 'mold';
+          list = this.getSharedMoldsForCutter(item) || [];
+        }
+
+        const total = Array.isArray(list) ? list.length : 0;
+        if (!total) return '';
+        
+        const displayList = list.slice(0, 3);
+        const remaining = total - 3;
+
+        let html = '';
+        html += `
+          <div class="modal-section dp-related-section">
+            <div class="section-header color-indigo">
+              <i class="fas fa-link"></i>
+              <span>${this.escapeHtml(title)} (${total})</span>
+            </div>
+            <div class="dp-related-list" style="padding-top:8px;">
+        `;
+
+        for (const r of displayList) {
+          html += this.renderRelatedRow(r, rowItemType);
+        }
+        
+        if (remaining > 0) {
+          html += `
+            <button class="btn-load-more dp-action-btn" type="button" data-jump="devices" style="width:100%; border-radius:8px; display:block; padding:8px; text-align:center; background:#f1f5f9; color:#475569; font-weight:600; font-size:13px; margin-top:8px; border:1px solid #e2e8f0; cursor:pointer;">
+              <i class="fas fa-chevron-right" style="margin-right:4px;"></i> Xem tất cả ${total} thiết bị
+            </button>
+          `;
+        }
+        
+        html += `</div></div>`;
+        return html;
+      } catch (e) {
+        return '';
+      }
+    }
+
     renderDesktopMiniRelated(item, type) {
       try {
         const t = String(type || '').toLowerCase();
@@ -3576,7 +3674,7 @@ document.addEventListener('click', (e) => {
       const row4 = [ { label: this.biLabel('樹脂', 'Loại nhựa'), rawValue: plasticType } ];
       const row5 = [
         { label: this.biLabel('初回出荷日', 'Ngày xuất hàng ĐT'), rawValue: firstShipment },
-        { label: this.biLabel('原価', 'Nguyên giá'), rawValue: costBadge }
+        { label: this.biLabel('原価 (￥)', 'Nguyên giá (￥)'), rawValue: costBadge }
       ];
       const row6 = [
         { label: this.biLabel('枚数', 'Số mảnh khuôn'), rawValue: pieceCount },
@@ -3584,11 +3682,11 @@ document.addEventListener('click', (e) => {
       ];
       const row7 = [
         { label: this.biLabel('金型寸法', 'Kích thước khuôn'), rawValue: moldDimBadge, customClass: 'mold-dim-row' },
-        { label: this.biLabel('重量', 'Khối lượng khuôn'), rawValue: weightText, customClass: 'mold-weight-row' }
+        { label: this.biLabel('重量 (kg)', 'Khối lượng khuôn (kg)'), rawValue: weightText, customClass: 'mold-weight-row' }
       ];
       const row8 = [
         { label: this.biLabel('製品寸法', 'Kích thước SP'), rawValue: prodDimBadge, customClass: 'prod-dim-row' },
-        { label: this.biLabel('製品重量', 'Khối lượng SP'), rawValue: trayWeight, customClass: 'prod-weight-row' }
+        { label: this.biLabel('製品重量 (g)', 'Khối lượng SP (g)'), rawValue: trayWeight, customClass: 'prod-weight-row' }
       ];
 
       const renderGrid = (arr, cls) => {
@@ -3760,7 +3858,7 @@ document.addEventListener('click', (e) => {
         { label: this.biLabel('金型コード', 'Mã khuôn'), rawValue: code },
         
         { label: this.biLabel('寸法', 'Kích thước'), rawValue: dimensions },
-        { label: this.biLabel('金型重量', 'Khối lượng'), rawValue: this.escapeHtml(weightTxt) },
+        { label: this.biLabel('金型重量 (kg)', 'Khối lượng (kg)'), rawValue: this.escapeHtml(weightTxt) },
         { label: this.biLabel('型タイプ', 'Kiểu khuôn'), rawValue: moldType },
         { label: this.biLabel('取付方向', 'Hướng lắp'), rawValue: installDir },
         { label: this.biLabel('枚数', 'Số mảnh'), rawValue: pieceCount },
@@ -3872,7 +3970,7 @@ document.addEventListener('click', (e) => {
         { label: this.biLabel('寸法', 'Kích thước LxWxH'), rawValue: dimensions },
         { label: this.biLabel('樹脂', 'Loại nhựa'), rawValue: plasticType, full: true },
         { label: this.biLabel('枚数', 'Số mảnh khuôn'), rawValue: pieceCount },
-        { label: this.biLabel('重量', 'Khối lượng'), rawValue: this.escapeHtml(weightTxt) },
+        { label: this.biLabel('重量 (kg)', 'Khối lượng (kg)'), rawValue: this.escapeHtml(weightTxt) },
       ];
 
       return `
@@ -4143,12 +4241,12 @@ document.addEventListener('click', (e) => {
         
         // 5. Kích thước khuôn (badge), Khối lượng khuôn, số mảnh khuôn
         { label: this.biLabel('金型寸法', 'Kích thước khuôn'), rawValue: moldDimBadge },
-        { label: this.biLabel('金型重量', 'Khối lượng khuôn'), rawValue: weightText },
+        { label: this.biLabel('金型重量 (kg)', 'Khối lượng khuôn (kg)'), rawValue: weightText },
         { label: this.biLabel('枚数', 'Số mảnh khuôn'), rawValue: pieceCount },
         
         // 6. Kích thước sản phẩm (badge), khối lượng sản phẩm
         { label: this.biLabel('製品寸法', 'Kính thước SP'), rawValue: prodDimBadge },
-        { label: this.biLabel('製品重量', 'Khối lượng SP'), rawValue: trayWeight }
+        { label: this.biLabel('製品重量 (g)', 'Khối lượng SP (g)'), rawValue: trayWeight }
       ];
 
       return `
@@ -4221,7 +4319,7 @@ document.addEventListener('click', (e) => {
         { label: this.biLabel('金型コード', 'Mã khuôn'), rawValue: code },
         
         { label: this.biLabel('寸法', 'Kích thước'), rawValue: dimensions },
-        { label: this.biLabel('金型重量', 'Khối lượng'), rawValue: this.escapeHtml(weightTxt) },
+        { label: this.biLabel('金型重量 (kg)', 'Khối lượng (kg)'), rawValue: this.escapeHtml(weightTxt) },
         { label: this.biLabel('型タイプ', 'Kiểu khuôn'), rawValue: moldType },
         { label: this.biLabel('取付方向', 'Hướng lắp'), rawValue: installDir },
         { label: this.biLabel('枚数', 'Số mảnh'), rawValue: pieceCount },
@@ -4333,7 +4431,7 @@ document.addEventListener('click', (e) => {
         { label: this.biLabel('寸法', 'Kích thước LxWxH'), rawValue: dimensions },
         { label: this.biLabel('樹脂', 'Loại nhựa'), rawValue: plasticType, full: true },
         { label: this.biLabel('枚数', 'Số mảnh khuôn'), rawValue: pieceCount },
-        { label: this.biLabel('重量', 'Khối lượng'), rawValue: this.escapeHtml(weightTxt) },
+        { label: this.biLabel('重量 (kg)', 'Khối lượng (kg)'), rawValue: this.escapeHtml(weightTxt) },
       ];
 
       return `
