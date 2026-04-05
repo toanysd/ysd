@@ -984,13 +984,13 @@ Compatibility goals:
 
     arr.sort(function (a, b) {
       if (field === 'productionDate') {
-        var ta = parseDateToTime(getItemProductionDate(a));
-        var tb = parseDateToTime(getItemProductionDate(b));
-        // đẩy rỗng xuống cuối
-        if (ta === null && tb === null) return 0;
-        if (ta === null) return 1;
-        if (tb === null) return -1;
-        return mul * (ta - tb);
+        var aVal = a.displayDate || a.productionDate || a.ProductionDate || '';
+        var bVal = b.displayDate || b.productionDate || b.ProductionDate || '';
+        var ta = aVal ? new Date(aVal).getTime() : new Date('1900-01-01').getTime();
+        var tb = bVal ? new Date(bVal).getTime() : new Date('1900-01-01').getTime();
+        if (isNaN(ta)) ta = new Date('1900-01-01').getTime();
+        if (isNaN(tb)) tb = new Date('1900-01-01').getTime();
+        return dir === 'asc' ? ta - tb : tb - ta;
       }
 
       if (field === 'id') {
