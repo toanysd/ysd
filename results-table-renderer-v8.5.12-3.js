@@ -56,9 +56,7 @@ class ResultsTableRenderer {
     this.currentPage = 1;
     this.totalPages = 1;
 
-    // Column filters
-    this.columnFilters = {};
-    this.activeFilterPopup = null;
+
 
     // Lock/Unlock
     this.isLocked = true;
@@ -86,14 +84,8 @@ class ResultsTableRenderer {
     // Bind to existing HTML controls
     this.bindHTMLControls();
 
-    // Close filter popup when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.column-filter-btn') && !e.target.closest('.filter-popup')) {
-        this.closeFilterPopup();
-      }
-    });
-
     // Apply saved widths (if any)
+
     this.applySavedColumnWidths();
 
     // Enable resizing handles
@@ -178,11 +170,7 @@ class ResultsTableRenderer {
     const wrapper = document.createElement('div');
     wrapper.className = 'table-wrapper';
 
-    const th = (colKey, ja, vi, hasFilter = true, resizable = true) => {
-      const filterBtn = hasFilter
-        ? `<button class="column-filter-btn" data-column="${colKey}" aria-label="filter">🔽</button>`
-        : '';
-
+    const th = (colKey, ja, vi, resizable = true) => {
       const resizer = (resizable && this.resizableCols.includes(colKey))
         ? `<span class="col-resizer" data-column="${colKey}" title="Kéo để đổi kích thước cột"></span>`
         : '';
@@ -195,7 +183,6 @@ class ResultsTableRenderer {
         <th class="col-${colKey}" data-column="${colKey}">
           <div class="th-content">
             ${label}
-            ${filterBtn}
           </div>
           ${resizer}
         </th>
@@ -222,14 +209,14 @@ class ResultsTableRenderer {
               <th class="col-checkbox" data-column="checkbox">
                 <input type="checkbox" id="selectAllTable" aria-label="select all">
               </th>
-              ${th('id', 'ID', null, true, true)}
-              ${th('code', 'コード', 'Mã', true, true)}
-              ${th('name', '製品情報', 'Sản phẩm', true, true)}
-              ${th('dimensions', '寸法', 'Kích thước', true, true)}
-              ${th('location', '位置', 'Vị trí', true, true)}
-              ${th('type', '種類', 'Loại', true, false)}
-              ${th('date', '更新日', 'Ngày cập nhật', true, true)}
-              ${th('status', '状態', 'Trạng thái', true, false)}
+              ${th('id', 'ID', null, true)}
+              ${th('code', 'コード', 'Mã', true)}
+              ${th('name', '製品情報', 'Sản phẩm', true)}
+              ${th('dimensions', '寸法', 'Kích thước', true)}
+              ${th('location', '位置', 'Vị trí', true)}
+              ${th('type', '種類', 'Loại', false)}
+              ${th('date', '更新日', 'Ngày cập nhật', true)}
+              ${th('status', '状態', 'Trạng thái', false)}
               <th class="col-actions" data-column="actions">操作</th>
             </tr>
           </thead>
@@ -263,23 +250,14 @@ class ResultsTableRenderer {
       });
     }
 
-    // Column filter buttons
-    table.querySelectorAll('.column-filter-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const column = btn.dataset.column;
-        this.openFilterPopup(column, btn);
-      });
-    });
-
     // Sort by clicking header (except checkbox/actions)
     table.querySelectorAll('th[class^="col-"]').forEach(th => {
       if (th.classList.contains('col-checkbox') || th.classList.contains('col-actions')) return;
 
       th.addEventListener('click', (e) => {
-        if (e.target.closest('.column-filter-btn') || e.target.closest('.col-resizer')) return;
+        if (e.target.closest('.col-resizer')) return;
 
-        const column = th.dataset.column || th.querySelector('.column-filter-btn')?.dataset.column;
+        const column = th.dataset.column;
         if (column && column !== 'checkbox' && column !== 'actions') {
           if (this.sortColumn === column) {
             this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -292,7 +270,6 @@ class ResultsTableRenderer {
           this.applyFiltersAndSort();
           this.calculatePagination();
           this.renderRows();
-          this.updateAllFilterButtons();
         }
       });
     });
@@ -313,7 +290,6 @@ class ResultsTableRenderer {
     }
 
     this.renderRows();
-    this.updateAllFilterButtons();
     this.updatePaginationResultCount();
   }
 
@@ -325,17 +301,6 @@ class ResultsTableRenderer {
 
   applyFiltersAndSort() {
     let filtered = [...this.items];
-
-    // Column filters
-    Object.keys(this.columnFilters).forEach(column => {
-      const filterValues = this.columnFilters[column];
-      if (filterValues && filterValues.length > 0) {
-        filtered = filtered.filter(item => {
-          const value = this.getColumnValue(item, column);
-          return filterValues.includes(value);
-        });
-      }
-    });
 
     // Sorting
     filtered.sort((a, b) => {
@@ -868,177 +833,7 @@ class ResultsTableRenderer {
     }
   }
 
-  /* ------------------------------------------------------------------------
-     Filter popup
-  ------------------------------------------------------------------------ */
-  openFilterPopup(column, buttonEl) {
-    this.closeFilterPopup();
 
-    const rect = buttonEl.getBoundingClientRect();
-    const popup = this.createFilterPopup(column);
-
-    document.body.appendChild(popup);
-
-    popup.style.left = `${rect.left}px`;
-    popup.style.top = `${rect.bottom + 6}px`;
-
-    const popupRect = popup.getBoundingClientRect();
-    if (popupRect.right > window.innerWidth) {
-      popup.style.left = `${window.innerWidth - popupRect.width - 10}px`;
-    }
-    if (popupRect.bottom > window.innerHeight) {
-      popup.style.top = `${rect.top - popupRect.height - 6}px`;
-    }
-
-    this.activeFilterPopup = popup;
-  }
-
-  createFilterPopup(column) {
-    const popup = document.createElement('div');
-    popup.className = 'filter-popup';
-    popup.dataset.column = column;
-
-    const uniqueValues = [...new Set(
-      this.items.map(item => this.getColumnValue(item, column))
-    )].filter(v => v !== null && v !== undefined && String(v).trim() !== '').sort();
-
-    const activeFilters = this.columnFilters[column] || [];
-
-    popup.innerHTML = `
-      <div class="filter-popup-header">
-        <span class="filter-popup-title">フィルター / Filter</span>
-        <button class="filter-popup-close" aria-label="close">✕</button>
-      </div>
-      <div class="filter-popup-body">
-        <div class="filter-sort-section">
-          <button class="filter-sort-btn" data-dir="asc">▲ 昇順 / Tăng dần</button>
-          <button class="filter-sort-btn" data-dir="desc">▼ 降順 / Giảm dần</button>
-        </div>
-        <div class="filter-divider"></div>
-        <div class="filter-values-section">
-          <div class="filter-search">
-            <input type="text" class="filter-search-input" placeholder="検索 / Tìm kiếm...">
-          </div>
-          <div class="filter-select-all">
-            <label>
-              <input type="checkbox" class="filter-select-all-cb" ${activeFilters.length === 0 ? 'checked' : ''}>
-              <span>すべて選択 / Chọn tất cả</span>
-            </label>
-          </div>
-          <div class="filter-values-list">
-            ${uniqueValues.map(value => `
-              <label class="filter-value-item">
-                <input type="checkbox" value="${String(value).replace(/"/g,'&quot;')}" ${activeFilters.length === 0 || activeFilters.includes(value) ? 'checked' : ''}>
-                <span>${value}</span>
-              </label>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-      <div class="filter-popup-footer">
-        <button class="filter-clear-btn">クリア / Clear</button>
-        <button class="filter-apply-btn">適用 / Apply</button>
-      </div>
-    `;
-
-    this.bindFilterPopupEvents(popup, column);
-    return popup;
-  }
-
-  bindFilterPopupEvents(popup, column) {
-    popup.querySelector('.filter-popup-close').addEventListener('click', () => {
-      this.closeFilterPopup();
-    });
-
-    popup.querySelectorAll('.filter-sort-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.sortColumn = column;
-        this.sortDirection = btn.dataset.dir;
-        this.currentPage = 1;
-        this.applyFiltersAndSort();
-        this.calculatePagination();
-        this.renderRows();
-        this.updateAllFilterButtons();
-        this.closeFilterPopup();
-      });
-    });
-
-    const searchInput = popup.querySelector('.filter-search-input');
-    searchInput.addEventListener('input', () => {
-      const query = (searchInput.value || '').toLowerCase();
-      popup.querySelectorAll('.filter-value-item').forEach(item => {
-        const text = (item.textContent || '').toLowerCase();
-        item.style.display = text.includes(query) ? '' : 'none';
-      });
-    });
-
-    const selectAllCb = popup.querySelector('.filter-select-all-cb');
-    selectAllCb.addEventListener('change', () => {
-      const checked = selectAllCb.checked;
-      popup.querySelectorAll('.filter-value-item input').forEach(cb => {
-        cb.checked = checked;
-      });
-    });
-
-    popup.querySelector('.filter-clear-btn').addEventListener('click', () => {
-      delete this.columnFilters[column];
-      this.currentPage = 1;
-      this.applyFiltersAndSort();
-      this.calculatePagination();
-      this.renderRows();
-      this.updateFilterButtonState(column, false);
-      this.closeFilterPopup();
-    });
-
-    popup.querySelector('.filter-apply-btn').addEventListener('click', () => {
-      const selectedValues = Array.from(
-        popup.querySelectorAll('.filter-value-item input:checked')
-      ).map(cb => cb.value);
-
-      const total = popup.querySelectorAll('.filter-value-item input').length;
-      if (selectedValues.length === total) {
-        delete this.columnFilters[column];
-        this.updateFilterButtonState(column, false);
-      } else {
-        this.columnFilters[column] = selectedValues;
-        this.updateFilterButtonState(column, true);
-      }
-
-      this.currentPage = 1;
-      this.applyFiltersAndSort();
-      this.calculatePagination();
-      this.renderRows();
-      this.closeFilterPopup();
-    });
-  }
-
-  closeFilterPopup() {
-    if (this.activeFilterPopup) {
-      this.activeFilterPopup.remove();
-      this.activeFilterPopup = null;
-    }
-  }
-
-  updateFilterButtonState(column, active) {
-    const btn = this.container.querySelector(`.column-filter-btn[data-column="${column}"]`);
-    if (!btn) return;
-
-    const isSorted = this.sortColumn === column;
-    let icon = '🔽';
-    if (isSorted) icon = this.sortDirection === 'asc' ? '▲' : '▼';
-
-    btn.textContent = icon;
-
-    if (active || isSorted) btn.classList.add('active');
-    else btn.classList.remove('active');
-  }
-
-  updateAllFilterButtons() {
-    ['id','code','name','dimensions','location','type','date','status'].forEach(column => {
-      const hasFilter = this.columnFilters[column] && this.columnFilters[column].length > 0;
-      this.updateFilterButtonState(column, hasFilter);
-    });
-  }
 
   /* ------------------------------------------------------------------------
      Selection API
@@ -1124,9 +919,7 @@ class ResultsTableRenderer {
 
   needsReset() {
     const hasSort = this.sortColumn !== null || this.sortDirection !== 'desc';
-    const f = this.columnFilters || {};
-    const hasFilter = Object.keys(f).some(k => f[k] && f[k].length > 0);
-    return hasSort || hasFilter;
+    return hasSort;
   }
 
   getTotalPages() {

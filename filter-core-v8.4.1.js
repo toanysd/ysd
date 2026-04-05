@@ -34,70 +34,94 @@ Compatibility goals:
   // Các field legacy (giữ giống file v8.1.0-6-4)
   var FILTER_FIELDS = [
     { id: 'itemType', label: '種別 / Loại', get: function (it) { return it.itemType || it.type; } },
-    { id: 'storageCompany', label: '保管会社 / Công ty giữ', get: function (it) {
-      return (it.storageCompanyInfo && (it.storageCompanyInfo.CompanyShortName || it.storageCompanyInfo.CompanyName))
-        || it.displayStorageCompany
-        || it.storageCompany
-        || '';
-    } },
-    { id: 'rackLocation', label: '棚位置 / Vị trí kệ', get: function (it) {
-      return (it.rackInfo && it.rackInfo.RackLocation)
-        || it.displayRackLocation
-        || it.rackLocation
-        || '';
-    } },
-    { id: 'rackId', label: '棚番号 / Mã kệ', get: function (it) {
-      return (it.rackLayerInfo && it.rackLayerInfo.RackID)
-        || (it.rackInfo && it.rackInfo.RackID)
-        || it.rackId
-        || '';
-    } },
-    { id: 'rackLayerId', label: '棚位置ID / Giá-Tầng (ID)', get: function (it) {
-      return it.RackLayerID
-        || (it.rackLayerInfo && it.rackLayerInfo.RackLayerID)
-        || it.location
-        || it.rackNo
-        || '';
-    } },
-    { id: 'layerNum', label: '棚の段 / Tầng', get: function (it) {
-      return (it.rackLayerInfo && (it.rackLayerInfo.RackLayerNumber || it.rackLayerInfo.RackLayerNo || it.rackLayerInfo.LayerNumber))
-        || '';
-    } },
-    { id: 'drawing', label: '図番 / Mã bản vẽ', get: function (it) {
-      var d = it.designInfo || {};
-      return d.CustomerDrawingNo || d.DrawingNumber || d.drawingNumber || d.DrawingNo
-        || it.CustomerDrawingNo || it.DrawingNumber || it.drawingNumber
-        || '';
-    } },
-    { id: 'equip', label: '設備コード / Thiết bị', get: function (it) {
-      var d = it.designInfo || {};
-      return d.CustomerEquipmentNo || d.EquipmentCode || d.equipmentCode
-        || it.CustomerEquipmentNo || it.EquipmentCode || it.equipmentCode
-        || '';
-    } },
-    { id: 'plastic', label: '樹脂 / Loại nhựa', get: function (it) {
-      var d = it.designInfo || {};
-      return it.plasticType || d.DesignForPlasticType || d.PlasticType || '';
-    } },
-    { id: 'dim', label: '寸法 / Kích thước', get: function (it) {
-      return it.displayDimensions || it.dimensions || it.displaySize || it.Size || it.Dimensions || '';
-    } },
-    { id: 'customer', label: '顧客名 / Khách hàng', get: function (it) {
-      return (it.customerInfo && (it.customerInfo.CustomerShortName || it.customerInfo.CustomerName))
-        || it.displayCustomer
-        || '';
-    } },
-    { id: 'status', label: '状態 / Trạng thái', get: function (it) {
-      return (it.latestStatusLog && it.latestStatusLog.Status)
-        || it.lastStatus
-        || null;
-    } },
-    { id: 'teflon', label: 'Teflon', get: function (it) {
-      return it.teflonStatus
-        || (it.latestTeflonLog && (it.latestTeflonLog.TeflonStatus || it.latestTeflonLog.Status))
-        || it.TeflonCoating
-        || null;
-    } },
+    {
+      id: 'storageCompany', label: '保管会社 / Công ty giữ', get: function (it) {
+        return (it.storageCompanyInfo && (it.storageCompanyInfo.CompanyShortName || it.storageCompanyInfo.CompanyName))
+          || it.displayStorageCompany
+          || it.storageCompany
+          || '';
+      }
+    },
+    {
+      id: 'rackLocation', label: '棚位置 / Vị trí kệ', get: function (it) {
+        return (it.rackInfo && it.rackInfo.RackLocation)
+          || it.displayRackLocation
+          || it.rackLocation
+          || '';
+      }
+    },
+    {
+      id: 'rackId', label: '棚番号 / Mã kệ', get: function (it) {
+        return (it.rackLayerInfo && it.rackLayerInfo.RackID)
+          || (it.rackInfo && it.rackInfo.RackID)
+          || it.rackId
+          || '';
+      }
+    },
+    {
+      id: 'rackLayerId', label: '棚位置ID / Giá-Tầng (ID)', get: function (it) {
+        return it.RackLayerID
+          || (it.rackLayerInfo && it.rackLayerInfo.RackLayerID)
+          || it.location
+          || it.rackNo
+          || '';
+      }
+    },
+    {
+      id: 'layerNum', label: '棚の段 / Tầng', get: function (it) {
+        return (it.rackLayerInfo && (it.rackLayerInfo.RackLayerNumber || it.rackLayerInfo.RackLayerNo || it.rackLayerInfo.LayerNumber))
+          || '';
+      }
+    },
+    {
+      id: 'drawing', label: '図番 / Mã bản vẽ', get: function (it) {
+        var d = it.designInfo || {};
+        return d.CustomerDrawingNo || d.DrawingNumber || d.drawingNumber || d.DrawingNo
+          || it.CustomerDrawingNo || it.DrawingNumber || it.drawingNumber
+          || '';
+      }
+    },
+    {
+      id: 'equip', label: '設備コード / Thiết bị', get: function (it) {
+        var d = it.designInfo || {};
+        return d.CustomerEquipmentNo || d.EquipmentCode || d.equipmentCode
+          || it.CustomerEquipmentNo || it.EquipmentCode || it.equipmentCode
+          || '';
+      }
+    },
+    {
+      id: 'plastic', label: '樹脂 / Loại nhựa', get: function (it) {
+        var d = it.designInfo || {};
+        return it.plasticType || d.DesignForPlasticType || d.PlasticType || '';
+      }
+    },
+    {
+      id: 'dim', label: '寸法 / Kích thước', get: function (it) {
+        return it.displayDimensions || it.dimensions || it.displaySize || it.Size || it.Dimensions || '';
+      }
+    },
+    {
+      id: 'customer', label: '顧客名 / Khách hàng', get: function (it) {
+        return (it.customerInfo && (it.customerInfo.CustomerShortName || it.customerInfo.CustomerName))
+          || it.displayCustomer
+          || '';
+      }
+    },
+    {
+      id: 'status', label: '状態 / Trạng thái', get: function (it) {
+        return (it.latestStatusLog && it.latestStatusLog.Status)
+          || it.lastStatus
+          || null;
+      }
+    },
+    {
+      id: 'teflon', label: 'Teflon', get: function (it) {
+        return it.teflonStatus
+          || (it.latestTeflonLog && (it.latestTeflonLog.TeflonStatus || it.latestTeflonLog.Status))
+          || it.TeflonCoating
+          || null;
+      }
+    },
     { id: 'returning', label: '返却 / Returning', get: function (it) { return it.MoldReturning || ''; } },
     { id: 'disposing', label: '廃棄 / Disposing', get: function (it) { return it.MoldDisposing || ''; } }
   ];
@@ -243,6 +267,100 @@ Compatibility goals:
     }
 
     return null;
+  }
+
+  // -------------------------------------------------------------------------
+  // Smart Parsers (AND / OR / Numeric)
+  // -------------------------------------------------------------------------
+
+  function evaluateSmartText(haystack, pattern) {
+    if (!pattern) return true;
+    var ht = toLowerSafe(haystack);
+    var pt = toLowerSafe(pattern);
+
+    // Tách bằng OR (dấu phẩy hoặc gạch đứng)
+    var orGroups = pt.split(/,|\|/);
+    for (var i = 0; i < orGroups.length; i++) {
+      var group = orGroups[i].trim();
+      if (!group) continue;
+
+      // Trong một group OR, mọi token AND phải khớp (phân tách bằng + hoặc &)
+      var andTokens = group.split(/\+|&/);
+      var groupPass = true;
+      for (var j = 0; j < andTokens.length; j++) {
+        var token = andTokens[j].trim();
+        if (!token) continue;
+
+        // Xử lý loại trừ nếu bắt đầu bằng dấu trừ '-'
+        if (token.charAt(0) === '-' && token.length > 1) {
+          var excludeToken = token.substring(1).trim();
+          if (excludeToken && ht.indexOf(excludeToken) !== -1) {
+            groupPass = false;
+            break;
+          }
+        } else {
+          if (ht.indexOf(token) === -1) {
+            groupPass = false;
+            break;
+          }
+        }
+      }
+      if (groupPass) return true;
+    }
+    return false;
+  }
+
+  function evaluateSmartNumeric(actualValue, pattern) {
+    if (!pattern) return true;
+    if (actualValue === null || actualValue === undefined || isNaN(actualValue)) return false;
+
+    var pt = normalizeText(pattern).replace(/\s+/g, '');
+    if (!pt) return true;
+
+    // Khoảng: 100-200
+    var rangeMatch = pt.match(/^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/);
+    if (rangeMatch) {
+      var min = parseFloat(rangeMatch[1]);
+      var max = parseFloat(rangeMatch[2]);
+      return actualValue >= min && actualValue <= max;
+    }
+
+    // Toán tử >=, <=, >, <, =
+    var opMatch = pt.match(/^(>=|<=|>|<|=)(\d+(?:\.\d+)?)$/);
+    if (opMatch) {
+      var op = opMatch[1];
+      var thres = parseFloat(opMatch[2]);
+      if (op === '>') return actualValue > thres;
+      if (op === '>=') return actualValue >= thres;
+      if (op === '<') return actualValue < thres;
+      if (op === '<=') return actualValue <= thres;
+      if (op === '=') return actualValue === thres;
+    }
+
+    // Giá trị chính xác tuyệt đối
+    var numPt = parseFloat(pt);
+    if (!isNaN(numPt)) {
+      // Allow a tiny margin for floats if needed, but exact is fine here.
+      return parseFloat(actualValue) === numPt;
+    }
+    return false;
+  }
+
+  function evaluateSmartDimensionOrRack(actualText, pattern) {
+    if (!pattern) return true;
+    // Cố gắng lấy số đầu tiên
+    var actualNum = safeParseFloat(actualText);
+    if (actualNum !== null) {
+      var ptClean = normalizeText(pattern).replace(/\s+/g, '');
+      // Nếu pattern có vẻ là biểu thức toán học
+      if (/^(>=|<=|>|<|=|-|\d)/.test(ptClean)) {
+        var isPass = evaluateSmartNumeric(actualNum, pattern);
+        if (isPass) return true;
+      }
+    }
+
+    // Fallback text match an toàn
+    return evaluateSmartText(actualText, pattern);
   }
 
   // -------------------------------------------------------------------------
@@ -421,10 +539,8 @@ Compatibility goals:
 
         // 5) dimension
         dimension: {
-          quickSelect: '',
-          quickText: '',
-          L: { min: null, max: null },
-          W: { min: null, max: null }
+          length: '',
+          width: ''
         },
 
         // 6) productionDate
@@ -446,7 +562,7 @@ Compatibility goals:
         orientation: { selected: [] },
 
         // 12) draftAngle
-        draftAngle: { min: null, max: null },
+        draftAngle: { text: '' },
 
         // 13) underAngle
         underAngle: { select: '', text: '' },
@@ -567,8 +683,7 @@ Compatibility goals:
       });
     }
 
-    // 1) legacy quick filter
-    list = this._applyLegacyFilter(list);
+    // 1) (Removed legacy quick filter)
 
     // 2) advanced drawer filters
     list = this._applyAdvancedFilters(list);
@@ -638,106 +753,91 @@ Compatibility goals:
     var out = items;
 
     // 2) customer
-    if (adv.customer) {
-      var cusSel = normalizeText(adv.customer.select);
+    if (adv.customer && normalizeText(adv.customer.text)) {
       var cusTxt = normalizeText(adv.customer.text);
-      if (cusSel) {
-        out = out.filter(function (it) {
-          return displayText(getItemCustomerText(it)) === displayText(cusSel);
-        });
-      }
-      if (cusTxt) {
-        out = out.filter(function (it) {
-          return containsText(getItemCustomerText(it), cusTxt);
-        });
-      }
+      out = out.filter(function (it) {
+        return evaluateSmartText(getItemCustomerText(it), cusTxt);
+      });
     }
 
     // 3) storageCompany
-    if (adv.storageCompany) {
-      var stSel = normalizeText(adv.storageCompany.select);
+    if (adv.storageCompany && normalizeText(adv.storageCompany.text)) {
       var stTxt = normalizeText(adv.storageCompany.text);
-      if (stSel) {
-        out = out.filter(function (it) {
-          return displayText(getItemStorageCompanyText(it)) === displayText(stSel);
-        });
-      }
-      if (stTxt) {
-        out = out.filter(function (it) {
-          return containsText(getItemStorageCompanyText(it), stTxt);
-        });
-      }
+      out = out.filter(function (it) {
+        return evaluateSmartText(getItemStorageCompanyText(it), stTxt);
+      });
     }
 
-    // 4) rackLayer
-    if (adv.rackLayer) {
-      var rlSel = normalizeText(adv.rackLayer.select);
+    // 4) rackLayer (now supports Math like > 3 for numeric layers)
+    if (adv.rackLayer && normalizeText(adv.rackLayer.text)) {
       var rlTxt = normalizeText(adv.rackLayer.text);
+      out = out.filter(function (it) {
+        var idStr = normalizeText(getItemRackLayerId(it));
+        var locStr = normalizeText(getItemRackLocation(it));
+        var fullStr = idStr + ' ' + locStr;
+        return evaluateSmartDimensionOrRack(idStr, rlTxt) || evaluateSmartDimensionOrRack(locStr, rlTxt) || evaluateSmartText(fullStr, rlTxt);
+      });
+    }
 
-      if (rlSel) {
+    // 5A) Cutline dimension (Smart Numeric Parsers for Cutters/Products)
+    if (adv.cutline) {
+      var kL = normalizeText(adv.cutline.length);
+      var kW = normalizeText(adv.cutline.width);
+      if (kL || kW) {
         out = out.filter(function (it) {
-          // Cho phép UI truyền: "RackLayerID" hoặc "RackLayerID <space> RackLocation"
-          var id = normalizeText(getItemRackLayerId(it));
-          var loc = normalizeText(getItemRackLocation(it));
+          var x = null; var y = null;
+          var d = (it && it.designInfo) ? it.designInfo : {};
 
-          // tách id nếu string có phần location
-          var expectId = rlSel;
-          var m = rlSel.match(/^([^\s\-]+)\s*[-\s].+$/);
-          if (m && m[1]) expectId = m[1].trim();
+          var cx = d.CutlineX || it.CutlineX || null;
+          var cy = d.CutlineY || it.CutlineY || null;
 
-          // Ưu tiên match ID
-          if (expectId && id && id === expectId) return true;
+          if (cx !== null || cy !== null) {
+            x = safeParseFloat(cx);
+            y = safeParseFloat(cy);
+            if (x === null && y === null) {
+              // Fallback parse string
+              var nums = parseDimensionNumbers(cx || cy);
+              if (nums) {
+                x = nums[0] !== undefined ? nums[0] : null;
+                y = nums[1] !== undefined ? nums[1] : null;
+              }
+            }
+          } else {
+            var cl = it.CutlineLength || d.CutlineLength || null;
+            var cw = it.CutlineWidth || d.CutlineWidth || null;
+            if (cl !== null || cw !== null) {
+              x = safeParseFloat(cl);
+              y = safeParseFloat(cw);
+            }
+          }
 
-          // Nếu không match ID, thử match nguyên chuỗi vào location
-          if (loc && (loc === rlSel || loc.indexOf(rlSel) !== -1)) return true;
+          if (x === null && y === null) return false;
 
-          // Cuối cùng: match vào id (contains)
-          if (id && id.indexOf(rlSel) !== -1) return true;
+          if (kL && !evaluateSmartNumeric(x, kL)) return false;
+          if (kW && !evaluateSmartNumeric(y, kW)) return false;
 
-          return false;
-        });
-      }
-
-      if (rlTxt) {
-        out = out.filter(function (it) {
-          return containsText(getItemRackLayerId(it) + ' ' + getItemRackLocation(it), rlTxt);
+          return true;
         });
       }
     }
 
-    // 5) dimension
+    // 5) dimension (Smart Numeric Parsers)
     if (adv.dimension) {
-      var dqSel = normalizeText(adv.dimension.quickSelect);
-      var dqTxt = normalizeText(adv.dimension.quickText);
-      var Lmin = (adv.dimension.L && adv.dimension.L.min !== null && adv.dimension.L.min !== '') ? safeParseFloat(adv.dimension.L.min) : null;
-      var Lmax = (adv.dimension.L && adv.dimension.L.max !== null && adv.dimension.L.max !== '') ? safeParseFloat(adv.dimension.L.max) : null;
-      var Wmin = (adv.dimension.W && adv.dimension.W.min !== null && adv.dimension.W.min !== '') ? safeParseFloat(adv.dimension.W.min) : null;
-      var Wmax = (adv.dimension.W && adv.dimension.W.max !== null && adv.dimension.W.max !== '') ? safeParseFloat(adv.dimension.W.max) : null;
+      var lTxt = normalizeText(adv.dimension.length);
+      var wTxt = normalizeText(adv.dimension.width);
 
-      if (dqSel) {
-        out = out.filter(function (it) {
-          return displayText(getItemDimensionText(it)) === displayText(dqSel);
-        });
-      }
-
-      if (dqTxt) {
-        out = out.filter(function (it) {
-          return containsText(getItemDimensionText(it), dqTxt);
-        });
-      }
-
-      if (Lmin !== null || Lmax !== null || Wmin !== null || Wmax !== null) {
+      if (lTxt || wTxt) {
         out = out.filter(function (it) {
           var dim = getItemDimensionText(it);
           var nums = parseDimensionNumbers(dim);
-          if (!nums) return false;
-          var L = (nums[0] === undefined) ? null : nums[0];
-          var W = (nums[1] === undefined) ? null : nums[1];
+          if (!nums && (lTxt || wTxt)) return false;
 
-          if (Lmin !== null && (L === null || L < Lmin)) return false;
-          if (Lmax !== null && (L === null || L > Lmax)) return false;
-          if (Wmin !== null && (W === null || W < Wmin)) return false;
-          if (Wmax !== null && (W === null || W > Wmax)) return false;
+          var L = nums ? ((nums[0] === undefined) ? null : nums[0]) : null;
+          var W = nums ? ((nums[1] === undefined) ? null : nums[1]) : null;
+
+          if (lTxt && !evaluateSmartNumeric(L, lTxt)) return false;
+          if (wTxt && !evaluateSmartNumeric(W, wTxt)) return false;
+
           return true;
         });
       }
@@ -765,31 +865,31 @@ Compatibility goals:
       }
     }
 
-    // 7) plastic contains
+    // 7) plastic (Smart)
     if (adv.plastic && normalizeText(adv.plastic.text)) {
       var ptxt = normalizeText(adv.plastic.text);
       out = out.filter(function (it) {
-        return containsText(getItemPlasticText(it), ptxt);
+        return evaluateSmartText(getItemPlasticText(it), ptxt);
       });
     }
 
-    // 8) textContent (engraving) contains
+    // 8) textContent / engraving (Smart)
     if (adv.textContent && normalizeText(adv.textContent.text)) {
       var etxt = normalizeText(adv.textContent.text);
       out = out.filter(function (it) {
-        return containsText(getItemEngravingText(it), etxt);
+        return evaluateSmartText(getItemEngravingText(it), etxt);
       });
     }
 
-    // 9) trayInfo contains
+    // 9) trayInfo (Smart)
     if (adv.trayInfo && normalizeText(adv.trayInfo.text)) {
       var ttxt = normalizeText(adv.trayInfo.text);
       out = out.filter(function (it) {
-        return containsText(getItemTrayInfoText(it), ttxt);
+        return evaluateSmartText(getItemTrayInfoText(it), ttxt);
       });
     }
 
-    // 10) setupType checkboxes (OR within selected, AND with others)
+    // 10) setupType checkboxes (Giữ nguyên logic Array)
     if (adv.setupType && Array.isArray(adv.setupType.selected) && adv.setupType.selected.length) {
       var setupSet = {};
       adv.setupType.selected.forEach(function (v) { setupSet[displayText(v)] = true; });
@@ -799,7 +899,7 @@ Compatibility goals:
       });
     }
 
-    // 11) orientation checkboxes
+    // 11) orientation checkboxes (Giữ nguyên logic Array)
     if (adv.orientation && Array.isArray(adv.orientation.selected) && adv.orientation.selected.length) {
       var oriSet = {};
       adv.orientation.selected.forEach(function (v) { oriSet[displayText(v)] = true; });
@@ -809,51 +909,32 @@ Compatibility goals:
       });
     }
 
-    // 12) draftAngle range
-    if (adv.draftAngle) {
-      var dmin = (adv.draftAngle.min !== null && adv.draftAngle.min !== '') ? safeParseFloat(adv.draftAngle.min) : null;
-      var dmax = (adv.draftAngle.max !== null && adv.draftAngle.max !== '') ? safeParseFloat(adv.draftAngle.max) : null;
-      if (dmin !== null || dmax !== null) {
-        out = out.filter(function (it) {
-          var v = safeParseFloat(getItemDraftAngle(it));
-          if (v === null) return false;
-          if (dmin !== null && v < dmin) return false;
-          if (dmax !== null && v > dmax) return false;
-          return true;
-        });
-      }
+    // 12) draftAngle checkboxes (Array matching like SetupType)
+    if (adv.draftAngle && Array.isArray(adv.draftAngle.selected) && adv.draftAngle.selected.length) {
+      var daSet = {};
+      adv.draftAngle.selected.forEach(function (v) { daSet[displayText(v)] = true; });
+      out = out.filter(function (it) {
+        var v = displayText(getItemDraftAngle(it));
+        return !!daSet[v];
+      });
     }
 
-    // 13) underAngle (select exact + text contains)
-    if (adv.underAngle) {
-      var uaSel = normalizeText(adv.underAngle.select);
-      var uaTxt = normalizeText(adv.underAngle.text);
-      if (uaSel) {
-        out = out.filter(function (it) {
-          return displayText(getItemUnderAngle(it)) === displayText(uaSel);
-        });
-      }
-      if (uaTxt) {
-        out = out.filter(function (it) {
-          return containsText(getItemUnderAngle(it), uaTxt);
-        });
-      }
+    // 13) underAngle checkboxes (Array matching like SetupType)
+    if (adv.underAngle && Array.isArray(adv.underAngle.selected) && adv.underAngle.selected.length) {
+      var uaSet = {};
+      adv.underAngle.selected.forEach(function (v) { uaSet[displayText(v)] = true; });
+      out = out.filter(function (it) {
+        var v = displayText(getItemUnderAngle(it));
+        return !!uaSet[v];
+      });
     }
 
-    // 14) cutline size
-    if (adv.cutline) {
-      var clSel = normalizeText(adv.cutline.select);
+    // 14) cutline size (Smart)
+    if (adv.cutline && normalizeText(adv.cutline.text)) {
       var clTxt = normalizeText(adv.cutline.text);
-      if (clSel) {
-        out = out.filter(function (it) {
-          return displayText(getItemCutlineSizeText(it)) === displayText(clSel);
-        });
-      }
-      if (clTxt) {
-        out = out.filter(function (it) {
-          return containsText(getItemCutlineSizeText(it), clTxt);
-        });
-      }
+      out = out.filter(function (it) {
+        return evaluateSmartDimensionOrRack(getItemCutlineSizeText(it), clTxt);
+      });
     }
 
     // 15) status flags
@@ -924,8 +1005,10 @@ Compatibility goals:
         return mul * naturalCompare(getItemLocation(a), getItemLocation(b));
       }
 
-      if (field === 'size') {
-        return compareDimensionsWithEmptyLast(getItemDimensionText(a), getItemDimensionText(b), mul);
+      if (field === 'size' || field === 'dim' || field === 'dimensions') {
+        var aVal = getItemDimensionText(a);
+        var bVal = getItemDimensionText(b);
+        return compareDimensionsWithEmptyLast(aVal, bVal, mul);
       }
 
       // fallback: không đổi

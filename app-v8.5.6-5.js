@@ -436,6 +436,10 @@ class App {
 
       // Chỉ xử lý vuốt ngang (tránh nhầm với cuộn dọc)
       if (MathAbsDeltaY < 50) {
+        if (window._panelClosingSwipe) {
+          window._panelClosingSwipe = false;
+          return;
+        }
         // Kiểm tra xem sự kiện vuốt có đang xảy ra bên trong một popup, panel hay drawer không (ví dụ Detail Panel, Filter Drawer)
         // Nếu có, KHÔNG mở sidebar để dành quyền vuốt đóng cho các panel đó
         const isInsidePanel = e.target.closest('#detailPanel, #filterDrawer, .filter-fullscreen-modal, .modal, .photo-detail-modal, .app-modal');
@@ -643,7 +647,26 @@ class App {
       }
 
       if (field === 'size') {
-        return mul * String(this.getItemSize(a)).localeCompare(String(this.getItemSize(b)), 'ja');
+        const parseDim = (item) => {
+            let l=0, w=0;
+            if (item.designInfo) {
+                const dl = parseFloat(item.designInfo.MoldDesignLength || item.designInfo.Length);
+                const dw = parseFloat(item.designInfo.MoldDesignWidth || item.designInfo.Width);
+                if (!isNaN(dl)) l = dl;
+                if (!isNaN(dw)) w = dw;
+            }
+            if (!l && !w) {
+                const s = String(this.getItemSize(item));
+                const parts = s.split(/[xX\-\~*]/);
+                if (parts.length > 0) l = parseFloat(parts[0]) || 0;
+                if (parts.length > 1) w = parseFloat(parts[1]) || 0;
+            }
+            return {l, w};
+        };
+        const dA = parseDim(a);
+        const dB = parseDim(b);
+        if (dA.l !== dB.l) return mul * (dA.l - dB.l);
+        return mul * (dA.w - dB.w);
       }
 
       // Unknown field -> không đổi

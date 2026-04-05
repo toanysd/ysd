@@ -176,6 +176,11 @@ Version:  v8.1.0-7
     return d.UnderAngle || it.UnderAngle || it.underAngle || '';
   }
 
+  function getItemDraftAngle(it) {
+    var d = (it && it.designInfo) ? it.designInfo : {};
+    return d.DraftAngle || it.DraftAngle || it.draftAngle || '';
+  }
+
   function getItemCutlineSize(it) {
     var d = (it && it.designInfo) ? it.designInfo : {};
     var x = safeParseFloat(d.CutlineX || it.CutlineX);
@@ -258,6 +263,8 @@ Version:  v8.1.0-7
         self.applyFilter();
         self.updateDrawerIndicators();
         self.updateModalIndicators();
+        self.updateBadge();
+        self.updateDetailButton();
       }, 150);
     },
 
@@ -309,22 +316,66 @@ Version:  v8.1.0-7
           '      </button>',
           '    </div>',
           '    <div class="filter-drawer-body">',
-
-          '      <section class="filter-accordion" data-filter="itemType">',
-          '        <button type="button" class="filter-accordion-header">',
-          '          <div class="filter-accordion-label"><span class="ja">種別</span><span class="vi">Loại</span></div>',
-          '          <div class="filter-accordion-summary" data-summary></div>',
-          '          <i class="fas fa-chevron-down filter-accordion-icon"></i>',
-          '        </button>',
-          '        <div class="filter-accordion-content">',
-          '          <select id="fditemType" class="filter-drawer-select">',
-          '            <option value="">指定なし</option>',
-          '            <option value="all">全て / Tất cả</option>',
-          '            <option value="mold">金型 / Khuôn</option>',
-          '            <option value="cutter">抜型 / Dao cắt</option>',
-          '          </select>',
+          '      <section class="filter-section filter-inline-section">',
+          '        <div class="filter-section-title"><span class="ja">検索</span><span class="vi">Tìm kiếm</span></div>',
+          '        <div style="position: relative;">',
+          '          <i class="fas fa-search" style="position: absolute; left: 10px; top: 12px; color: #a1a1aa"></i>',
+          '          <input id="fdrawKeyword" type="text" class="filter-drawer-input" placeholder="Gõ từ khóa..." style="padding-left: 32px;">',
           '        </div>',
           '      </section>',
+
+          '      <section class="filter-section filter-inline-section">',
+          '        <div class="filter-section-title"><span class="ja">種別</span><span class="vi">Loại thiết bị</span></div>',
+          '        <div class="filter-btn-group" id="fdCategoryGroup">',
+          '          <button type="button" class="filter-box-btn active" data-val="all">全て 🗃️</button>',
+          '          <button type="button" class="filter-box-btn" data-val="mold">金型 🛠️</button>',
+          '          <button type="button" class="filter-box-btn" data-val="cutter">抜型 ✂️</button>',
+          '        </div>',
+          '      </section>',
+
+          '      <section class="filter-section filter-inline-section">',
+          '        <div class="filter-section-title"><span class="ja">ソート</span><span class="vi">Sắp xếp</span></div>',
+          '        <div class="filter-btn-group" id="fdSortGroup">',
+          '          <button type="button" class="filter-box-btn sort-btn" data-field="productionDate" data-dir="desc"><div class="fb-icon">🕒</div><div class="fb-text"><span class="ja">新着</span><span class="vi">Mới</span></div><div class="sort-arr"></div></button>',
+          '          <button type="button" class="filter-box-btn sort-btn" data-field="dim" data-dir="desc"><div class="fb-icon">📏</div><div class="fb-text"><span class="ja">寸法</span><span class="vi">Kích cỡ</span></div><div class="sort-arr"></div></button>',
+          '          <button type="button" class="filter-box-btn sort-btn" data-field="code" data-dir="asc"><div class="fb-icon">🔤</div><div class="fb-text"><span class="ja">コード</span><span class="vi">Mã</span></div><div class="sort-arr"></div></button>',
+          '        </div>',
+          '      </section>',
+
+          '      <section class="filter-section filter-inline-section">',
+          '        <div class="filter-section-title"><span class="ja">製造日</span><span class="vi">TG SX/Sửa đổi</span></div>',
+          '        <div class="filter-pill-group" id="fdDatePillGroup">',
+          '          <button type="button" class="filter-pill-btn active" data-days="all">全て</button>',
+          '          <button type="button" class="filter-pill-btn" data-days="3">3日以内</button>',
+          '          <button type="button" class="filter-pill-btn" data-days="7">7日以内</button>',
+          '          <button type="button" class="filter-pill-btn" data-days="30">30日以内</button>',
+          '          <button type="button" class="filter-pill-btn" data-days="custom">カスタム 📅</button>',
+          '        </div>',
+          '        <div id="fdDateCustomWrap" class="hidden" style="margin-top: 10px;">',
+          '          <div class="filter-date-row"><label><span class="vi">Từ</span></label><input id="fddatefrom" type="date" class="filter-drawer-input"></div>',
+          '          <div class="filter-date-row"><label><span class="vi">Đến</span></label><input id="fddateto" type="date" class="filter-drawer-input"></div>',
+          '        </div>',
+          '      </section>',
+
+          '      <section class="filter-section filter-inline-section">',
+          '        <div class="filter-section-title"><span class="ja">金型サイズ</span><span class="vi">Kích thước khuôn (L x W)</span></div>',
+          '        <div class="filter-range-row" style="display: flex; gap: 8px;">',
+          '          <input id="fddimL" type="text" class="filter-drawer-input" placeholder="L (例: >=200)">',
+          '          <span style="align-self: center; color: #a1a1aa">x</span>',
+          '          <input id="fddimW" type="text" class="filter-drawer-input" placeholder="W (例: <100)">',
+          '        </div>',
+          '      </section>',
+
+          '      <section class="filter-section filter-inline-section">',
+          '        <div class="filter-section-title"><span class="ja">製品/抜き型サイズ</span><span class="vi">Kích thước Dao/SP (L x W)</span></div>',
+          '        <div class="filter-range-row" style="display: flex; gap: 8px;">',
+          '          <input id="fdcutlineL" type="text" class="filter-drawer-input" placeholder="L (例: >=200)">',
+          '          <span style="align-self: center; color: #a1a1aa">x</span>',
+          '          <input id="fdcutlineW" type="text" class="filter-drawer-input" placeholder="W (例: <100)">',
+          '        </div>',
+          '      </section>',
+
+          '      <div class="filter-section-divider"></div>',
 
           '      <section class="filter-accordion" data-filter="customer">',
           '        <button type="button" class="filter-accordion-header">',
@@ -333,8 +384,7 @@ Version:  v8.1.0-7
           '          <i class="fas fa-chevron-down filter-accordion-icon"></i>',
           '        </button>',
           '        <div class="filter-accordion-content">',
-          '          <input id="fdcustomerinput" type="text" class="filter-drawer-input" placeholder="検索 / Gõ lọc">',
-          '          <select id="fdcustomer" class="filter-drawer-select"></select>',
+          '          <input id="fdcustomerinput" type="text" class="filter-drawer-input" placeholder="JAE, KDS...">',
           '        </div>',
           '      </section>',
 
@@ -345,59 +395,18 @@ Version:  v8.1.0-7
           '          <i class="fas fa-chevron-down filter-accordion-icon"></i>',
           '        </button>',
           '        <div class="filter-accordion-content">',
-          '          <input id="fdstorageCompanyinput" type="text" class="filter-drawer-input" placeholder="検索 / Gõ lọc">',
-          '          <select id="fdstorageCompany" class="filter-drawer-select"></select>',
+          '          <input id="fdstorageCompanyinput" type="text" class="filter-drawer-input" placeholder="YSD...">',
           '        </div>',
           '      </section>',
 
           '      <section class="filter-accordion" data-filter="rackLayer">',
           '        <button type="button" class="filter-accordion-header">',
-          '          <div class="filter-accordion-label"><span class="ja">棚位置</span><span class="vi">Giá / Tầng</span></div>',
+          '          <div class="filter-accordion-label"><span class="ja">棚位置</span><span class="vi">Giá / Tầng (RackID, Loc)</span></div>',
           '          <div class="filter-accordion-summary" data-summary></div>',
           '          <i class="fas fa-chevron-down filter-accordion-icon"></i>',
           '        </button>',
           '        <div class="filter-accordion-content">',
-          '          <input id="fdrackLayerinput" type="text" class="filter-drawer-input" placeholder="R01-03 ...">',
-          '          <select id="fdrackLayer" class="filter-drawer-select"></select>',
-          '        </div>',
-          '      </section>',
-
-          '      <section class="filter-accordion" data-filter="dimension">',
-          '        <button type="button" class="filter-accordion-header">',
-          '          <div class="filter-accordion-label"><span class="ja">寸法</span><span class="vi">Kích thước</span></div>',
-          '          <div class="filter-accordion-summary" data-summary></div>',
-          '          <i class="fas fa-chevron-down filter-accordion-icon"></i>',
-          '        </button>',
-          '        <div class="filter-accordion-content">',
-          '          <label class="filter-group-caption"><span class="ja">クイック選択</span><span class="vi">Chọn nhanh</span></label>',
-          '          <input id="fddimquickinput" type="text" class="filter-drawer-input" placeholder="469x299 ...">',
-          '          <select id="fddimquick" class="filter-drawer-select"></select>',
-          '          <div class="filter-dim-range">',
-          '            <label class="filter-group-caption"><span class="ja">L</span><span class="vi">Dài (L)</span></label>',
-          '            <div class="filter-range-row">',
-          '              <input id="fddimLmin" type="number" class="filter-drawer-input" placeholder="Min">',
-          '              <span class="range-separator">~</span>',
-          '              <input id="fddimLmax" type="number" class="filter-drawer-input" placeholder="Max">',
-          '            </div>',
-          '            <label class="filter-group-caption"><span class="ja">W</span><span class="vi">Rộng (W)</span></label>',
-          '            <div class="filter-range-row">',
-          '              <input id="fddimWmin" type="number" class="filter-drawer-input" placeholder="Min">',
-          '              <span class="range-separator">~</span>',
-          '              <input id="fddimWmax" type="number" class="filter-drawer-input" placeholder="Max">',
-          '            </div>',
-          '          </div>',
-          '        </div>',
-          '      </section>',
-
-          '      <section class="filter-accordion" data-filter="productionDate">',
-          '        <button type="button" class="filter-accordion-header">',
-          '          <div class="filter-accordion-label"><span class="ja">製造日</span><span class="vi">Ngày sản xuất</span></div>',
-          '          <div class="filter-accordion-summary" data-summary></div>',
-          '          <i class="fas fa-chevron-down filter-accordion-icon"></i>',
-          '        </button>',
-          '        <div class="filter-accordion-content">',
-          '          <div class="filter-date-row"><label><span class="ja">から</span><span class="vi">Từ ngày</span></label><input id="fddatefrom" type="date" class="filter-drawer-input"></div>',
-          '          <div class="filter-date-row"><label><span class="ja">まで</span><span class="vi">Đến ngày</span></label><input id="fddateto" type="date" class="filter-drawer-input"></div>',
+          '          <input id="fdrackLayerinput" type="text" class="filter-drawer-input" placeholder="21, 事務所前...">',
           '        </div>',
           '      </section>',
 
@@ -408,7 +417,7 @@ Version:  v8.1.0-7
           '          <i class="fas fa-chevron-down filter-accordion-icon"></i>',
           '        </button>',
           '        <div class="filter-accordion-content">',
-          '          <input id="fdplastic" type="text" class="filter-drawer-input" placeholder="PP, ABS ...">',
+          '          <input id="fdplastic" type="text" class="filter-drawer-input" placeholder="PP, PS, PET...">',
           '        </div>',
           '      </section>',
 
@@ -419,7 +428,7 @@ Version:  v8.1.0-7
           '          <i class="fas fa-chevron-down filter-accordion-icon"></i>',
           '        </button>',
           '        <div class="filter-accordion-content">',
-          '          <input id="fdtextContent" type="text" class="filter-drawer-input" placeholder="刻印内容...">',
+          '          <input id="fdtextContent" type="text" class="filter-drawer-input" placeholder="彫刻内容">',
           '        </div>',
           '      </section>',
 
@@ -430,7 +439,7 @@ Version:  v8.1.0-7
           '          <i class="fas fa-chevron-down filter-accordion-icon"></i>',
           '        </button>',
           '        <div class="filter-accordion-content">',
-          '          <input id="fdtrayInfo" type="text" class="filter-drawer-input" placeholder="Tray info...">',
+          '          <input id="fdtrayInfo" type="text" class="filter-drawer-input" placeholder="Thông tin Tray...">',
           '        </div>',
           '      </section>',
 
@@ -463,37 +472,22 @@ Version:  v8.1.0-7
           '          <i class="fas fa-chevron-down filter-accordion-icon"></i>',
           '        </button>',
           '        <div class="filter-accordion-content">',
-          '          <div class="filter-range-row">',
-          '            <input id="fddraftmin" type="number" class="filter-drawer-input" placeholder="Min">',
-          '            <span class="range-separator">~</span>',
-          '            <input id="fddraftmax" type="number" class="filter-drawer-input" placeholder="Max">',
-          '          </div>',
+          '          <div id="fddraftanglelist" class="filter-checkbox-list"></div>',
           '        </div>',
           '      </section>',
 
           '      <section class="filter-accordion" data-filter="underAngle">',
           '        <button type="button" class="filter-accordion-header">',
-          '          <div class="filter-accordion-label"><span class="ja">UnderAngle</span><span class="vi">Undercut</span></div>',
+          '          <div class="filter-accordion-label"><span class="ja">UnderAngle</span><span class="vi">Thoát phương ngang</span></div>',
           '          <div class="filter-accordion-summary" data-summary></div>',
           '          <i class="fas fa-chevron-down filter-accordion-icon"></i>',
           '        </button>',
           '        <div class="filter-accordion-content">',
-          '          <input id="fdunderAngleinput" type="text" class="filter-drawer-input" placeholder="検索 / Gõ lọc">',
-          '          <select id="fdunderAngle" class="filter-drawer-select"></select>',
+          '          <div id="fdunderanglelist" class="filter-checkbox-list"></div>',
           '        </div>',
           '      </section>',
 
-          '      <section class="filter-accordion" data-filter="cutlineSize">',
-          '        <button type="button" class="filter-accordion-header">',
-          '          <div class="filter-accordion-label"><span class="ja">刃型寸法</span><span class="vi">Cutline</span></div>',
-          '          <div class="filter-accordion-summary" data-summary></div>',
-          '          <i class="fas fa-chevron-down filter-accordion-icon"></i>',
-          '        </button>',
-          '        <div class="filter-accordion-content">',
-          '          <input id="fdcutlineinput" type="text" class="filter-drawer-input" placeholder="200x300 ...">',
-          '          <select id="fdcutline" class="filter-drawer-select"></select>',
-          '        </div>',
-          '      </section>',
+
 
           '      <section class="filter-accordion" data-filter="statusFlags">',
           '        <button type="button" class="filter-accordion-header">',
@@ -511,34 +505,6 @@ Version:  v8.1.0-7
           '            <label><input type="checkbox" id="fdreturning"> Returning</label>',
           '            <label><input type="checkbox" id="fddisposing"> Disposing</label>',
           '          </div>',
-          '        </div>',
-          '      </section>',
-
-          '      <section class="filter-accordion" data-filter="legacyQuick">',
-          '        <button type="button" class="filter-accordion-header">',
-          '          <div class="filter-accordion-label"><span class="ja">簡易フィルター</span><span class="vi">Lọc nhanh</span></div>',
-          '          <div class="filter-accordion-summary" data-summary></div>',
-          '          <i class="fas fa-chevron-down filter-accordion-icon"></i>',
-          '        </button>',
-          '        <div class="filter-accordion-content">',
-          '          <div class="legacy-controls">',
-          '            <div class="filter-group-caption"><span class="ja">種別</span><span class="vi">Loại</span></div>',
-          '            <select id="fdLegacyCategorySelect" class="filter-drawer-select"></select>',
-          '            <div class="filter-group-caption"><span class="ja">項目</span><span class="vi">Trường</span></div>',
-          '            <select id="fdLegacyField" class="filter-drawer-select"></select>',
-          '            <div class="filter-group-caption"><span class="ja">検索</span><span class="vi">Tìm</span></div>',
-          '            <input id="fdLegacyValueSearch" type="text" class="filter-drawer-input" placeholder="Gõ để lọc...">',
-          '            <div class="filter-group-caption"><span class="ja">値</span><span class="vi">Giá trị</span></div>',
-          '            <select id="fdLegacyValue" class="filter-drawer-select"><option value="">-- Chọn --</option></select>',
-          '            <div class="filter-group-caption"><span class="ja">ソート</span><span class="vi">Sort</span></div>',
-          '            <select id="fdLegacySortField" class="filter-drawer-select"></select>',
-          '            <div class="filter-group-caption"><span class="ja">順序</span><span class="vi">Thứ tự</span></div>',
-          '            <select id="fdLegacySortDirection" class="filter-drawer-select">',
-          '              <option value="desc">降順 / Giảm dần</option>',
-          '              <option value="asc">昇順 / Tăng dần</option>',
-          '            </select>',
-          '          </div>',
-          '          <p class="legacy-note">この部分は旧フィルター互換です。</p>',
           '        </div>',
           '      </section>',
 
@@ -744,6 +710,25 @@ Version:  v8.1.0-7
       this.populateDrawerLegacyControls();
     },
 
+    updateSortUI: function (sortGroup) {
+      if (!sortGroup) return;
+      var currentField = this.core.state.sort.field;
+      var currentDir = this.core.state.sort.direction;
+      var btns = sortGroup.querySelectorAll('.filter-box-btn.sort-btn');
+      btns.forEach(function (b) {
+        var arr = b.querySelector('.sort-arr');
+        if (!arr) return;
+        if (b.classList.contains('active')) {
+          arr.innerHTML = currentDir === 'asc' ? '▲' : '▼';
+          arr.style.color = currentDir === 'asc' ? '#10b981' : '#f43f5e';
+          arr.style.fontWeight = 'bold';
+        } else {
+          arr.innerHTML = '';
+          arr.style.color = '';
+        }
+      });
+    },
+
     populateFilterFields: function (selectEl) {
       var html = '<option value="">-- 全て --</option>';
       FILTER_FIELDS.forEach(function (field) {
@@ -879,8 +864,8 @@ Version:  v8.1.0-7
       // Search bar detail button -> open drawer
       if (refs.detailBtn) {
         refs.detailBtn.addEventListener('click', function (e) {
-          try { e.preventDefault(); } catch (err) {}
-          try { e.stopPropagation(); } catch (err2) {}
+          try { e.preventDefault(); } catch (err) { }
+          try { e.stopPropagation(); } catch (err2) { }
           self.toggleDrawer();
         });
       }
@@ -888,7 +873,7 @@ Version:  v8.1.0-7
       // Mobile bottom navbar: 絞込
       if (refs.mobileNavFilterBtn) {
         refs.mobileNavFilterBtn.addEventListener('click', function (e) {
-          try { e.preventDefault(); } catch (err) {}
+          try { e.preventDefault(); } catch (err) { }
           self.toggleDrawer();
         });
       }
@@ -959,25 +944,21 @@ Version:  v8.1.0-7
 
       // Drawer wiring
       this.bindDrawerElements();
-      //if (drawerRefs.backdrop) drawerRefs.backdrop.addEventListener('click', function () { self.closeDrawer(); });
+      if (drawerRefs.backdrop) drawerRefs.backdrop.addEventListener('click', function () { self.closeDrawer(); });
       if (drawerRefs.closeBtn) drawerRefs.closeBtn.addEventListener('click', function () { self.closeDrawer(); });
       if (drawerRefs.footerCloseBtn) drawerRefs.footerCloseBtn.addEventListener('click', function () { self.closeDrawer(); });
       if (drawerRefs.applyBtn) {
-        drawerRefs.applyBtn.addEventListener('click', function () { 
-          if (window.app && typeof window.app.resetAll === 'function') {
-            window.app.resetAll();
-          } else {
-            self.resetAll(); 
-          }
-          self.collapseAllDrawerFields(); 
-          self.closeDrawer(); 
+        drawerRefs.applyBtn.addEventListener('click', function () {
+          self.resetAll();
+          self.collapseAllDrawerFields();
+          self.closeDrawer();
         });
       }
 
       if (drawerRefs.clearBtn) {
-        drawerRefs.clearBtn.addEventListener('click', function () { 
-          self.resetAll(); 
-          self.collapseAllDrawerFields(); 
+        drawerRefs.clearBtn.addEventListener('click', function () {
+          self.resetAll();
+          self.collapseAllDrawerFields();
         });
       }
 
@@ -985,19 +966,20 @@ Version:  v8.1.0-7
       if (drawerRefs.root) {
         var fdTouchStartX = 0;
         var fdTouchStartY = 0;
-        drawerRefs.root.addEventListener('touchstart', function(e) {
+        drawerRefs.root.addEventListener('touchstart', function (e) {
           if (e.touches.length === 1) {
             fdTouchStartX = e.touches[0].clientX;
             fdTouchStartY = e.touches[0].clientY;
           }
         }, { passive: true });
-        
-        drawerRefs.root.addEventListener('touchmove', function(e) {
+
+        drawerRefs.root.addEventListener('touchmove', function (e) {
           if (!fdTouchStartX || !fdTouchStartY || e.touches.length !== 1) return;
           var dx = e.touches[0].clientX - fdTouchStartX;
           var dy = e.touches[0].clientY - fdTouchStartY;
           // Vuốt sang phải dứt khoát > 60px và không cuộn dọc nhiều (<40px)
           if (dx > 60 && Math.abs(dy) < 40 && fdTouchStartX < 100) {
+            window._panelClosingSwipe = true;
             self.closeDrawer();
             fdTouchStartX = 0; // trigger only once
           }
@@ -1006,6 +988,8 @@ Version:  v8.1.0-7
 
       // Drawer controls
       this.setupDrawerControlEvents();
+      var drawer = document.getElementById('filterDrawer');
+      if (drawer) this.updateSortUI(drawer.querySelector('#fdSortGroup'));
 
       // ESC close
       document.addEventListener('keydown', function (e) {
@@ -1048,93 +1032,118 @@ Version:  v8.1.0-7
         });
       }
 
-      // 1 itemType
-      onChange('fditemType', function (el) {
-        self.core.setAdvanced('itemType', el.value);
-        // Đồng bộ category
-        if (el.value && el.value !== 'all') self.core.setCategory(el.value);
-        if (el.value === 'all') self.core.setCategory('all');
+      // Keyword Search (sync with global input)
+      onInput('fdrawKeyword', function (el) {
+        var globSearch = document.getElementById('searchInput');
+        if (globSearch) {
+          globSearch.value = el.value;
+          // Trigger input event on global search
+          globSearch.dispatchEvent(new Event('input', { bubbles: true }));
+        }
       });
 
-      // 2 customer
-      onChange('fdcustomer', function (el) {
-        var adv = self.core.state.advanced || {};
-        adv.customer = adv.customer || { select: '', text: '' };
-        adv.customer.select = el.value;
-        self.core.setAdvanced('customer', adv.customer);
-      });
-      onInput('fdcustomerinput', function (el) {
-        var adv = self.core.state.advanced || {};
-        adv.customer = adv.customer || { select: '', text: '' };
-        adv.customer.text = el.value;
-        self.core.setAdvanced('customer', adv.customer);
-        self.filterDrawerSelectOptions('fdcustomer', el.value);
-      });
-
-      // 3 storage
-      onChange('fdstorageCompany', function (el) {
-        var adv = self.core.state.advanced || {};
-        adv.storageCompany = adv.storageCompany || { select: '', text: '' };
-        adv.storageCompany.select = el.value;
-        self.core.setAdvanced('storageCompany', adv.storageCompany);
-      });
-      onInput('fdstorageCompanyinput', function (el) {
-        var adv = self.core.state.advanced || {};
-        adv.storageCompany = adv.storageCompany || { select: '', text: '' };
-        adv.storageCompany.text = el.value;
-        self.core.setAdvanced('storageCompany', adv.storageCompany);
-        self.filterDrawerSelectOptions('fdstorageCompany', el.value);
-      });
-
-      // 4 rackLayer
-      onChange('fdrackLayer', function (el) {
-        var adv = self.core.state.advanced || {};
-        adv.rackLayer = adv.rackLayer || { select: '', text: '' };
-        adv.rackLayer.select = el.value;
-        self.core.setAdvanced('rackLayer', adv.rackLayer);
-      });
-      onInput('fdrackLayerinput', function (el) {
-        var adv = self.core.state.advanced || {};
-        adv.rackLayer = adv.rackLayer || { select: '', text: '' };
-        adv.rackLayer.text = el.value;
-        self.core.setAdvanced('rackLayer', adv.rackLayer);
-        self.filterDrawerSelectOptions('fdrackLayer', el.value);
-      });
-
-      // 5 dim quick + range
-      function updateDim() {
-        var adv = self.core.state.advanced || {};
-        adv.dimension = adv.dimension || { quickSelect: '', quickText: '', L: { min: null, max: null }, W: { min: null, max: null } };
-        var qs = drawer.querySelector('#fddimquick');
-        var qt = drawer.querySelector('#fddimquickinput');
-        var Lmin = drawer.querySelector('#fddimLmin');
-        var Lmax = drawer.querySelector('#fddimLmax');
-        var Wmin = drawer.querySelector('#fddimWmin');
-        var Wmax = drawer.querySelector('#fddimWmax');
-        adv.dimension.quickSelect = qs ? qs.value : '';
-        adv.dimension.quickText = qt ? qt.value : '';
-        adv.dimension.L.min = (Lmin && Lmin.value !== '') ? Lmin.value : null;
-        adv.dimension.L.max = (Lmax && Lmax.value !== '') ? Lmax.value : null;
-        adv.dimension.W.min = (Wmin && Wmin.value !== '') ? Wmin.value : null;
-        adv.dimension.W.max = (Wmax && Wmax.value !== '') ? Wmax.value : null;
-        self.core.setAdvanced('dimension', adv.dimension);
-        if (qt) self.filterDrawerSelectOptions('fddimquick', qt.value);
-      }
-      var dimIds = ['fddimquick', 'fddimquickinput', 'fddimLmin', 'fddimLmax', 'fddimWmin', 'fddimWmax'];
-      dimIds.forEach(function (id) {
-        var el = drawer.querySelector('#' + id);
-        if (!el) return;
-        el.addEventListener((id === 'fddimquick') ? 'change' : 'input', function () {
-          if (self._suppressEvents) return;
-          updateDim();
-          self.updateBadge();
-          self.updateDetailButton();
-          self.scheduleApply();
+      // Categories
+      var catGroup = drawer.querySelector('#fdCategoryGroup');
+      if (catGroup) {
+        var cbtns = catGroup.querySelectorAll('.filter-box-btn');
+        Array.prototype.forEach.call(cbtns, function (b) {
+          b.addEventListener('click', function () {
+            if (self._suppressEvents) return;
+            cbtns.forEach(function (bb) { bb.classList.remove('active'); });
+            b.classList.add('active');
+            var val = b.getAttribute('data-val');
+            self.core.setCategory(val);
+            self.core.setAdvanced('itemType', val);
+            self.updateBadge();
+            self.updateDetailButton();
+            self.applyFilter();
+            self.scheduleApply();
+          });
         });
-      });
+      }
 
-      // 6 date
-      function updateDate() {
+      // Sorting
+      var sortGroup = drawer.querySelector('#fdSortGroup');
+      if (sortGroup) {
+        var sbtns = sortGroup.querySelectorAll('.filter-box-btn.sort-btn');
+        Array.prototype.forEach.call(sbtns, function (b) {
+          b.addEventListener('click', function () {
+            if (self._suppressEvents) return;
+            var field = b.getAttribute('data-field');
+            var dir = b.getAttribute('data-dir');
+            if (b.classList.contains('active')) {
+              dir = (dir === 'desc') ? 'asc' : 'desc';
+              b.setAttribute('data-dir', dir);
+            } else {
+              sbtns.forEach(function (bb) { bb.classList.remove('active'); });
+              b.classList.add('active');
+            }
+            self.core.setSort(field, dir);
+            self.updateSortUI(sortGroup);
+            self.updateBadge();
+            self.updateDetailButton();
+            self.applyFilter();
+            self.scheduleApply();
+          });
+        });
+      }
+
+      // Date Pills
+      var dateGroup = drawer.querySelector('#fdDatePillGroup');
+      var customWrap = drawer.querySelector('#fdDateCustomWrap');
+      if (dateGroup) {
+        var dpills = dateGroup.querySelectorAll('.filter-pill-btn');
+        Array.prototype.forEach.call(dpills, function (b) {
+          b.addEventListener('click', function () {
+            if (self._suppressEvents) return;
+            dpills.forEach(function (bb) { bb.classList.remove('active'); });
+            b.classList.add('active');
+            var days = b.getAttribute('data-days');
+
+            var adv = self.core.state.advanced || {};
+            adv.productionDate = adv.productionDate || { from: '', to: '' };
+            adv.productionDate.from = '';
+            adv.productionDate.to = '';
+
+            var isCustomActive = null;
+            if (days === 'custom') {
+              if (customWrap) {
+                // If already active, toggle it OFF (user clicks again to close custom wrap)
+                if (b.classList.contains('active') && !customWrap.classList.contains('hidden')) {
+                  customWrap.classList.add('hidden');
+                  b.classList.remove('active');
+                  isCustomActive = false;
+                  // Clear date state
+                  adv.productionDate.from = '';
+                  adv.productionDate.to = '';
+                } else {
+                  customWrap.classList.remove('hidden');
+                  isCustomActive = true;
+                }
+              }
+            } else {
+              if (customWrap) customWrap.classList.add('hidden');
+              if (days !== 'all') {
+                var d = new Date();
+                d.setDate(d.getDate() - parseInt(days));
+                var m = ('0' + (d.getMonth() + 1)).slice(-2);
+                var dy = ('0' + d.getDate()).slice(-2);
+                adv.productionDate.from = String(d.getFullYear()) + '-' + m + '-' + dy; // Wait python in js? No I used python slicing format inside js string... fix below!
+              }
+            }
+            // If it's a fixed days OR we just toggled OFF custom, we apply immediately
+            if (days !== 'custom' || isCustomActive === false) {
+              self.core.setAdvanced('productionDate', adv.productionDate);
+              self.updateBadge();
+              self.updateDetailButton();
+              self.applyFilter();
+              self.scheduleApply();
+            }
+          });
+        });
+      }
+
+      function updateCustomDate() {
         var adv = self.core.state.advanced || {};
         adv.productionDate = adv.productionDate || { from: '', to: '' };
         var from = drawer.querySelector('#fddatefrom');
@@ -1148,14 +1157,109 @@ Version:  v8.1.0-7
         if (!el) return;
         el.addEventListener('change', function () {
           if (self._suppressEvents) return;
-          updateDate();
+          updateCustomDate();
           self.updateBadge();
           self.updateDetailButton();
           self.scheduleApply();
         });
       });
 
-      // 7 plastic
+      // Mold Dimensions (L x W)
+      function updateDim() {
+        var adv = self.core.state.advanced || {};
+        adv.dimension = adv.dimension || {};
+        var dimL = drawer.querySelector('#fddimL');
+        var dimW = drawer.querySelector('#fddimW');
+        adv.dimension.length = (dimL && dimL.value !== '') ? dimL.value : null;
+        adv.dimension.width = (dimW && dimW.value !== '') ? dimW.value : null;
+        self.core.setAdvanced('dimension', adv.dimension);
+      }
+      var fddimL = drawer.querySelector('#fddimL');
+      var fddimW = drawer.querySelector('#fddimW');
+      if (fddimL) {
+        fddimL.addEventListener('input', function () {
+          if (self._suppressEvents) return;
+          updateDim(); self.updateBadge(); self.updateDetailButton(); self.scheduleApply();
+        });
+        fddimL.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' && !window.matchMedia('(max-width: 768px)').matches) {
+            e.preventDefault();
+            if (fddimW) fddimW.focus();
+          }
+        });
+      }
+      if (fddimW) {
+        fddimW.addEventListener('input', function () {
+          if (self._suppressEvents) return;
+          updateDim(); self.updateBadge(); self.updateDetailButton(); self.scheduleApply();
+        });
+        fddimW.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            fddimW.blur();
+          }
+        });
+      }
+
+      // Cutter Dimensions (Cutline L x W)
+      function updateCutline() {
+        var adv = self.core.state.advanced || {};
+        adv.cutline = adv.cutline || {};
+        var cL = drawer.querySelector('#fdcutlineL');
+        var cW = drawer.querySelector('#fdcutlineW');
+        adv.cutline.length = (cL && cL.value !== '') ? cL.value : null;
+        adv.cutline.width = (cW && cW.value !== '') ? cW.value : null;
+        self.core.setAdvanced('cutline', adv.cutline);
+      }
+      var fdcutlineL = drawer.querySelector('#fdcutlineL');
+      var fdcutlineW = drawer.querySelector('#fdcutlineW');
+      if (fdcutlineL) {
+        fdcutlineL.addEventListener('input', function () {
+          if (self._suppressEvents) return;
+          updateCutline(); self.updateBadge(); self.updateDetailButton(); self.scheduleApply();
+        });
+        fdcutlineL.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' && !window.matchMedia('(max-width: 768px)').matches) {
+            e.preventDefault();
+            if (fdcutlineW) fdcutlineW.focus();
+          }
+        });
+      }
+      if (fdcutlineW) {
+        fdcutlineW.addEventListener('input', function () {
+          if (self._suppressEvents) return;
+          updateCutline(); self.updateBadge(); self.updateDetailButton(); self.scheduleApply();
+        });
+        fdcutlineW.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            fdcutlineW.blur();
+          }
+        });
+      }
+
+      // Accordions
+      onInput('fdcustomerinput', function (el) {
+        var adv = self.core.state.advanced || {};
+        adv.customer = adv.customer || { select: '', text: '' };
+        adv.customer.text = el.value;
+        self.core.setAdvanced('customer', adv.customer);
+      });
+
+      onInput('fdstorageCompanyinput', function (el) {
+        var adv = self.core.state.advanced || {};
+        adv.storageCompany = adv.storageCompany || { select: '', text: '' };
+        adv.storageCompany.text = el.value;
+        self.core.setAdvanced('storageCompany', adv.storageCompany);
+      });
+
+      onInput('fdrackLayerinput', function (el) {
+        var adv = self.core.state.advanced || {};
+        adv.rackLayer = adv.rackLayer || { select: '', text: '' };
+        adv.rackLayer.text = el.value;
+        self.core.setAdvanced('rackLayer', adv.rackLayer);
+      });
+
       onInput('fdplastic', function (el) {
         var adv = self.core.state.advanced || {};
         adv.plastic = adv.plastic || { text: '' };
@@ -1163,7 +1267,6 @@ Version:  v8.1.0-7
         self.core.setAdvanced('plastic', adv.plastic);
       });
 
-      // 8 textContent
       onInput('fdtextContent', function (el) {
         var adv = self.core.state.advanced || {};
         adv.textContent = adv.textContent || { text: '' };
@@ -1171,7 +1274,6 @@ Version:  v8.1.0-7
         self.core.setAdvanced('textContent', adv.textContent);
       });
 
-      // 9 trayInfo
       onInput('fdtrayInfo', function (el) {
         var adv = self.core.state.advanced || {};
         adv.trayInfo = adv.trayInfo || { text: '' };
@@ -1179,7 +1281,6 @@ Version:  v8.1.0-7
         self.core.setAdvanced('trayInfo', adv.trayInfo);
       });
 
-      // 10 setupType list
       var setupList = drawer.querySelector('#fdsetupTypelist');
       if (setupList) {
         setupList.addEventListener('change', function () {
@@ -1197,7 +1298,6 @@ Version:  v8.1.0-7
         });
       }
 
-      // 11 orientation list
       var oriList = drawer.querySelector('#fdorientationlist');
       if (oriList) {
         oriList.addEventListener('change', function () {
@@ -1215,67 +1315,22 @@ Version:  v8.1.0-7
         });
       }
 
-      // 12 draft range
-      function updateDraft() {
+      onInput('fddraftangle', function (el) {
         var adv = self.core.state.advanced || {};
         adv.draftAngle = adv.draftAngle || { min: null, max: null };
-        var mn = drawer.querySelector('#fddraftmin');
-        var mx = drawer.querySelector('#fddraftmax');
-        adv.draftAngle.min = (mn && mn.value !== '') ? mn.value : null;
-        adv.draftAngle.max = (mx && mx.value !== '') ? mx.value : null;
+        adv.draftAngle.min = el.value;
+        adv.draftAngle.max = null;
         self.core.setAdvanced('draftAngle', adv.draftAngle);
-      }
-      ['fddraftmin', 'fddraftmax'].forEach(function (id) {
-        var el = drawer.querySelector('#' + id);
-        if (!el) return;
-        el.addEventListener('input', function () {
-          if (self._suppressEvents) return;
-          updateDraft();
-          self.updateBadge();
-          self.updateDetailButton();
-          self.scheduleApply();
-        });
       });
 
-      // 13 underAngle
-      onChange('fdunderAngle', function (el) {
-        var adv = self.core.state.advanced || {};
-        adv.underAngle = adv.underAngle || { select: '', text: '' };
-        adv.underAngle.select = el.value;
-        self.core.setAdvanced('underAngle', adv.underAngle);
-        self.scheduleApply();
-      });
-      onInput('fdunderAngleinput', function (el) {
-        var adv = self.core.state.advanced || {};
-        adv.underAngle = adv.underAngle || { select: '', text: '' };
-        adv.underAngle.text = el.value;
-        self.core.setAdvanced('underAngle', adv.underAngle);
-        self.filterDrawerSelectOptions('fdunderAngle', el.value);
-        self.scheduleApply();
-      });
 
-      // 14 cutline
-      onChange('fdcutline', function (el) {
-        var adv = self.core.state.advanced || {};
-        adv.cutline = adv.cutline || { select: '', text: '' };
-        adv.cutline.select = el.value;
-        self.core.setAdvanced('cutline', adv.cutline);
-        self.scheduleApply();
-      });
+
       onInput('fdcutlineinput', function (el) {
         var adv = self.core.state.advanced || {};
         adv.cutline = adv.cutline || { select: '', text: '' };
         adv.cutline.text = el.value;
         self.core.setAdvanced('cutline', adv.cutline);
-        self.filterDrawerSelectOptions('fdcutline', el.value);
-        self.scheduleApply();
       });
-
-      // 15 status flags lists
-      var invList = drawer.querySelector('#fdinventoryStatuslist');
-      var tfList = drawer.querySelector('#fdteflonlist');
-      var cbReturning = drawer.querySelector('#fdreturning');
-      var cbDisposing = drawer.querySelector('#fddisposing');
 
       function ensureStatusFlags() {
         var adv = self.core.state.advanced || {};
@@ -1283,6 +1338,7 @@ Version:  v8.1.0-7
         return adv.statusFlags;
       }
 
+      var invList = drawer.querySelector('#fdinventoryStatuslist');
       if (invList) {
         invList.addEventListener('change', function () {
           if (self._suppressEvents) return;
@@ -1298,6 +1354,7 @@ Version:  v8.1.0-7
         });
       }
 
+      var tfList = drawer.querySelector('#fdteflonlist');
       if (tfList) {
         tfList.addEventListener('change', function () {
           if (self._suppressEvents) return;
@@ -1313,6 +1370,7 @@ Version:  v8.1.0-7
         });
       }
 
+      var cbReturning = drawer.querySelector('#fdreturning');
       if (cbReturning) {
         cbReturning.addEventListener('change', function () {
           if (self._suppressEvents) return;
@@ -1325,6 +1383,7 @@ Version:  v8.1.0-7
         });
       }
 
+      var cbDisposing = drawer.querySelector('#fddisposing');
       if (cbDisposing) {
         cbDisposing.addEventListener('change', function () {
           if (self._suppressEvents) return;
@@ -1333,73 +1392,6 @@ Version:  v8.1.0-7
           self.core.setAdvanced('statusFlags', flags);
           self.updateBadge();
           self.updateDetailButton();
-          self.scheduleApply();
-        });
-      }
-
-      // 16 legacy quick inside drawer (no duplicate ids)
-      var legacyCat = drawer.querySelector('#fdLegacyCategorySelect');
-      var legacyField = drawer.querySelector('#fdLegacyField');
-      var legacyValue = drawer.querySelector('#fdLegacyValue');
-      var legacySearch = drawer.querySelector('#fdLegacyValueSearch');
-      var legacySortField = drawer.querySelector('#fdLegacySortField');
-      var legacySortDir = drawer.querySelector('#fdLegacySortDirection');
-
-      if (legacyCat) {
-        legacyCat.addEventListener('change', function () {
-          if (self._suppressEvents) return;
-          self.core.setCategory(legacyCat.value);
-          self.syncDrawerLegacyToDesktop();
-          self.applyFilter();
-          self.scheduleApply();
-        });
-      }
-
-      if (legacyField) {
-        legacyField.addEventListener('change', function () {
-          if (self._suppressEvents) return;
-          self.core.setLegacyFilter(legacyField.value, '');
-          self.populateDrawerLegacyValues();
-          self.syncDrawerLegacyToDesktop();
-          self.applyFilter();
-          self.scheduleApply();
-        });
-      }
-
-      if (legacyValue) {
-        legacyValue.addEventListener('change', function () {
-          if (self._suppressEvents) return;
-          self.core.setLegacyFilter(self.core.state.legacy.fieldId, legacyValue.value);
-          self.syncDrawerLegacyToDesktop();
-          self.applyFilter();
-          self.scheduleApply();
-        });
-      }
-
-      if (legacySearch) {
-        legacySearch.addEventListener('input', function () {
-          if (self._suppressEvents) return;
-          self.filterDrawerLegacyValueOptionsByKeyword(legacySearch.value);
-          self.scheduleApply();
-        });
-      }
-
-      if (legacySortField) {
-        legacySortField.addEventListener('change', function () {
-          if (self._suppressEvents) return;
-          self.core.setSort(legacySortField.value, self.core.state.sort.direction);
-          self.syncDrawerLegacyToDesktop();
-          self.applyFilter();
-          self.scheduleApply();
-        });
-      }
-
-      if (legacySortDir) {
-        legacySortDir.addEventListener('change', function () {
-          if (self._suppressEvents) return;
-          self.core.setSort(self.core.state.sort.field, legacySortDir.value);
-          self.syncDrawerLegacyToDesktop();
-          self.applyFilter();
           self.scheduleApply();
         });
       }
@@ -1589,6 +1581,7 @@ Version:  v8.1.0-7
       var setCutline = {};
       var setInvStatus = {};
       var setTeflon = {};
+      var setDraft = {};
 
       items.forEach(function (it) {
         var c = normalizeText(getItemCustomer(it));
@@ -1611,6 +1604,9 @@ Version:  v8.1.0-7
 
         var ua = normalizeText(getItemUnderAngle(it));
         if (ua) setUnder[ua] = true;
+
+        var da = normalizeText(getItemDraftAngle(it));
+        if (da) setDraft[da] = true;
 
         var cl = normalizeText(getItemCutlineSize(it));
         if (cl) setCutline[cl] = true;
@@ -1665,13 +1661,15 @@ Version:  v8.1.0-7
       fillSelect('fdstorageCompany', setStorage);
       fillSelect('fdrackLayer', setRackLayer);
       fillSelectDim('fddimquick', setDim);
-      fillSelect('fdunderAngle', setUnder);
+
       fillSelect('fdcutline', setCutline);
 
       fillCheckboxList('fdsetupTypelist', setSetup);
       fillCheckboxList('fdorientationlist', setOri);
       fillCheckboxList('fdinventoryStatuslist', setInvStatus);
       fillCheckboxList('fdteflonlist', setTeflon);
+      fillCheckboxList('fddraftanglelist', setDraft);
+      fillCheckboxList('fdunderanglelist', setUnder);
 
       // Restore selections for select fields (advanced)
       this.restoreDrawerSelectionsFromState();
@@ -1688,37 +1686,44 @@ Version:  v8.1.0-7
 
       this._suppressEvents = true;
       try {
-        var elItemType = drawer.querySelector('#fditemType');
-        if (elItemType) elItemType.value = adv.itemType || '';
+        var globSearch = document.getElementById('keywordSearch_v8');
+        var kwin = drawer.querySelector('#fdrawKeyword');
+        if (kwin && globSearch) {
+          kwin.value = globSearch.value || '';
+        }
 
-        var selCustomer = drawer.querySelector('#fdcustomer');
-        var inCustomer = drawer.querySelector('#fdcustomerinput');
-        if (selCustomer && adv.customer) selCustomer.value = adv.customer.select || '';
-        if (inCustomer && adv.customer) inCustomer.value = adv.customer.text || '';
+        var catGroup = drawer.querySelector('#fdCategoryGroup');
+        if (catGroup) {
+          var cBtns = catGroup.querySelectorAll('.filter-box-btn');
+          var matchedCat = false;
+          cBtns.forEach(function (b) {
+            b.classList.remove('active');
+            if (b.getAttribute('data-val') === (st.category || 'all')) {
+              b.classList.add('active');
+              matchedCat = true;
+            }
+          });
+          if (!matchedCat && cBtns.length) cBtns[0].classList.add('active');
+        }
 
-        var selStorage = drawer.querySelector('#fdstorageCompany');
-        var inStorage = drawer.querySelector('#fdstorageCompanyinput');
-        if (selStorage && adv.storageCompany) selStorage.value = adv.storageCompany.select || '';
-        if (inStorage && adv.storageCompany) inStorage.value = adv.storageCompany.text || '';
-
-        var selRack = drawer.querySelector('#fdrackLayer');
-        var inRack = drawer.querySelector('#fdrackLayerinput');
-        if (selRack && adv.rackLayer) selRack.value = adv.rackLayer.select || '';
-        if (inRack && adv.rackLayer) inRack.value = adv.rackLayer.text || '';
+        var sortGroup = drawer.querySelector('#fdSortGroup');
+        if (sortGroup) {
+          var sBtns = sortGroup.querySelectorAll('.filter-box-btn.sort-btn');
+          sBtns.forEach(function (b) {
+            b.classList.remove('active');
+            var dirAttr = b.getAttribute('data-dir');
+            if (b.getAttribute('data-field') === (st.sort.field || '')) {
+              b.classList.add('active');
+              b.setAttribute('data-dir', st.sort.direction || 'desc');
+            }
+          });
+        }
 
         if (adv.dimension) {
-          var selDim = drawer.querySelector('#fddimquick');
-          var inDim = drawer.querySelector('#fddimquickinput');
-          var Lmin = drawer.querySelector('#fddimLmin');
-          var Lmax = drawer.querySelector('#fddimLmax');
-          var Wmin = drawer.querySelector('#fddimWmin');
-          var Wmax = drawer.querySelector('#fddimWmax');
-          if (selDim) selDim.value = adv.dimension.quickSelect || '';
-          if (inDim) inDim.value = adv.dimension.quickText || '';
-          if (Lmin) Lmin.value = (adv.dimension.L && adv.dimension.L.min != null) ? adv.dimension.L.min : '';
-          if (Lmax) Lmax.value = (adv.dimension.L && adv.dimension.L.max != null) ? adv.dimension.L.max : '';
-          if (Wmin) Wmin.value = (adv.dimension.W && adv.dimension.W.min != null) ? adv.dimension.W.min : '';
-          if (Wmax) Wmax.value = (adv.dimension.W && adv.dimension.W.max != null) ? adv.dimension.W.max : '';
+          var inDimL = drawer.querySelector('#fddimL');
+          var inDimW = drawer.querySelector('#fddimW');
+          if (inDimL) inDimL.value = (adv.dimension.L && adv.dimension.L.min != null) ? adv.dimension.L.min : '';
+          if (inDimW) inDimW.value = (adv.dimension.W && adv.dimension.W.min != null) ? adv.dimension.W.min : '';
         }
 
         if (adv.productionDate) {
@@ -1726,7 +1731,29 @@ Version:  v8.1.0-7
           var dt = drawer.querySelector('#fddateto');
           if (df) df.value = adv.productionDate.from || '';
           if (dt) dt.value = adv.productionDate.to || '';
+
+          var dateGroup = drawer.querySelector('#fdDatePillGroup');
+          if (dateGroup) {
+            var dateBtns = dateGroup.querySelectorAll('.filter-pill-btn');
+            dateBtns.forEach(function (b) { b.classList.remove('active'); });
+            if (adv.productionDate.from) {
+              var cBtn = dateGroup.querySelector('[data-days="custom"]');
+              if (cBtn) cBtn.classList.add('active');
+            } else {
+              var cBtn = dateGroup.querySelector('[data-days="all"]');
+              if (cBtn) cBtn.classList.add('active');
+            }
+          }
         }
+
+        var inCustomer = drawer.querySelector('#fdcustomerinput');
+        if (inCustomer && adv.customer) inCustomer.value = adv.customer.text || '';
+
+        var inStorage = drawer.querySelector('#fdstorageCompanyinput');
+        if (inStorage && adv.storageCompany) inStorage.value = adv.storageCompany.text || '';
+
+        var inRack = drawer.querySelector('#fdrackLayerinput');
+        if (inRack && adv.rackLayer) inRack.value = adv.rackLayer.text || '';
 
         if (adv.plastic) {
           var pl = drawer.querySelector('#fdplastic');
@@ -1744,27 +1771,20 @@ Version:  v8.1.0-7
         }
 
         if (adv.draftAngle) {
-          var dm = drawer.querySelector('#fddraftmin');
-          var dx = drawer.querySelector('#fddraftmax');
+          var dm = drawer.querySelector('#fddraftangle');
           if (dm) dm.value = adv.draftAngle.min != null ? adv.draftAngle.min : '';
-          if (dx) dx.value = adv.draftAngle.max != null ? adv.draftAngle.max : '';
         }
 
         if (adv.underAngle) {
-          var uai = drawer.querySelector('#fdunderAngleinput');
-          var uas = drawer.querySelector('#fdunderAngle');
+          var uai = drawer.querySelector('#fdunderangleinput');
           if (uai) uai.value = adv.underAngle.text || '';
-          if (uas) uas.value = adv.underAngle.select || '';
         }
 
         if (adv.cutline) {
           var cli = drawer.querySelector('#fdcutlineinput');
-          var cls = drawer.querySelector('#fdcutline');
           if (cli) cli.value = adv.cutline.text || '';
-          if (cls) cls.value = adv.cutline.select || '';
         }
 
-        // checkbox lists
         function setChecked(listId, selected) {
           var box = drawer.querySelector('#' + listId);
           if (!box) return;
@@ -1787,27 +1807,11 @@ Version:  v8.1.0-7
           if (d) d.checked = adv.statusFlags.disposing === true;
         }
 
-        // drawer legacy
-        var legacyCat = drawer.querySelector('#fdLegacyCategorySelect');
-        var legacyField = drawer.querySelector('#fdLegacyField');
-        var legacyValue = drawer.querySelector('#fdLegacyValue');
-        var legacySortField = drawer.querySelector('#fdLegacySortField');
-        var legacySortDir = drawer.querySelector('#fdLegacySortDirection');
-        if (legacyCat) legacyCat.value = st.category || 'all';
-        if (legacyField) legacyField.value = st.legacy.fieldId || '';
-        this.populateDrawerLegacyValues();
-        if (legacyValue) legacyValue.value = st.legacy.value || '';
-        if (legacySortField) legacySortField.value = st.sort.field || DEFAULT_SORT.field;
-        if (legacySortDir) legacySortDir.value = st.sort.direction || DEFAULT_SORT.direction;
-
       } finally {
         this._suppressEvents = false;
       }
     },
 
-    // ---------------------------------------------------------------------
-    // Apply filter
-    // ---------------------------------------------------------------------
     applyFilter: function () {
       var results = this.core.apply(getAllItems(), { dispatch: true });
       // results already dispatched; keep for debugging
@@ -1821,11 +1825,12 @@ Version:  v8.1.0-7
       var st = this.core.getState();
       var adv = st.advanced || {};
 
-      var isOn = false;
+      var isFilter = false;
+      var isSort = false;
 
-      if (st.category && st.category !== 'all') isOn = true;
-      if (st.legacy && st.legacy.fieldId && st.legacy.value) isOn = true;
-      if (st.sort && (st.sort.field !== DEFAULT_SORT.field || st.sort.direction !== DEFAULT_SORT.direction)) isOn = true;
+      if (st.category && st.category !== 'all') isFilter = true;
+      if (st.legacy && st.legacy.fieldId && st.legacy.value) isFilter = true;
+      if (st.sort && (st.sort.field !== DEFAULT_SORT.field || st.sort.direction !== DEFAULT_SORT.direction)) isSort = true;
 
       // advanced check
       function hasAdv() {
@@ -1840,20 +1845,22 @@ Version:  v8.1.0-7
         if (adv.trayInfo && adv.trayInfo.text) return true;
         if (adv.setupType && adv.setupType.selected && adv.setupType.selected.length) return true;
         if (adv.orientation && adv.orientation.selected && adv.orientation.selected.length) return true;
-        if (adv.draftAngle && (adv.draftAngle.min || adv.draftAngle.max)) return true;
-        if (adv.underAngle && (adv.underAngle.select || adv.underAngle.text)) return true;
+        if (adv.draftAngle && adv.draftAngle.selected && adv.draftAngle.selected.length) return true;
+        if (adv.underAngle && adv.underAngle.selected && adv.underAngle.selected.length) return true;
         if (adv.cutline && (adv.cutline.select || adv.cutline.text)) return true;
         if (adv.statusFlags && ((adv.statusFlags.inventoryStatus && adv.statusFlags.inventoryStatus.length) || (adv.statusFlags.teflon && adv.statusFlags.teflon.length) || adv.statusFlags.returning || adv.statusFlags.disposing)) return true;
         return false;
       }
 
-      if (hasAdv()) isOn = true;
+      if (hasAdv()) isFilter = true;
+      var isOn = isFilter || isSort;
 
       // Desktop badge
       var desktopBadge = document.querySelector('#filterSection .filter-badge');
       if (desktopBadge) {
         if (isOn) {
           desktopBadge.textContent = 'ON';
+          desktopBadge.style.backgroundColor = isFilter ? '#f43f5e' : '#f97316';
           desktopBadge.classList.remove('hidden');
         } else {
           desktopBadge.classList.add('hidden');
@@ -1865,23 +1872,67 @@ Version:  v8.1.0-7
         if (isOn) {
           refs.mobileNavBadge.textContent = 'ON';
           refs.mobileNavBadge.style.display = 'flex';
+          refs.mobileNavBadge.style.backgroundColor = isFilter ? '#f43f5e' : '#f97316';
         } else {
           refs.mobileNavBadge.textContent = '';
           refs.mobileNavBadge.style.display = 'none';
+        }
+      }
+      // Desktop NavBtn Badge Color
+      var desktopBtnI = document.querySelector('#filterNavBtn i');
+      if (desktopBtnI) {
+        if (isOn) {
+          desktopBtnI.style.color = isFilter ? '#f43f5e' : '#f97316';
+        } else {
+          desktopBtnI.style.color = '';
         }
       }
     },
 
     updateDetailButton: function () {
       if (!refs.detailBtn) return;
-      var desktopBadge = document.querySelector('#filterSection .filter-badge');
-      var isOn = false;
-      if (desktopBadge && !desktopBadge.classList.contains('hidden')) isOn = true;
-      if (isOn) refs.detailBtn.classList.add('active');
-      else refs.detailBtn.classList.remove('active');
+      var st = this.core.getState();
+      var adv = st.advanced || {};
+      var isFilter = false;
+      var isSort = false;
+
+      if (st.category && st.category !== 'all') isFilter = true;
+      if (st.legacy && st.legacy.fieldId && st.legacy.value) isFilter = true;
+      if (st.sort && (st.sort.field !== DEFAULT_SORT.field || st.sort.direction !== DEFAULT_SORT.direction)) isSort = true;
+
+      function hasAdv() {
+        if (adv.itemType && adv.itemType !== '' && adv.itemType !== 'all') return true;
+        if (adv.customer && (adv.customer.select || adv.customer.text)) return true;
+        if (adv.storageCompany && (adv.storageCompany.select || adv.storageCompany.text)) return true;
+        if (adv.rackLayer && (adv.rackLayer.select || adv.rackLayer.text)) return true;
+        if (adv.dimension && (adv.dimension.quickSelect || adv.dimension.quickText || (adv.dimension.L && (adv.dimension.L.min || adv.dimension.L.max)) || (adv.dimension.W && (adv.dimension.W.min || adv.dimension.W.max)))) return true;
+        if (adv.productionDate && (adv.productionDate.from || adv.productionDate.to)) return true;
+        if (adv.plastic && adv.plastic.text) return true;
+        if (adv.textContent && adv.textContent.text) return true;
+        if (adv.trayInfo && adv.trayInfo.text) return true;
+        if (adv.setupType && adv.setupType.selected && adv.setupType.selected.length) return true;
+        if (adv.orientation && adv.orientation.selected && adv.orientation.selected.length) return true;
+        if (adv.draftAngle && adv.draftAngle.selected && adv.draftAngle.selected.length) return true;
+        if (adv.underAngle && adv.underAngle.selected && adv.underAngle.selected.length) return true;
+        if (adv.cutline && (adv.cutline.select || adv.cutline.text)) return true;
+        if (adv.statusFlags && ((adv.statusFlags.inventoryStatus && adv.statusFlags.inventoryStatus.length) || (adv.statusFlags.teflon && adv.statusFlags.teflon.length) || adv.statusFlags.returning || adv.statusFlags.disposing)) return true;
+        return false;
+      }
+      if (hasAdv()) isFilter = true;
+
+      var isOn = isFilter || isSort;
+      if (isOn) {
+        refs.detailBtn.classList.add('active');
+        refs.detailBtn.style.color = isFilter ? '#f43f5e' : '#f97316';
+        refs.detailBtn.style.borderColor = isFilter ? '#f43f5e' : '#f97316';
+      } else {
+        refs.detailBtn.classList.remove('active');
+        refs.detailBtn.style.color = '';
+        refs.detailBtn.style.borderColor = '';
+      }
     },
 
-        updateDrawerIndicators: function () {
+    updateDrawerIndicators: function () {
       var drawer = document.getElementById('filterDrawer');
       if (!drawer) return;
 
@@ -1946,13 +1997,13 @@ Version:  v8.1.0-7
       setSection('orientation', !!(adv.orientation && adv.orientation.selected && adv.orientation.selected.length),
         (adv.orientation && adv.orientation.selected && adv.orientation.selected.length) ? (adv.orientation.selected.length + ' selected') : '');
 
-      // draftAngle
-      var draftOn = !!(adv.draftAngle && (adv.draftAngle.min || adv.draftAngle.max));
-      setSection('draftAngle', draftOn, draftOn ? ((adv.draftAngle.min || '') + ' ~ ' + (adv.draftAngle.max || '')) : '');
+      // draftAngle (Array matching)
+      setSection('draftAngle', !!(adv.draftAngle && adv.draftAngle.selected && adv.draftAngle.selected.length),
+        (adv.draftAngle && adv.draftAngle.selected && adv.draftAngle.selected.length) ? (adv.draftAngle.selected.length + ' selected') : '');
 
-      // underAngle / cutline
-      setSection('underAngle', !!(adv.underAngle && (adv.underAngle.select || adv.underAngle.text)),
-        adv.underAngle ? (adv.underAngle.select || adv.underAngle.text) : '');
+      // underAngle (Array matching)
+      setSection('underAngle', !!(adv.underAngle && adv.underAngle.selected && adv.underAngle.selected.length),
+        (adv.underAngle && adv.underAngle.selected && adv.underAngle.selected.length) ? (adv.underAngle.selected.length + ' selected') : '');
       setSection('cutlineSize', !!(adv.cutline && (adv.cutline.select || adv.cutline.text)),
         adv.cutline ? (adv.cutline.select || adv.cutline.text) : '');
 
@@ -2021,13 +2072,33 @@ Version:  v8.1.0-7
 
     resetAll: function () {
       this.core.resetAll();
+
+      // Also clear Global Search Input
+      var globSearch = document.getElementById('searchInput');
+      var drawerSearch = document.getElementById('fdrawKeyword');
+      var wasSearching = false;
+      if (globSearch && globSearch.value.trim() !== '') {
+        globSearch.value = '';
+        wasSearching = true;
+      }
+      if (drawerSearch && drawerSearch.value.trim() !== '') {
+        drawerSearch.value = '';
+      }
+
       this.updateUI();
       this.updateBadge();
       this.updateDetailButton();
       this.applyFilter();
+
+      // Dispatch input event to clear SearchModule cache AFTER filter is applied
+      if (wasSearching) {
+        setTimeout(function () {
+          if (globSearch) globSearch.dispatchEvent(new Event('input', { bubbles: true }));
+        }, 50);
+      }
     },
 
-        collapseAllDrawerFields: function () {
+    collapseAllDrawerFields: function () {
       var drawer = document.getElementById('filterDrawer');
       if (!drawer) return;
       var sections = drawer.querySelectorAll('.filter-accordion.open');
@@ -2081,7 +2152,7 @@ Version:  v8.1.0-7
 
     },
 
-        injectDrawerPerFieldReset: function () {
+    injectDrawerPerFieldReset: function () {
       var self = this;
       var drawer = document.getElementById('filterDrawer');
       if (!drawer) return;
@@ -2105,8 +2176,8 @@ Version:  v8.1.0-7
         headerBtn.insertBefore(reset, icon);
 
         function doReset(ev) {
-          try { ev.preventDefault(); } catch (e) {}
-          try { ev.stopPropagation(); } catch (e2) {}
+          try { ev.preventDefault(); } catch (e) { }
+          try { ev.stopPropagation(); } catch (e2) { }
           self.resetDrawerField(key);
         }
 
@@ -2231,7 +2302,7 @@ Version:  v8.1.0-7
 
       // remove silent (để tránh lưu vào state)
       if (patch && Object.prototype.hasOwnProperty.call(patch, 'silent')) {
-        try { delete patch.silent; } catch (e) {}
+        try { delete patch.silent; } catch (e) { }
       }
 
       this._suppressEvents = true;

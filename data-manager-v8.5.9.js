@@ -1170,14 +1170,18 @@
     }
 
     function createMoldDimensionString(mold, design) {
-        if (design?.MoldDesignLength && design?.MoldDesignWidth && design?.MoldDesignHeight) {
-            return `${design.MoldDesignLength}x${design.MoldDesignWidth}x${design.MoldDesignHeight}`;
+        if (design?.MoldDesignLength && design?.MoldDesignWidth) {
+            let s = `${design.MoldDesignLength}x${design.MoldDesignWidth}`;
+            if (design.MoldDesignHeight) s += `x${design.MoldDesignHeight}`;
+            return s;
         }
         if (design?.MoldDesignDim) return design.MoldDesignDim;
-        if (mold?.MoldLength && mold?.MoldWidth && mold?.MoldHeight) {
-            return `${mold.MoldLength}x${mold.MoldWidth}x${mold.MoldHeight}`;
+        if (mold?.MoldLength && mold?.MoldWidth) {
+            let s = `${mold.MoldLength}x${mold.MoldWidth}`;
+            if (mold.MoldHeight) s += `x${mold.MoldHeight}`;
+            return s;
         }
-        return '';
+        return mold?.Size || design?.Size || '';
     }
 
     function getCustomerDisplayName(customer, company) {
