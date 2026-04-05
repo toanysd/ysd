@@ -262,6 +262,10 @@
      */
     openModal() {
       if (!this.state.modal) return;
+      if (window.SwipeHistoryTrap) {
+        window.SwipeHistoryTrap.push('qrExportModal', () => this.closeModal());
+        window.SwipeHistoryTrap.bindSwipe(this.state.modal, () => this.closeModal());
+      }
       this.state.modal.classList.add('qr-modal-open');
       this.state.modal.classList.remove('qr-modal-hidden');
       document.body.style.overflow = 'hidden';
@@ -271,6 +275,7 @@
      * Đóng modal QR
      */
     closeModal() {
+      if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('qrExportModal');
       if (!this.state.modal) return;
       this.state.modal.classList.remove('qr-modal-open');
       this.state.modal.classList.add('qr-modal-hidden');
@@ -692,17 +697,17 @@
             if (!response.ok) throw new Error('Network error');
             const blob = await response.blob();
             const objectUrl = window.URL.createObjectURL(blob);
-            
+
             const typeCode = this.state.currentType === 'mold' ? 'MOLD' : 'CUTTER';
             const fileName = `MCQR_${typeCode}_${this.state.currentId || ''}_${this.state.currentCode || ''}_${this.state.currentSize}.jpg`;
-            
+
             const link = document.createElement('a');
             link.href = objectUrl;
             link.download = fileName;
             document.body.appendChild(link);
             link.click();
             link.remove();
-            
+
             setTimeout(() => window.URL.revokeObjectURL(objectUrl), 100);
           } catch (error) {
             console.warn('Lỗi tải ảnh trực tiếp, tự động chuyển hướng tab mới:', error);

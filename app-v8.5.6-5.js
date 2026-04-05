@@ -20,6 +20,69 @@
 ============================================================================ */
 const SIDEBAR_STATE_KEY = 'moldcutter_sidebar_v81';
 
+/* ============================================================================
+   GLOBAL SWIPE & HISTORY TRAP UTILITY (v8.5.6+)
+   Handles preventing Android system back gestures by trapping window history
+   and providing swipe-to-close features for all Modals/Panels.
+============================================================================ */
+window.SwipeHistoryTrap = (function () {
+  var states = [];
+  var isHandlingPop = false;
+
+  window.addEventListener('popstate', function (e) {
+    if (states.length > 0) {
+      isHandlingPop = true;
+      var trap = states.pop();
+      if (typeof trap.closeCallback === 'function') {
+        trap.closeCallback();
+      }
+      setTimeout(function () { isHandlingPop = false; }, 100);
+    }
+  });
+
+  return {
+    push: function (id, closeCallback) {
+      window.history.pushState({ trapId: id }, '', window.location.href);
+      states.push({ id: id, closeCallback: closeCallback });
+    },
+    remove: function (id) {
+      if (isHandlingPop) return;
+      var idx = states.findIndex(function (s) { return s.id === id; });
+      if (idx !== -1) {
+        if (idx === states.length - 1) {
+          states.pop();
+          isHandlingPop = true;
+          window.history.back();
+          setTimeout(function () { isHandlingPop = false; }, 100);
+        } else {
+          states.splice(idx, 1);
+        }
+      }
+    },
+    bindSwipe: function (element, closeCallback) {
+      if (!element) return;
+      var startX = 0, startY = 0;
+      element.addEventListener('touchstart', function (e) {
+        startX = e.changedTouches[0].screenX;
+        startY = e.changedTouches[0].screenY;
+      }, { passive: true });
+      element.addEventListener('touchend', function (e) {
+        if (startX < 35) return; // System Back Dead zone
+        var endX = e.changedTouches[0].screenX;
+        var endY = e.changedTouches[0].screenY;
+        var deltaX = endX - startX;
+        var deltaY = Math.abs(endY - startY);
+        if (deltaX > 60 && deltaY < 60) {
+          // Do not interfere with horizontally scrollable elements
+          var isTable = e.target.closest('.table-scroll-container, table, .scroll-x');
+          if (isTable) return;
+          if (typeof closeCallback === 'function') closeCallback();
+        }
+      }, { passive: true });
+    }
+  };
+})();
+
 class App {
   constructor() {
     this.allItems = [];
@@ -80,7 +143,7 @@ class App {
       const isNarrow = window.matchMedia('(max-width: 1024px)').matches;
 
       // Chỉ render lại khi mode đổi để tránh gọi quá nhiều
-      if(this._lastPaginationMode === isNarrow) return;
+      if (this._lastPaginationMode === isNarrow) return;
       this._lastPaginationMode = isNarrow;
 
       this.updatePagination(); // updatePagination() sẽ gọi renderPagination() đúng currentPage/totalPages
@@ -124,7 +187,7 @@ class App {
         if (this.allItems.length > 0) {
           console.log('Sample item:', this.allItems[0]);
         }
-        
+
         // Fix: Auto re-apply filters & search so it doesn't reset to empty view
         if (this.searchQuery || this.selectedCategory !== 'all') {
           this.applyFilters();
@@ -178,7 +241,7 @@ class App {
     try {
       const searchInput = document.getElementById('searchInput');
       const savedQuery = sessionStorage.getItem('moldSearchQuery_v8');
-      
+
       // Lấy keyword: Ưu tiên giá trị mà browser tự rollback trên UI (nếu có), nếu không có thì lấy từ session.
       let finalQuery = '';
       if (searchInput && searchInput.value.trim()) {
@@ -195,7 +258,7 @@ class App {
           if (clearBtn) clearBtn.style.display = 'flex';
         }
         if (this.searchModule) {
-           this.searchModule.currentQuery = finalQuery;
+          this.searchModule.currentQuery = finalQuery;
         }
       }
 
@@ -210,7 +273,7 @@ class App {
         // Debounce small delay in case child modules are still waking up
         setTimeout(() => this.applyFilters(), 100);
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // Update initial counts
     this.updateCategoryDropdown();
@@ -325,7 +388,7 @@ class App {
       // 4) Tái áp dụng Search trên nền kết quả của Sidebar
       this.currentPage = 1;
       this.applyFilters();
-    });  
+    });
 
     // Search input (fallback if SearchModule not available)
     const searchInput = document.getElementById('searchInput');
@@ -383,29 +446,29 @@ class App {
       const sidebar = document.getElementById('sidebar');
       const toggleBtn = document.querySelector('.sidebar-toggle');
       if (!sidebar) return;
-      
+
       const isMobile = window.innerWidth <= 768;
       const clickedInsideSidebar = sidebar.contains(e.target);
       const clickedToggleBtn = toggleBtn && toggleBtn.contains(e.target);
       const mobileNavbar = document.getElementById('mobileNavbar');
       const clickedMobileNavbar = mobileNavbar && mobileNavbar.contains(e.target);
-      
+
       if (!clickedInsideSidebar && !clickedToggleBtn && !clickedMobileNavbar) {
         if (isMobile && sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-            this.updateSidebarIcon();
+          sidebar.classList.remove('open');
+          this.updateSidebarIcon();
         } else if (!isMobile && !sidebar.classList.contains('collapsed')) {
-            // Freeze then collapse
-            sidebar.classList.add('sidebar-freeze');
-            sidebar.getBoundingClientRect();
-            sidebar.classList.add('collapsed');
-            
-            requestAnimationFrame(() => requestAnimationFrame(() => {
-                sidebar.classList.remove('sidebar-freeze');
-            }));
-            
-            this.updateSidebarIcon();
-            try { localStorage.setItem(SIDEBAR_STATE_KEY, "1"); } catch(e){}
+          // Freeze then collapse
+          sidebar.classList.add('sidebar-freeze');
+          sidebar.getBoundingClientRect();
+          sidebar.classList.add('collapsed');
+
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            sidebar.classList.remove('sidebar-freeze');
+          }));
+
+          this.updateSidebarIcon();
+          try { localStorage.setItem(SIDEBAR_STATE_KEY, "1"); } catch (e) { }
         }
       }
     });
@@ -424,7 +487,7 @@ class App {
     document.addEventListener('touchend', (e) => {
       touchEndX = e.changedTouches[0].screenX;
       touchEndY = e.changedTouches[0].screenY;
-      
+
       const isMobile = window.innerWidth <= 768;
       if (!isMobile) return;
 
@@ -446,16 +509,16 @@ class App {
 
         // Kiểm tra xem người dùng có đang vuốt trúng vùng cuộn ngang mặc định không (ví dụ Table)
         const isTargetScrollable = e.target.closest('.table-scroll-container') || e.target.closest('table');
-        
+
         // 1. Vuốt sang phải dứt khoát > 50px VÀ bắt đầu từ gần cạnh trái (startX < 100px để dễ vuốt hơn) -> MỞ Sidebar
         // Nếu điểm bắt đầu vuốt chạm vào bảng (table), giới hạn lại sát mép (30px) để không cản trở việc cuộn bảng.
         const allowedEdge = isTargetScrollable ? 30 : 100;
-        
+
         if (deltaX > 50 && touchStartX <= allowedEdge && !sidebarEl.classList.contains('open') && !isInsidePanel) {
           sidebarEl.classList.add('open');
           this.updateSidebarIcon();
         }
-        
+
         // 2. Vuốt sang trái dứt khoát > 50px (âm) -> ĐÓNG Sidebar
         else if (deltaX < -50 && sidebarEl.classList.contains('open')) {
           sidebarEl.classList.remove('open');
@@ -503,9 +566,9 @@ class App {
         e.stopPropagation();
         const isShowing = actionButtonsList.classList.contains('show');
         if (isShowing) {
-           actionButtonsList.classList.remove('show');
+          actionButtonsList.classList.remove('show');
         } else {
-           actionButtonsList.classList.add('show');
+          actionButtonsList.classList.add('show');
         }
       });
 
@@ -545,7 +608,7 @@ class App {
     });
   }
 
-  
+
 
   // ========================================================================
   // Sorting helpers (Card view needs default sort like Table)
@@ -648,20 +711,20 @@ class App {
 
       if (field === 'size') {
         const parseDim = (item) => {
-            let l=0, w=0;
-            if (item.designInfo) {
-                const dl = parseFloat(item.designInfo.MoldDesignLength || item.designInfo.Length);
-                const dw = parseFloat(item.designInfo.MoldDesignWidth || item.designInfo.Width);
-                if (!isNaN(dl)) l = dl;
-                if (!isNaN(dw)) w = dw;
-            }
-            if (!l && !w) {
-                const s = String(this.getItemSize(item));
-                const parts = s.split(/[xX\-\~*]/);
-                if (parts.length > 0) l = parseFloat(parts[0]) || 0;
-                if (parts.length > 1) w = parseFloat(parts[1]) || 0;
-            }
-            return {l, w};
+          let l = 0, w = 0;
+          if (item.designInfo) {
+            const dl = parseFloat(item.designInfo.MoldDesignLength || item.designInfo.Length);
+            const dw = parseFloat(item.designInfo.MoldDesignWidth || item.designInfo.Width);
+            if (!isNaN(dl)) l = dl;
+            if (!isNaN(dw)) w = dw;
+          }
+          if (!l && !w) {
+            const s = String(this.getItemSize(item));
+            const parts = s.split(/[xX\-\~*]/);
+            if (parts.length > 0) l = parseFloat(parts[0]) || 0;
+            if (parts.length > 1) w = parseFloat(parts[1]) || 0;
+          }
+          return { l, w };
         };
         const dA = parseDim(a);
         const dB = parseDim(b);
@@ -674,10 +737,10 @@ class App {
     });
   }
 
-/**
-   * Apply filters (search + category)
-   * NEW: Use SearchModule.searchItems() for advanced search
-   */
+  /**
+     * Apply filters (search + category)
+     * NEW: Use SearchModule.searchItems() for advanced search
+     */
   applyFilters() {
     // Kế thừa kết quả từ bộ lọc Sidebar nếu có, không thì duyệt toàn bộ list
     let filtered = this._lastFilterResults ? [...this._lastFilterResults] : [...this.allItems];
@@ -719,9 +782,9 @@ class App {
           const company = (item.company || '').toLowerCase();
 
           return code.includes(query) ||
-                 name.includes(query) ||
-                 location.includes(query) ||
-                 company.includes(query);
+            name.includes(query) ||
+            location.includes(query) ||
+            company.includes(query);
         });
       }
     }
@@ -729,12 +792,12 @@ class App {
     filtered = this.sortForCardView(filtered);
     this.filteredItems = filtered;
     this.currentPage = 1;
-    
+
     // Save to session
     try {
       sessionStorage.setItem('moldSearchQuery_v8', this.searchQuery || '');
       sessionStorage.setItem('moldSearchCategory_v8', this.selectedCategory || 'all');
-    } catch(e) {}
+    } catch (e) { }
 
     this.updateUI();
   }
@@ -756,7 +819,7 @@ class App {
 
     try {
       sessionStorage.removeItem('moldSearchQuery_v8');
-    } catch(e) {}
+    } catch (e) { }
 
     this.applyFilters();
   }
@@ -851,13 +914,13 @@ class App {
   /**
    * Toggle sidebar
    */
-  toggleSidebar(){
+  toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    if(!sidebar) return;
+    if (!sidebar) return;
 
     const isMobile = window.innerWidth <= 768;
 
-    if(isMobile){
+    if (isMobile) {
       sidebar.classList.toggle('open');
       sidebar.classList.remove('collapsed');
       this.updateSidebarIcon();
@@ -876,7 +939,7 @@ class App {
 
     try {
       localStorage.setItem(SIDEBARSTATEKEY, isCollapsed ? "1" : "0");
-    } catch (e) {}
+    } catch (e) { }
 
     // Bỏ freeze sau 2 frame (đủ an toàn cho mọi trình duyệt)
     requestAnimationFrame(() => {
@@ -887,15 +950,15 @@ class App {
 
     this.updateSidebarIcon();
   }
-  
+
   updateSidebarIcon() {
     const sidebar = document.getElementById('sidebar');
     const icon = document.querySelector('.sidebar-toggle i');
     if (!sidebar || !icon) return;
-    
+
     const isMobile = window.innerWidth <= 768;
     const isOpen = isMobile ? sidebar.classList.contains('open') : !sidebar.classList.contains('collapsed');
-    
+
     icon.className = isOpen ? 'fas fa-chevron-left' : 'fas fa-chevron-right';
   }
 
@@ -991,7 +1054,7 @@ class App {
 
     // Page numbers
     const isNarrow = window.innerWidth <= 1024;
-    if(!isNarrow){
+    if (!isNarrow) {
       const maxPages = 7;
       let startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
       let endPage = Math.min(totalPages, startPage + maxPages - 1);
@@ -1001,7 +1064,7 @@ class App {
       for (let i = startPage; i <= endPage; i++) {
         html += '<button class="pagination-btn btn-page ' + (i === currentPage ? 'active' : '') + '" data-page="' + i + '">' + i + '</button>';
       }
-    }else{
+    } else {
       const startPage = Math.max(1, currentPage - 1);
       const endPage = Math.min(totalPages, currentPage + 1);
       for (let i = startPage; i <= endPage; i++) {
@@ -1137,9 +1200,9 @@ class App {
 
     // Apply color class dynamically
     const updateDropdownClass = () => {
-        categoryDropdown.classList.remove('mold-active', 'cutter-active');
-        if (categoryDropdown.value === 'mold') categoryDropdown.classList.add('mold-active');
-        if (categoryDropdown.value === 'cutter') categoryDropdown.classList.add('cutter-active');
+      categoryDropdown.classList.remove('mold-active', 'cutter-active');
+      if (categoryDropdown.value === 'mold') categoryDropdown.classList.add('mold-active');
+      if (categoryDropdown.value === 'cutter') categoryDropdown.classList.add('cutter-active');
     };
     categoryDropdown.addEventListener('change', updateDropdownClass);
     updateDropdownClass(); // init
@@ -1172,10 +1235,10 @@ class App {
    */
   handleItemClick(item) {
     console.log('Item clicked:', item.code || item.MoldCode || item.CutterNo);
-    
+
     // Xác định itemType
     const itemType = item.type || item.itemType || 'mold';
-    
+
     // Mở DetailPanel (v8.2.3)
     if (window.DetailPanel) {
       window.DetailPanel.open(item, itemType);
@@ -1264,9 +1327,9 @@ class App {
         needsReset = true;
       }
       if (this.currentView === 'table' &&
-          this.tableRenderer &&
-          typeof this.tableRenderer.needsReset === 'function' &&
-          this.tableRenderer.needsReset()) {
+        this.tableRenderer &&
+        typeof this.tableRenderer.needsReset === 'function' &&
+        this.tableRenderer.needsReset()) {
         needsReset = true;
       }
       if (needsReset || (this.filteredItems && this.filteredItems.length > 0)) {
@@ -1437,7 +1500,7 @@ class App {
 
     document.body.appendChild(overlay);
 
-    const close = () => { try { overlay.remove(); } catch (e) {} };
+    const close = () => { try { overlay.remove(); } catch (e) { } };
 
     overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
 
@@ -1503,11 +1566,11 @@ class App {
     return;
   }
 
-    /**
-   * Open Photo Audit Tool (safe)
-   * - Không làm hỏng app nếu PhotoAuditTool chưa được load
-   * - Nếu tool hỗ trợ preselect thì truyền item vào, nếu không thì vẫn mở tool để tự chọn thiết bị
-   */
+  /**
+ * Open Photo Audit Tool (safe)
+ * - Không làm hỏng app nếu PhotoAuditTool chưa được load
+ * - Nếu tool hỗ trợ preselect thì truyền item vào, nếu không thì vẫn mở tool để tự chọn thiết bị
+ */
   openPhotoAuditForItem(item) {
     const code = item && (item.type === 'mold' ? (item.MoldCode || '') : (item.CutterNo || '')) || '';
 
@@ -1567,7 +1630,7 @@ class App {
           if (window.CheckInOut && typeof window.CheckInOut.openModal === 'function') {
             return resolve(window.CheckInOut);
           }
-        } catch (e) {}
+        } catch (e) { }
 
         if (Date.now() - t0 >= timeoutMs) {
           return reject(new Error('CheckInOut chưa sẵn sàng'));
@@ -1608,10 +1671,10 @@ class App {
           alert('Module TeflonProcessing chưa sẵn sàng.');
           return;
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
-    switch(action) {
+    switch (action) {
       case 'inout':
         if (window.CheckInOut && typeof window.CheckInOut.openSmart === 'function') {
           window.CheckInOut.openSmart(item);
@@ -1651,7 +1714,7 @@ class App {
           });
         break;
 
-        case 'move':
+      case 'move':
         if (window.LocationMove && typeof window.LocationMove.open === 'function') {
           window.LocationMove.open(item);
         } else {
@@ -1751,7 +1814,7 @@ class App {
 
     if (this.searchModule) {
       if (typeof this.searchModule.clearSearch === 'function') {
-         this.searchModule.clearSearch();
+        this.searchModule.clearSearch();
       }
       this.searchModule.currentQuery = '';
     }
@@ -1768,7 +1831,7 @@ class App {
 
     // 3. Reset Global Filter
     if (window.FilterModule && typeof window.FilterModule.resetAll === 'function') {
-      window.FilterModule.resetAll(); 
+      window.FilterModule.resetAll();
       // FilterModule.resetAll() sẽ tự động bắn event filterapplied, gọi lại app.applyFilters()
     } else {
       // Fallback
@@ -1830,7 +1893,7 @@ class App {
 }
 
 // Global Sync Status Helper
-window.setGlobalSyncStatus = function(status) {
+window.setGlobalSyncStatus = function (status) {
   const icon = document.getElementById('globalSyncIcon');
   if (!icon) return;
   // classes: syncing, success, error

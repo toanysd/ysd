@@ -515,6 +515,11 @@
     openModal() {
       if (!this.state.initialized) this.init();
 
+      if (window.SwipeHistoryTrap) {
+        window.SwipeHistoryTrap.push('qrScanModal', () => this.closeModal());
+        window.SwipeHistoryTrap.bindSwipe(this.state.modal, () => this.closeModal());
+      }
+
       this.state.modal.classList.add('qrscan-open');
       document.body.style.overflow = 'hidden';
 
@@ -529,6 +534,8 @@
      * Đóng modal & dừng camera.
      */
     closeModal() {
+      if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('qrScanModal');
+
       this.stopScan();
       if (this.state.modal) {
         this.state.modal.classList.remove('qrscan-open');
@@ -758,7 +765,7 @@
     parsePayload(raw) {
       if (!raw) return null;
       const text = String(raw).trim();
-      
+
       try {
         if (text.startsWith('http')) {
           const url = new URL(text);
@@ -899,26 +906,26 @@
     openDetail(item, kind) {
       if (!item) return;
 
-      const itemId = kind === 'mold' 
-          ? (item.MoldID || item.MoldCode) 
-          : (item.CutterID || item.CutterNo);
+      const itemId = kind === 'mold'
+        ? (item.MoldID || item.MoldCode)
+        : (item.CutterID || item.CutterNo);
 
       // Kéo tấm thẻ bảng mã chi tiết bằng API v8 thay vì Local Dispatch
       if (window.DetailPanel && typeof window.DetailPanel.open === 'function') {
-          console.log('[QRScanSearch] Mở thẻ Panel trực tiếp:', itemId);
-          window.DetailPanel.open(item, kind);
+        console.log('[QRScanSearch] Mở thẻ Panel trực tiếp:', itemId);
+        window.DetailPanel.open(item, kind);
       } else {
-          // Dự phòng nếu không có class DetailPanel v8
-          console.warn('[QRScanSearch] Bảng DetailPanel không tồn tại. Đẩy lệnh Dispatch.');
-          const evt = new CustomEvent('detailchanged', {
-            detail: {
-              item,
-              itemType: kind,
-              itemId: itemId,
-              source: 'qr-scan'
-            }
-          });
-          document.dispatchEvent(evt);
+        // Dự phòng nếu không có class DetailPanel v8
+        console.warn('[QRScanSearch] Bảng DetailPanel không tồn tại. Đẩy lệnh Dispatch.');
+        const evt = new CustomEvent('detailchanged', {
+          detail: {
+            item,
+            itemType: kind,
+            itemId: itemId,
+            source: 'qr-scan'
+          }
+        });
+        document.dispatchEvent(evt);
       }
     }
   };

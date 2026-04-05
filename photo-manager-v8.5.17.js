@@ -127,7 +127,7 @@
     '      <thead><tr>',
     '        <th style="width:44px"></th>',
     '        <th data-col="devicelabel">機器 / Thiết bị</th>',
-    '        <th data-col="device_type">タイプ / Loại</th>',    
+    '        <th data-col="device_type">タイプ / Loại</th>',
     '        <th data-col="file_size">サイズ</th>',
     '        <th data-col="created_at">日付 / Ngày</th>',
     '        <th data-col="state">状態 / Trạng thái</th>',
@@ -173,7 +173,7 @@
     '    <button class="pm-info-cancel-btn" id="pmInfoCancelBtn">キャンセル</button>',
     '  </div>',
     '</div>',
-    
+
     '</div>', /* pm-body */
     '</div>', /* pm-container */
     '</div>', /* pm-overlay */
@@ -199,7 +199,7 @@
     '  <div class="pm-lb-footer" id="pmLbDots"></div>',
     '</div>',
 
-    
+
 
     /* Storage Modal */
     '<div class="pm-storage-modal pm-hidden" id="pmStorageModal">',
@@ -250,21 +250,21 @@
      MODULE
   ────────────────────────────────────────────────────────── */
   function PhotoManagerModule() {
-    this._mounted        = false;
-    this._allPhotos      = [];
-    this._filtered       = [];
-    this._view           = 'icon-small';
-    this._navKey         = 'all';
-    this._stateFilter    = 'all';
-    this._search         = '';
-    this._sort           = { field: 'created_at', dir: 'desc' };
-    this._deviceFilter   = null;
-    this._selected       = new Set();
-    this._selMode        = false;
-    this._currentRecord  = null;
-    this._lbIndex        = 0;
+    this._mounted = false;
+    this._allPhotos = [];
+    this._filtered = [];
+    this._view = 'icon-small';
+    this._navKey = 'all';
+    this._stateFilter = 'all';
+    this._search = '';
+    this._sort = { field: 'created_at', dir: 'desc' };
+    this._deviceFilter = null;
+    this._selected = new Set();
+    this._selMode = false;
+    this._currentRecord = null;
+    this._lbIndex = 0;
     this._transferTarget = null;
-    this._transferIds    = null;
+    this._transferIds = null;
     this._pendingConfirm = null;
 
     // Cache + incremental render (v8.4.6-4)
@@ -303,7 +303,7 @@
       if (DevPS) {
         if (DevPS.tableName === 'device_photos') DevPS.tableName = 'device_photos';
       }
-    } catch (e) {}
+    } catch (e) { }
 
     var self = this;
 
@@ -329,86 +329,86 @@
     // Dﾃｹng document-level delegation + window.PhotoManager tr盻ｱc ti蘯ｿp
     if (!document._pmCtxV15) {
       document._pmCtxV15 = true;
-      var _pmLPT=null, _pmLPTgt=null, _pmIsLP=false, _pmTS={x:0,y:0};
-      var _pmI = function(){ return window.PhotoManager; };
-      var _pmOO = function(){ var o=document.getElementById('pmOverlay'); return o&&!o.classList.contains('pm-hidden'); };
-      var _pmFI = function(t){ return (t&&t.closest)?(t.closest('.pm-item')||t.closest('#pmDetailTbody tr')):null; };
-      var _pmFR = function(pm,it){
-        if(!pm||!pm._filtered||!it||!it.dataset||!it.dataset.id) return null;
-        var id=it.dataset.id;
-        for(var i=0;i<pm._filtered.length;i++){ if(String(pm._filtered[i].id)===String(id)) return pm._filtered[i]; }
+      var _pmLPT = null, _pmLPTgt = null, _pmIsLP = false, _pmTS = { x: 0, y: 0 };
+      var _pmI = function () { return window.PhotoManager; };
+      var _pmOO = function () { var o = document.getElementById('pmOverlay'); return o && !o.classList.contains('pm-hidden'); };
+      var _pmFI = function (t) { return (t && t.closest) ? (t.closest('.pm-item') || t.closest('#pmDetailTbody tr')) : null; };
+      var _pmFR = function (pm, it) {
+        if (!pm || !pm._filtered || !it || !it.dataset || !it.dataset.id) return null;
+        var id = it.dataset.id;
+        for (var i = 0; i < pm._filtered.length; i++) { if (String(pm._filtered[i].id) === String(id)) return pm._filtered[i]; }
         return null;
       };
-      document.addEventListener('contextmenu',function(e){
-        if(!_pmOO()) return;
-        if(_pmIsLP){e.preventDefault();e.stopPropagation();return;}
-        var pc=document.getElementById('pmContent');
-        if(!pc||!pc.contains(e.target)) return;
-        var it=_pmFI(e.target);
-        if(!it||!it.dataset.id) return;
+      document.addEventListener('contextmenu', function (e) {
+        if (!_pmOO()) return;
+        if (_pmIsLP) { e.preventDefault(); e.stopPropagation(); return; }
+        var pc = document.getElementById('pmContent');
+        if (!pc || !pc.contains(e.target)) return;
+        var it = _pmFI(e.target);
+        if (!it || !it.dataset.id) return;
         e.preventDefault(); e.stopPropagation();
-        var pm=_pmI(),rec=_pmFR(pm,it);
-        console.log('[PM-CTX] id:',it.dataset.id,'rec:',!!rec,'filtered:',pm?pm._filtered.length:'?');
-        if(pm&&rec){pm._hideContextMenu();pm._showContextMenu(e,rec);}
-      },true);
-      document.addEventListener('pointerdown',function(e){
-        if(!_pmOO()) return;
-        if(!document.hasFocus()) try{window.focus();}catch(x){}
-        var pc=document.getElementById('pmContent');
-        if(!pc||!pc.contains(e.target)) return;
-        var it=_pmFI(e.target);
-        if(!it||!it.dataset.id) return;
-        if(e.pointerType==='touch'){
-          _pmIsLP=false;_pmLPTgt=it;_pmTS={x:e.clientX,y:e.clientY};
-          if(_pmLPT) clearTimeout(_pmLPT);
-          _pmLPT=setTimeout(function(){
-            _pmIsLP=true;_pmLPT=null;
-            var pm=_pmI(),rec=_pmFR(pm,_pmLPTgt);
-            if(pm&&rec){pm._hideContextMenu();if(navigator.vibrate)navigator.vibrate(50);pm._showContextMenu({clientX:_pmTS.x,clientY:_pmTS.y,preventDefault:function(){},stopPropagation:function(){}},rec);}
-          },550);
+        var pm = _pmI(), rec = _pmFR(pm, it);
+        console.log('[PM-CTX] id:', it.dataset.id, 'rec:', !!rec, 'filtered:', pm ? pm._filtered.length : '?');
+        if (pm && rec) { pm._hideContextMenu(); pm._showContextMenu(e, rec); }
+      }, true);
+      document.addEventListener('pointerdown', function (e) {
+        if (!_pmOO()) return;
+        if (!document.hasFocus()) try { window.focus(); } catch (x) { }
+        var pc = document.getElementById('pmContent');
+        if (!pc || !pc.contains(e.target)) return;
+        var it = _pmFI(e.target);
+        if (!it || !it.dataset.id) return;
+        if (e.pointerType === 'touch') {
+          _pmIsLP = false; _pmLPTgt = it; _pmTS = { x: e.clientX, y: e.clientY };
+          if (_pmLPT) clearTimeout(_pmLPT);
+          _pmLPT = setTimeout(function () {
+            _pmIsLP = true; _pmLPT = null;
+            var pm = _pmI(), rec = _pmFR(pm, _pmLPTgt);
+            if (pm && rec) { pm._hideContextMenu(); if (navigator.vibrate) navigator.vibrate(50); pm._showContextMenu({ clientX: _pmTS.x, clientY: _pmTS.y, preventDefault: function () { }, stopPropagation: function () { } }, rec); }
+          }, 550);
         }
-      },true);
-      document.addEventListener('pointermove',function(e){
-        if(_pmLPT){if(Math.abs(e.clientX-_pmTS.x)>10||Math.abs(e.clientY-_pmTS.y)>10){clearTimeout(_pmLPT);_pmLPT=null;}}
-      },true);
-      document.addEventListener('pointerup',function(){if(_pmLPT){clearTimeout(_pmLPT);_pmLPT=null;}},true);
-      document.addEventListener('pointercancel',function(){if(_pmLPT){clearTimeout(_pmLPT);_pmLPT=null;}},true);
-      document.addEventListener('click',function(e){
-        if(!_pmOO()) return;
-        var pc=document.getElementById('pmContent');
-        if(!pc||!pc.contains(e.target)) return;
-        if(_pmIsLP){e.preventDefault();e.stopPropagation();_pmIsLP=false;return;}
-        var it=_pmFI(e.target);
-        if(!it||!it.dataset.id) return;
-        var pm=_pmI(),rec=_pmFR(pm,it);
-        if(!pm||!rec) return;
-        
+      }, true);
+      document.addEventListener('pointermove', function (e) {
+        if (_pmLPT) { if (Math.abs(e.clientX - _pmTS.x) > 10 || Math.abs(e.clientY - _pmTS.y) > 10) { clearTimeout(_pmLPT); _pmLPT = null; } }
+      }, true);
+      document.addEventListener('pointerup', function () { if (_pmLPT) { clearTimeout(_pmLPT); _pmLPT = null; } }, true);
+      document.addEventListener('pointercancel', function () { if (_pmLPT) { clearTimeout(_pmLPT); _pmLPT = null; } }, true);
+      document.addEventListener('click', function (e) {
+        if (!_pmOO()) return;
+        var pc = document.getElementById('pmContent');
+        if (!pc || !pc.contains(e.target)) return;
+        if (_pmIsLP) { e.preventDefault(); e.stopPropagation(); _pmIsLP = false; return; }
+        var it = _pmFI(e.target);
+        if (!it || !it.dataset.id) return;
+        var pm = _pmI(), rec = _pmFR(pm, it);
+        if (!pm || !rec) return;
+
         var isCheck = !!e.target.closest('.pm-item-check');
-        var inL=e.target.closest('.pm-item-label')||e.target.closest('.pm-device-link');
-        if(inL && !isCheck){e.preventDefault();e.stopPropagation();pm._hideContextMenu();if(!pm._selMode)pm._openInfoPanel(rec);return;}
-        
-        if(pm._selMode || isCheck) {
-          if(it.tagName !== 'TR') { 
-            e.preventDefault(); e.stopPropagation(); 
+        var inL = e.target.closest('.pm-item-label') || e.target.closest('.pm-device-link');
+        if (inL && !isCheck) { e.preventDefault(); e.stopPropagation(); pm._hideContextMenu(); if (!pm._selMode) pm._openInfoPanel(rec); return; }
+
+        if (pm._selMode || isCheck) {
+          if (it.tagName !== 'TR') {
+            e.preventDefault(); e.stopPropagation();
             if (!pm._selMode) pm._selMode = true;
-            
+
             var idx = pm._filtered.indexOf(rec);
-            
+
             if (e.shiftKey && pm._lastSelectedIdx >= 0 && idx >= 0) {
-               var start = Math.min(pm._lastSelectedIdx, idx);
-               var end   = Math.max(pm._lastSelectedIdx, idx);
-               for (var i = start; i <= end; i++) {
-                 var r = pm._filtered[i];
-                 if (r && !pm._selected.has(String(r.id))) {
-                    pm._selected.add(String(r.id));
-                    var el = document.querySelector('.pm-item[data-id="'+r.id+'"]');
-                    if (el) el.classList.add('pm-selected');
-                 }
-               }
+              var start = Math.min(pm._lastSelectedIdx, idx);
+              var end = Math.max(pm._lastSelectedIdx, idx);
+              for (var i = start; i <= end; i++) {
+                var r = pm._filtered[i];
+                if (r && !pm._selected.has(String(r.id))) {
+                  pm._selected.add(String(r.id));
+                  var el = document.querySelector('.pm-item[data-id="' + r.id + '"]');
+                  if (el) el.classList.add('pm-selected');
+                }
+              }
             } else {
-               pm._toggleSelect(String(rec.id));
-               pm._lastSelectedIdx = pm._selected.has(String(rec.id)) ? idx : -1;
-               it.classList.toggle('pm-selected', pm._selected.has(String(rec.id)));
+              pm._toggleSelect(String(rec.id));
+              pm._lastSelectedIdx = pm._selected.has(String(rec.id)) ? idx : -1;
+              it.classList.toggle('pm-selected', pm._selected.has(String(rec.id)));
             }
             pm._updateSelectionBar();
             var container = it.closest('.pm-grid');
@@ -416,14 +416,14 @@
           }
           return;
         }
-        if(it.tagName==='TR'){pm._openInfoPanel(rec);}
-        else{var idx=pm._filtered.indexOf(rec);if(idx>=0)pm._openLightbox(idx);}
+        if (it.tagName === 'TR') { pm._openInfoPanel(rec); }
+        else { var idx = pm._filtered.indexOf(rec); if (idx >= 0) pm._openLightbox(idx); }
       });
     }
 
     console.log('[PhotoManager] Mounted');
   };
-;
+  ;
 
   /* ── open ──────────────────────────────────────────────── */
   PhotoManagerModule.prototype.open = function (opts) {
@@ -435,7 +435,7 @@
       if (DevPS) {
         if (DevPS.tableName === 'device_photos') DevPS.tableName = 'device_photos';
       }
-    } catch (e) {}
+    } catch (e) { }
 
     this._pmSetBaseZ('top');
     opts = opts || {};
@@ -446,7 +446,7 @@
 
     this._selected.clear();
     this._selMode = false;
-    this._search  = '';
+    this._search = '';
 
     var si = document.getElementById('pmSearchInput');
     if (si) si.value = '';
@@ -455,6 +455,10 @@
 
     var overlay = document.getElementById('pmOverlay');
     if (overlay) {
+      if (window.SwipeHistoryTrap) {
+        window.SwipeHistoryTrap.push('photoManager', () => this.close());
+        window.SwipeHistoryTrap.bindSwipe(overlay, () => this.close());
+      }
       overlay.classList.remove('pm-hidden');
       requestAnimationFrame(function () { overlay.classList.add('pm-show'); });
     }
@@ -477,10 +481,12 @@
 
     this._loadPhotos(true);
   };
-;
+  ;
 
   /* ── close ─────────────────────────────────────────────── */
   PhotoManagerModule.prototype.close = function () {
+    if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('photoManager');
+
     var overlay = document.getElementById('pmOverlay');
     if (!overlay) return;
     overlay.classList.remove('pm-show');
@@ -492,16 +498,16 @@
 
   /* ── _applyDeviceFilter ─────────────────────────────────── */
   PhotoManagerModule.prototype._applyDeviceFilter = function () {
-    var badge    = document.getElementById('pmFilterBadge');
+    var badge = document.getElementById('pmFilterBadge');
     var badgeTxt = document.getElementById('pmFilterBadgeText');
-    var devInfo  = document.getElementById('pmDeviceInfo');
+    var devInfo = document.getElementById('pmDeviceInfo');
     if (this._deviceFilter) {
       var label = (this._deviceFilter.type === 'mold' ? '🔧 ' : '✂️ ') + this._deviceFilter.code;
       if (badgeTxt) badgeTxt.textContent = label;
-      if (badge)    badge.classList.remove('pm-hidden');
-      if (devInfo)  devInfo.textContent  = label;
+      if (badge) badge.classList.remove('pm-hidden');
+      if (devInfo) devInfo.textContent = label;
     } else {
-      if (badge)   badge.classList.add('pm-hidden');
+      if (badge) badge.classList.add('pm-hidden');
       if (devInfo) devInfo.textContent = '';
     }
   };
@@ -533,7 +539,7 @@
     var filters = { includeTrash: true, orderBy: this._sort.field, orderDir: this._sort.dir };
     if (this._deviceFilter) {
       filters.deviceType = this._deviceFilter.type;
-      filters.deviceId   = this._deviceFilter.id;
+      filters.deviceId = this._deviceFilter.id;
     }
 
     DevPS.getPhotos(filters).then(function (res) {
@@ -552,7 +558,7 @@
       if (!silent) self._showLoading(false);
     });
   };
-;
+  ;
 
   /* ── _enrichWithDeviceInfo ──────────────────────────────── */
   /* FIX: Khai báo đúng 1 lần, không lồng nhau */
@@ -561,8 +567,8 @@
     if (!global.DataManager || typeof global.DataManager.getAllItems !== 'function') {
       /* Không có DataManager – gán devicelabel từ device_id */
       photos.forEach(function (p) {
-        p.devicecode  = p.devicecode  || '';
-        p.devicename  = p.devicename  || '';
+        p.devicecode = p.devicecode || '';
+        p.devicename = p.devicename || '';
         p.devicelabel = p.devicelabel || p.device_id || String(p.deviceid || '');
       });
       return;
@@ -571,42 +577,42 @@
     if (!items || !Array.isArray(items)) return;
     var moldMap = {}, cutterMap = {}, rackMap = {}, trayMap = {};
     items.forEach(function (it) {
-      if (it.type === 'mold')        moldMap[String(it.MoldID)]    = it;
+      if (it.type === 'mold') moldMap[String(it.MoldID)] = it;
       else if (it.type === 'cutter') cutterMap[String(it.CutterID)] = it;
     });
     // Add logic to get Racks if available in DataManager
     var racksData = [];
     if (global.DataManager.racksData) racksData = global.DataManager.racksData;
-    else if (global.DataManager.getAllItems) racksData = global.DataManager.getAllItems().filter(function(i){ return i.type==='rack'});
-    
-    racksData.forEach(function(r) {
+    else if (global.DataManager.getAllItems) racksData = global.DataManager.getAllItems().filter(function (i) { return i.type === 'rack' });
+
+    racksData.forEach(function (r) {
       if (r.RackID) rackMap[String(r.RackID)] = r;
     });
-    
+
     // Add logic to get Trays if available in DataManager
     var traysData = [];
     if (global.DataManager && typeof global.DataManager.getAllTrays === 'function') {
-        traysData = global.DataManager.getAllTrays();
+      traysData = global.DataManager.getAllTrays();
     }
-    traysData.forEach(function(t) {
-        if (t.TrayID) trayMap[String(t.TrayID)] = t;
+    traysData.forEach(function (t) {
+      if (t.TrayID) trayMap[String(t.TrayID)] = t;
     });
 
     photos.forEach(function (p) {
       /* Supabase trả về snake_case: device_type, device_id */
       var dtype = p.device_type || p.devicetype || '';
-      var did   = String(p.device_id  || p.deviceid  || '');
-      var it    = null;
-      var rack  = null;
-      var tray  = null;
-      if (dtype === 'mold')        it = moldMap[did];
+      var did = String(p.device_id || p.deviceid || '');
+      var it = null;
+      var rack = null;
+      var tray = null;
+      if (dtype === 'mold') it = moldMap[did];
       else if (dtype === 'cutter') it = cutterMap[did];
-      else if (dtype === 'rack')   rack = rackMap[did] || { RackID: did, RackName: p.devicename || did, RackLocation: p.devicecode || '' };
-      else if (dtype === 'tray')   tray = trayMap[did] || { TrayID: did, MoldTrayName: p.devicename || ('Tray ' + did) };
+      else if (dtype === 'rack') rack = rackMap[did] || { RackID: did, RackName: p.devicename || did, RackLocation: p.devicecode || '' };
+      else if (dtype === 'tray') tray = trayMap[did] || { TrayID: did, MoldTrayName: p.devicename || ('Tray ' + did) };
 
       if (it) {
-        p.devicecode = it.MoldCode  || it.CutterNo   || '';
-        p.devicename = it.MoldName  || it.CutterName || '';
+        p.devicecode = it.MoldCode || it.CutterNo || '';
+        p.devicename = it.MoldName || it.CutterName || '';
       } else if (rack) {
         p.devicecode = rack.RackLocation || rack.RackCompanyLocation || '';
         p.devicename = rack.RackName || ('Rack ' + rack.RackID);
@@ -626,33 +632,33 @@
   /* ── _applyFilters ─────────────────────────────────────── */
   PhotoManagerModule.prototype._applyFilters = function () {
     var photos = this._allPhotos.slice();
-    var nav    = this._navKey;
-    var sf     = this._stateFilter;
-    var q      = this._search.toLowerCase().trim();
+    var nav = this._navKey;
+    var sf = this._stateFilter;
+    var q = this._search.toLowerCase().trim();
 
     /* Nav filter – khi chọn trash/thumbnails trong leftnav thì bỏ chip filter */
-    if (nav === 'molds')      photos = photos.filter(function (p) { return (p.device_type||p.devicetype) === 'mold';    });
-    if (nav === 'cutters')    photos = photos.filter(function (p) { return (p.device_type||p.devicetype) === 'cutter';  });
-    if (nav === 'racks')      photos = photos.filter(function (p) { return (p.device_type||p.devicetype) === 'rack';    });
-    if (nav === 'trays')      photos = photos.filter(function (p) { return (p.device_type||p.devicetype) === 'tray';    });
+    if (nav === 'molds') photos = photos.filter(function (p) { return (p.device_type || p.devicetype) === 'mold'; });
+    if (nav === 'cutters') photos = photos.filter(function (p) { return (p.device_type || p.devicetype) === 'cutter'; });
+    if (nav === 'racks') photos = photos.filter(function (p) { return (p.device_type || p.devicetype) === 'rack'; });
+    if (nav === 'trays') photos = photos.filter(function (p) { return (p.device_type || p.devicetype) === 'tray'; });
     if (nav === 'thumbnails') photos = photos.filter(function (p) { return p.is_thumbnail; });
-    if (nav === 'trash')      photos = photos.filter(function (p) { return p.state === 'trash'; });
+    if (nav === 'trash') photos = photos.filter(function (p) { return p.state === 'trash'; });
 
     /* State chip filter – chỉ áp dụng khi KHÔNG ở trash/thumbnails nav */
     if (nav !== 'trash' && nav !== 'thumbnails') {
-      if (sf === 'all')       photos = photos.filter(function (p) { return p.state !== 'trash'; });
-      if (sf === 'active')    photos = photos.filter(function (p) { return p.state === 'active'; });
-      if (sf === 'inbox')     photos = photos.filter(function (p) { return p.state === 'inbox'; });
+      if (sf === 'all') photos = photos.filter(function (p) { return p.state !== 'trash'; });
+      if (sf === 'active') photos = photos.filter(function (p) { return p.state === 'active'; });
+      if (sf === 'inbox') photos = photos.filter(function (p) { return p.state === 'inbox'; });
       if (sf === 'thumbnail') photos = photos.filter(function (p) { return p.is_thumbnail; });
-      if (sf === 'trash')     photos = photos.filter(function (p) { return p.state === 'trash'; });
+      if (sf === 'trash') photos = photos.filter(function (p) { return p.state === 'trash'; });
     }
 
     /* Search – tìm theo tên file, device_id, mã khuôn, tên khuôn */
     if (q) photos = photos.filter(function (p) {
-      var name   = (p.original_filename || '').toLowerCase();
-      var devId  = (p.device_id  || p.deviceid  || '').toLowerCase();
-      var dcode  = (p.devicecode || '').toLowerCase();
-      var dname  = (p.devicename || '').toLowerCase();
+      var name = (p.original_filename || '').toLowerCase();
+      var devId = (p.device_id || p.deviceid || '').toLowerCase();
+      var dcode = (p.devicecode || '').toLowerCase();
+      var dname = (p.devicename || '').toLowerCase();
       var dlabel = (p.devicelabel || '').toLowerCase();
       return name.includes(q) || devId.includes(q) || dcode.includes(q) || dname.includes(q) || dlabel.includes(q);
     });
@@ -678,8 +684,8 @@
 
     var glarge = document.getElementById('pmGridLarge');
     var gsmall = document.getElementById('pmGridSmall');
-    var dview  = document.getElementById('pmDetailView');
-    var empty  = document.getElementById('pmEmpty');
+    var dview = document.getElementById('pmDetailView');
+    var empty = document.getElementById('pmEmpty');
 
     // Chỉ hiện nút "Dọn rác" khi đang xem tab Thùng rác
     var topEmptyBtn = document.getElementById('pmEmptyTrashTopBtn');
@@ -689,15 +695,15 @@
 
     if (glarge) glarge.classList.toggle('pm-hidden', view !== 'icon-large');
     if (gsmall) gsmall.classList.toggle('pm-hidden', view !== 'icon-small');
-    if (dview)  dview.classList.toggle('pm-hidden', view !== 'detail');
-    if (empty)  empty.classList.toggle('pm-hidden', photos.length !== 0);
+    if (dview) dview.classList.toggle('pm-hidden', view !== 'detail');
+    if (empty) empty.classList.toggle('pm-hidden', photos.length !== 0);
 
     if (!photos.length) return;
 
     this._resetIncrementalRender();
     this._renderMore();
   };
-;
+  ;
 
   /* ── _renderGrid ─────────────────────────────────────────── */
   // v8.4.6-4: render grid theo lát, tránh render quá nhiều ảnh 1 lần
@@ -740,21 +746,21 @@
       var did = (p.deviceid || p.deviceId || '').toString();
 
       html += '<div class="pm-item ' + (isSel ? 'pm-selected ' : '') + (isTrash ? 'pm-trash ' : '') + '" data-id="' + _esc(p.id) + '" data-idx="' + i + '" tabindex="0">';
-      html +=   '<div class="pm-item-check"><i class="fas fa-check"></i></div>';
-      html +=   '<div class="pm-item-thumb">';
+      html += '<div class="pm-item-check"><i class="fas fa-check"></i></div>';
+      html += '<div class="pm-item-thumb">';
       if (thumbUrl) html += '<img src="' + _esc(thumbUrl) + '" alt="' + _esc(p.originalfilename) + '" loading="lazy" />';
       else html += '<div class="pm-item-no-img"><i class="fas fa-image"></i></div>';
       if (p.isthumbnail) html += '<div class="pm-thumb-star"><i class="fas fa-star"></i></div>';
       if (isTrash) html += '<div class="pm-state-badge pm-state-trash"></div>';
       if (isInbox) html += '<div class="pm-state-badge pm-state-inbox"></div>';
-      html +=   '</div>';
+      html += '</div>';
 
-      html +=   '<div class="pm-item-label">';
-      html +=     '<div class="pm-item-name">'
-                + '<span class="pm-device-link" data-type="' + _esc(dtype) + '" data-id="' + _esc(did) + '" style="font-weight:700; color:var(--pm-blue);">' + _esc(deviceTitle) + '</span>'
-                + '</div>';
-      html +=     '<div class="pm-item-meta">' + _esc(metaParts.join(' · ')) + '</div>';
-      html +=   '</div>';
+      html += '<div class="pm-item-label">';
+      html += '<div class="pm-item-name">'
+        + '<span class="pm-device-link" data-type="' + _esc(dtype) + '" data-id="' + _esc(did) + '" style="font-weight:700; color:var(--pm-blue);">' + _esc(deviceTitle) + '</span>'
+        + '</div>';
+      html += '<div class="pm-item-meta">' + _esc(metaParts.join(' · ')) + '</div>';
+      html += '</div>';
       html += '</div>';
     }
 
@@ -776,7 +782,7 @@
         try {
           var ii = self._filtered.findIndex(function (p) { return String(p.id) === String(id); });
           if (ii >= 0) return ii;
-        } catch (e) {}
+        } catch (e) { }
         var n = Number(el.dataset.idx);
         return isNaN(n) ? 0 : n;
       };
@@ -790,7 +796,7 @@
     this._resetIncrementalRender();
     this._renderMore();
   };
-;
+  ;
 
   /* ── _renderDetail ───────────────────────────────────────── */
   PhotoManagerModule.prototype._renderDetailSlice = function (startIdx, endIdx, append) {
@@ -819,9 +825,9 @@
 
       var stateLabel = (p.state === 'active') ? 'active'
         : (p.state === 'inbox') ? 'inbox'
-        : (p.state === 'temp') ? 'temp'
-        : (p.state === 'trash') ? 'trash'
-        : (p.state || '');
+          : (p.state === 'temp') ? 'temp'
+            : (p.state === 'trash') ? 'trash'
+              : (p.state || '');
 
       var deviceDisp = p.devicelabel || (p.deviceid ? String(p.deviceid) : '');
 
@@ -854,7 +860,7 @@
         try {
           var ii = self._filtered.findIndex(function (p) { return String(p.id) === String(id); });
           if (ii >= 0) return ii;
-        } catch (e) {}
+        } catch (e) { }
         var n = Number(row.dataset.idx);
         return isNaN(n) ? 0 : n;
       };
@@ -887,19 +893,19 @@
     this._resetIncrementalRender();
     this._renderMore();
   };
-;
+  ;
 
   /* ── _updateNavCounts ────────────────────────────────────── */
   PhotoManagerModule.prototype._updateNavCounts = function () {
-    var all    = this._allPhotos;
+    var all = this._allPhotos;
     var setTxt = function (id, n) { var el = document.getElementById(id); if (el) el.textContent = n; };
-    setTxt('pmNavCountAll',    all.filter(function (p) { return p.state !== 'trash'; }).length);
-    setTxt('pmNavCountMold',   all.filter(function (p) { return (p.device_type||p.devicetype) === 'mold'   && p.state !== 'trash'; }).length);
-    setTxt('pmNavCountCutter', all.filter(function (p) { return (p.device_type||p.devicetype) === 'cutter' && p.state !== 'trash'; }).length);
-    setTxt('pmNavCountRack',   all.filter(function (p) { return (p.device_type||p.devicetype) === 'rack'   && p.state !== 'trash'; }).length);
-    setTxt('pmNavCountTray',   all.filter(function (p) { return (p.device_type||p.devicetype) === 'tray'   && p.state !== 'trash'; }).length);
-    setTxt('pmNavCountThumb',  all.filter(function (p) { return p.is_thumbnail; }).length);
-    setTxt('pmNavCountTrash',  all.filter(function (p) { return p.state === 'trash'; }).length);
+    setTxt('pmNavCountAll', all.filter(function (p) { return p.state !== 'trash'; }).length);
+    setTxt('pmNavCountMold', all.filter(function (p) { return (p.device_type || p.devicetype) === 'mold' && p.state !== 'trash'; }).length);
+    setTxt('pmNavCountCutter', all.filter(function (p) { return (p.device_type || p.devicetype) === 'cutter' && p.state !== 'trash'; }).length);
+    setTxt('pmNavCountRack', all.filter(function (p) { return (p.device_type || p.devicetype) === 'rack' && p.state !== 'trash'; }).length);
+    setTxt('pmNavCountTray', all.filter(function (p) { return (p.device_type || p.devicetype) === 'tray' && p.state !== 'trash'; }).length);
+    setTxt('pmNavCountThumb', all.filter(function (p) { return p.is_thumbnail; }).length);
+    setTxt('pmNavCountTrash', all.filter(function (p) { return p.state === 'trash'; }).length);
   };
 
   /* ── _updateStatusBar ────────────────────────────────────── */
@@ -913,8 +919,8 @@
   PhotoManagerModule.prototype._updateStorageBar = function () {
     var DevPS = global.DevicePhotoStore;
     if (!DevPS) return;
-    var self  = this;
-    var opts  = this._deviceFilter
+    var self = this;
+    var opts = this._deviceFilter
       ? { deviceType: this._deviceFilter.type, deviceId: this._deviceFilter.id }
       : {};
 
@@ -927,15 +933,15 @@
       var pct = Math.min(100, Math.round((totalSize / (1024 * 1024 * 1024)) * 100));
       if (fill) {
         fill.style.width = pct + '%';
-        fill.className   = 'pm-storage-bar-fill' + (pct > 80 ? ' pm-danger' : pct > 60 ? ' pm-warn' : '');
+        fill.className = 'pm-storage-bar-fill' + (pct > 80 ? ' pm-danger' : pct > 60 ? ' pm-warn' : '');
       }
     };
 
     if (typeof DevPS.getStorageStats === 'function') {
       DevPS.getStorageStats(opts).then(function (stats) {
         if (!stats || stats.error || stats.totalSize === undefined) { calcFromLoaded(); return; }
-        var fill    = document.getElementById('pmStorageBarFill');
-        var text    = document.getElementById('pmStorageText');
+        var fill = document.getElementById('pmStorageBarFill');
+        var text = document.getElementById('pmStorageText');
         var rawSize = Number(stats.totalSize) || 0;
         if (rawSize <= 0) {
           calcFromLoaded();
@@ -946,7 +952,7 @@
         var pct = Math.min(100, Math.round((rawSize / (1024 * 1024 * 1024)) * 100));
         if (fill) {
           fill.style.width = pct + '%';
-          fill.className   = 'pm-storage-bar-fill' + (pct > 80 ? ' pm-danger' : pct > 60 ? ' pm-warn' : '');
+          fill.className = 'pm-storage-bar-fill' + (pct > 80 ? ' pm-danger' : pct > 60 ? ' pm-warn' : '');
         }
       }).catch(calcFromLoaded);
     } else {
@@ -957,20 +963,20 @@
   /* ── SELECTION ───────────────────────────────────────────── */
   PhotoManagerModule.prototype._toggleSelect = function (id) {
     if (this._selected.has(id)) this._selected.delete(id);
-    else                         this._selected.add(id);
+    else this._selected.add(id);
     if (!this._selected.size) this._selMode = false;
   };
 
   PhotoManagerModule.prototype._updateSelectionBar = function () {
-    var bar   = document.getElementById('pmSelectionBar');
+    var bar = document.getElementById('pmSelectionBar');
     var count = document.getElementById('pmSelCount');
-    var show  = this._selected.size > 0;
-    if (bar)   bar.classList.toggle('pm-show', show);
+    var show = this._selected.size > 0;
+    if (bar) bar.classList.toggle('pm-show', show);
     if (count) count.textContent = this._selected.size + ' 件選択 / ' + this._selected.size + ' đã chọn';
     var isTrashNav = this._navKey === 'trash';
-    var selTrash   = document.getElementById('pmSelTrash');
-    var selDelete  = document.getElementById('pmSelDelete');
-    if (selTrash)  selTrash.style.display  = isTrashNav ? 'none' : '';
+    var selTrash = document.getElementById('pmSelTrash');
+    var selDelete = document.getElementById('pmSelDelete');
+    if (selTrash) selTrash.style.display = isTrashNav ? 'none' : '';
     if (selDelete) selDelete.style.display = '';
   };
 
@@ -986,31 +992,35 @@
   PhotoManagerModule.prototype._showContextMenu = function (e, record) {
     if (this._ctxMenuTimer) { clearTimeout(this._ctxMenuTimer); this._ctxMenuTimer = null; }
     if (!record) return;
-    var self    = this;
-    var menu    = document.getElementById('pmContextMenu');
+    var self = this;
+    var menu = document.getElementById('pmContextMenu');
     if (!menu) return;
     var isTrash = record.state === 'trash';
 
     var items = [];
     if (!isTrash) {
-      items.push({ icon: 'fa-download',     label: 'ダウンロード / Tải về',         cls: 'pm-ctx-blue',  fn: function () {
-        self._downloadFile(self._getFullUrl(record), record.original_filename || 'photo.jpg');
-      } });
-      items.push({ icon: 'fa-eye',          label: 'プレビュー / Xem',             cls: '',             fn: function () {
-        var ii = -1;
-        try { ii = self._filtered.findIndex(function (p) { return String(p.id) === String(record.id); }); } catch (e) {}
-        self._openLightbox(ii >= 0 ? ii : 0);
-      } });
-      items.push({ icon: 'fa-info-circle',  label: '詳細 / Chi tiết',              cls: '',             fn: function () { self._openInfoPanel(record); } });
+      items.push({
+        icon: 'fa-download', label: 'ダウンロード / Tải về', cls: 'pm-ctx-blue', fn: function () {
+          self._downloadFile(self._getFullUrl(record), record.original_filename || 'photo.jpg');
+        }
+      });
+      items.push({
+        icon: 'fa-eye', label: 'プレビュー / Xem', cls: '', fn: function () {
+          var ii = -1;
+          try { ii = self._filtered.findIndex(function (p) { return String(p.id) === String(record.id); }); } catch (e) { }
+          self._openLightbox(ii >= 0 ? ii : 0);
+        }
+      });
+      items.push({ icon: 'fa-info-circle', label: '詳細 / Chi tiết', cls: '', fn: function () { self._openInfoPanel(record); } });
       items.push('sep');
       if (!record.is_thumbnail)
-        items.push({ icon: 'fa-star',       label: 'サムネイル設定 / Đặt đại diện', cls: 'pm-ctx-teal', fn: function () { self._handleSetThumbnail(record); } });
-      items.push({ icon: 'fa-exchange-alt', label: '移動 / Chuyển thiết bị',       cls: '',             fn: function () { self._openTransferModal([record.id]); } });
+        items.push({ icon: 'fa-star', label: 'サムネイル設定 / Đặt đại diện', cls: 'pm-ctx-teal', fn: function () { self._handleSetThumbnail(record); } });
+      items.push({ icon: 'fa-exchange-alt', label: '移動 / Chuyển thiết bị', cls: '', fn: function () { self._openTransferModal([record.id]); } });
       items.push('sep');
-      items.push({ icon: 'fa-trash',        label: 'ゴミ箱へ / Vào thùng rác',     cls: 'pm-ctx-danger', fn: function () { self._handleMoveToTrash([record.id]); } });
+      items.push({ icon: 'fa-trash', label: 'ゴミ箱へ / Vào thùng rác', cls: 'pm-ctx-danger', fn: function () { self._handleMoveToTrash([record.id]); } });
     } else {
-      items.push({ icon: 'fa-undo',  label: '元に戻す / Khôi phục',       cls: 'pm-ctx-teal',  fn: function () { self._handleRestore([record.id]); } });
-      items.push({ icon: 'fa-times', label: '完全削除 / Xóa vĩnh viễn',   cls: 'pm-ctx-danger', fn: function () { self._handlePermanentDelete([record.id]); } });
+      items.push({ icon: 'fa-undo', label: '元に戻す / Khôi phục', cls: 'pm-ctx-teal', fn: function () { self._handleRestore([record.id]); } });
+      items.push({ icon: 'fa-times', label: '完全削除 / Xóa vĩnh viễn', cls: 'pm-ctx-danger', fn: function () { self._handlePermanentDelete([record.id]); } });
     }
 
     var html = '';
@@ -1022,25 +1032,25 @@
 
     menu.classList.remove('pm-hidden', 'pm-show');
     menu.style.display = 'block';
-    
+
     // Force DOM reflow to fix animation and hit-testing paint issues in Chrome
     void menu.offsetWidth;
 
-    var mx = Math.min(e.clientX, window.innerWidth  - 200);
+    var mx = Math.min(e.clientX, window.innerWidth - 200);
     var my = Math.min(e.clientY, window.innerHeight - 200);
     menu.style.left = mx + 'px';
-    menu.style.top  = my + 'px';
-    
+    menu.style.top = my + 'px';
+
     menu.classList.add('pm-show');
 
-    var btns   = menu.querySelectorAll('.pm-ctx-item');
+    var btns = menu.querySelectorAll('.pm-ctx-item');
     var fnList = items.filter(function (it) { return it !== 'sep'; });
     btns.forEach(function (btn, i) {
       btn.addEventListener('click', function (ev) {
-         ev.preventDefault();
-         ev.stopPropagation();
-         self._hideContextMenu();
-         fnList[i].fn();
+        ev.preventDefault();
+        ev.stopPropagation();
+        self._hideContextMenu();
+        fnList[i].fn();
       });
     });
   };
@@ -1050,9 +1060,9 @@
     var menu = document.getElementById('pmContextMenu');
     if (menu) {
       menu.classList.remove('pm-show');
-      this._ctxMenuTimer = setTimeout(function () { 
-        menu.classList.add('pm-hidden'); 
-        menu.style.display = ''; 
+      this._ctxMenuTimer = setTimeout(function () {
+        menu.classList.add('pm-hidden');
+        menu.style.display = '';
       }, 120);
     }
   };
@@ -1091,6 +1101,10 @@
     if (lb) lb.style.zIndex = '2147483645';
 
     if (!lb) return;
+    if (window.SwipeHistoryTrap) {
+      window.SwipeHistoryTrap.push('pmLightbox', () => this._closeLightbox());
+      window.SwipeHistoryTrap.bindSwipe(lb, () => this._closeLightbox());
+    }
     lb.classList.remove('pm-hidden');
     requestAnimationFrame(function () { lb.classList.add('pm-show'); });
     this._renderLightboxSlide();
@@ -1098,15 +1112,15 @@
 
   PhotoManagerModule.prototype._renderLightboxSlide = function () {
     var photos = this._filtered;
-    var idx    = this._lbIndex;
+    var idx = this._lbIndex;
     if (!photos.length) return;
     if (isNaN(idx)) idx = 0;
     idx = Math.max(0, Math.min(idx, photos.length - 1));
     this._lbIndex = idx;
-    var p     = photos[idx];
-    var img   = document.getElementById('pmLbImg');
-    var nm    = document.getElementById('pmLbName');
-    var mt    = document.getElementById('pmLbMeta');
+    var p = photos[idx];
+    var img = document.getElementById('pmLbImg');
+    var nm = document.getElementById('pmLbName');
+    var mt = document.getElementById('pmLbMeta');
     var DevPS = global.DevicePhotoStore;
     var fullUrl = this._getFullUrl(p);
     if (img) {
@@ -1119,18 +1133,18 @@
       var pNext = photos[idx + 1];
       if (pPrev) this._prefetchFull(this._getFullUrl(pPrev));
       if (pNext) this._prefetchFull(this._getFullUrl(pNext));
-    } catch (e) {}
+    } catch (e) { }
 
-    if (nm)  nm.textContent  = p.original_filename || '';
+    if (nm) nm.textContent = p.original_filename || '';
     /* Hiện tên khuôn / mã khuôn thay vì chỉ device_id */
     var metaDevLabel = p.devicelabel || p.device_id || p.deviceid || '';
-    var rawSize      = Number(((p && (p.file_size !== undefined ? p.file_size : (p.filesize !== undefined ? p.filesize : p.fileSize))) || 0)) || 0;
-    var sizeStr      = (DevPS && rawSize > 0) ? DevPS.formatBytes(rawSize) : '';
-    var dateStr      = p.created_at ? new Date(p.created_at).toLocaleDateString('ja-JP') : '';
-    var metaParts    = [];
+    var rawSize = Number(((p && (p.file_size !== undefined ? p.file_size : (p.filesize !== undefined ? p.filesize : p.fileSize))) || 0)) || 0;
+    var sizeStr = (DevPS && rawSize > 0) ? DevPS.formatBytes(rawSize) : '';
+    var dateStr = p.created_at ? new Date(p.created_at).toLocaleDateString('ja-JP') : '';
+    var metaParts = [];
     if (metaDevLabel) metaParts.push(metaDevLabel);
-    if (sizeStr)      metaParts.push(sizeStr);
-    if (dateStr)      metaParts.push(dateStr);
+    if (sizeStr) metaParts.push(sizeStr);
+    if (dateStr) metaParts.push(dateStr);
     if (mt) mt.textContent = metaParts.join(' · ');
 
     var dots = document.getElementById('pmLbDots');
@@ -1150,13 +1164,14 @@
   };
 
   PhotoManagerModule.prototype._closeLightbox = function () {
+    if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('pmLightbox');
     var lb = document.getElementById('pmLightbox');
     if (lb) { lb.classList.remove('pm-show'); setTimeout(function () { lb.classList.add('pm-hidden'); }, 200); }
   };
 
   /* ── INFO PANEL ──────────────────────────────────────────── */
   PhotoManagerModule.prototype._openInfoPanel = function (record) {
-    var self  = this;
+    var self = this;
     var DevPS = global.DevicePhotoStore;
     var panel = document.getElementById('pmInfoPanel');
     if (!panel) return;
@@ -1166,21 +1181,21 @@
     var tUrl = this._getThumbUrl(record);
     if (thumb) {
       if (tUrl) {
-        try { thumb.style.display = 'block'; } catch (e) {}
+        try { thumb.style.display = 'block'; } catch (e) { }
         this._setImgElFromUrlCached(thumb, tUrl, this._imgCacheNameThumb);
       } else {
         try {
           thumb.removeAttribute('src');
           thumb.style.display = 'none';
-        } catch (e) {}
+        } catch (e) { }
       }
     }
 
     _setText('pmInfoFilename', record.original_filename || '—');
 
     /* Hiện mã khuôn + tên khuôn trong info panel */
-    var dtype   = record.device_type || record.devicetype || '';
-    var icon    = dtype === 'mold' ? '🔧 Khuôn' : (dtype === 'cutter' ? '✂️ Dao cắt' : (dtype === 'rack' ? '🗄️ Giá để khuôn' : '📦 Khay'));
+    var dtype = record.device_type || record.devicetype || '';
+    var icon = dtype === 'mold' ? '🔧 Khuôn' : (dtype === 'cutter' ? '✂️ Dao cắt' : (dtype === 'rack' ? '🗄️ Giá để khuôn' : '📦 Khay'));
     var devDisp = record.devicelabel || record.device_id || record.deviceid || '—';
     _setText('pmInfoDevice', icon + ' ' + devDisp);
 
@@ -1216,10 +1231,15 @@
       if (permDelBtn) permDelBtn.addEventListener('click', function () { self._handlePermanentDelete([record.id]); self._closeInfoPanel(); });
     }
 
+    if (window.SwipeHistoryTrap) {
+      window.SwipeHistoryTrap.push('pmInfoPanel', () => this._closeInfoPanel());
+      window.SwipeHistoryTrap.bindSwipe(panel, () => this._closeInfoPanel());
+    }
     panel.classList.add('pm-open');
   };
 
   PhotoManagerModule.prototype._closeInfoPanel = function () {
+    if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('pmInfoPanel');
     var panel = document.getElementById('pmInfoPanel');
     if (panel) panel.classList.remove('pm-open');
     this._currentRecord = null;
@@ -1231,11 +1251,11 @@
     if (!DevPS) return;
     var modal = document.getElementById('pmStorageModal');
     if (!modal) return;
-    var body  = document.getElementById('pmStorageBody');
-    var opts  = this._deviceFilter
+    var body = document.getElementById('pmStorageBody');
+    var opts = this._deviceFilter
       ? { deviceType: this._deviceFilter.type, deviceId: this._deviceFilter.id }
       : {};
-    var self  = this;
+    var self = this;
 
     var renderStats = function (s) {
       if (!body) return;
@@ -1246,9 +1266,9 @@
         rawTrash = Number(fallbackStats.trashSize || 0);
       }
 
-      var total     = rawTotal > 0 ? DevPS.formatBytes(rawTotal) : '0 B';
+      var total = rawTotal > 0 ? DevPS.formatBytes(rawTotal) : '0 B';
       var trashSize = rawTrash > 0 ? DevPS.formatBytes(rawTrash) : '0 B';
-      var pct       = rawTotal > 0 ? Math.round((rawTotal / (1024 * 1024 * 1024)) * 100) : 0;
+      var pct = rawTotal > 0 ? Math.round((rawTotal / (1024 * 1024 * 1024)) * 100) : 0;
       body.innerHTML =
         '<div class="pm-storage-stat-row"><span class="pm-storage-stat-label">合計 / Tổng ảnh</span><span class="pm-storage-stat-value">' + (s.total || 0) + ' 件</span></div>' +
         '<div class="pm-storage-stat-row"><span class="pm-storage-stat-label">アクティブ</span><span class="pm-storage-stat-value">' + (s.active || 0) + ' 件</span></div>' +
@@ -1260,9 +1280,9 @@
 
     /* Fallback từ dữ liệu đã tải */
     var fallbackStats = {
-      total:     self._allPhotos.length,
-      active:    self._allPhotos.filter(function (p) { return p.state === 'active'; }).length,
-      trash:     self._allPhotos.filter(function (p) { return p.state === 'trash';  }).length,
+      total: self._allPhotos.length,
+      active: self._allPhotos.filter(function (p) { return p.state === 'active'; }).length,
+      trash: self._allPhotos.filter(function (p) { return p.state === 'trash'; }).length,
       totalSize: self._allPhotos.reduce(function (a, p) { return a + (Number(((p && (p.file_size !== undefined ? p.file_size : (p.filesize !== undefined ? p.filesize : p.fileSize))) || 0)) || 0); }, 0),
       trashSize: self._allPhotos.filter(function (p) { return p.state === 'trash'; }).reduce(function (a, p) { return a + (Number(((p && (p.file_size !== undefined ? p.file_size : (p.filesize !== undefined ? p.filesize : p.fileSize))) || 0)) || 0); }, 0)
     };
@@ -1276,23 +1296,32 @@
       renderStats(fallbackStats);
     }
 
+    if (window.SwipeHistoryTrap) {
+      window.SwipeHistoryTrap.push('pmStorageModal', () => this._closeStorageModal());
+      window.SwipeHistoryTrap.bindSwipe(modal, () => this._closeStorageModal());
+    }
     modal.classList.remove('pm-hidden');
     requestAnimationFrame(function () { modal.classList.add('pm-show'); });
   };
 
   PhotoManagerModule.prototype._closeStorageModal = function () {
+    if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('pmStorageModal');
     var modal = document.getElementById('pmStorageModal');
     if (modal) { modal.classList.remove('pm-show'); setTimeout(function () { modal.classList.add('pm-hidden'); }, 200); }
   };
 
   /* ── TRANSFER MODAL ────────────────────────────────────────── */
   PhotoManagerModule.prototype._openTransferModal = function (ids) {
-    this._transferIds    = ids;
+    this._transferIds = ids;
     this._transferTarget = null;
-    var modal   = document.getElementById('pmTransferModal');
+    var modal = document.getElementById('pmTransferModal');
     var results = document.getElementById('pmTransferResults');
     if (!modal) return;
     if (results) results.innerHTML = '<div style="padding:12px;color:var(--pm-text-mute);font-size:12px;">Tìm kiếm thiết bị để chuyển...</div>';
+    if (window.SwipeHistoryTrap) {
+      window.SwipeHistoryTrap.push('pmTransferModal', () => this._closeTransferModal());
+      window.SwipeHistoryTrap.bindSwipe(modal, () => this._closeTransferModal());
+    }
     modal.classList.remove('pm-hidden');
     requestAnimationFrame(function () { modal.classList.add('pm-show'); });
     var search = document.getElementById('pmTransferSearch');
@@ -1300,16 +1329,17 @@
   };
 
   PhotoManagerModule.prototype._closeTransferModal = function () {
+    if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('pmTransferModal');
     var modal = document.getElementById('pmTransferModal');
     if (modal) { modal.classList.remove('pm-show'); setTimeout(function () { modal.classList.add('pm-hidden'); }, 200); }
-    this._transferIds    = null;
+    this._transferIds = null;
     this._transferTarget = null;
   };
 
   /* ── CONFIRM DIALOG ─────────────────────────────────────────── */
   PhotoManagerModule.prototype._showConfirm = function (msg, sub, okLabel, onOk, danger) {
     var self = this;
-    var dlg  = document.getElementById('pmConfirmDialog');
+    var dlg = document.getElementById('pmConfirmDialog');
     if (!dlg) return;
 
     // Ép confirm dialog luôn nổi lên trên Photo Manager (kể cả khi CSS dùng !important)
@@ -1317,12 +1347,12 @@
       dlg.style.setProperty('position', 'fixed', 'important');
       dlg.style.setProperty('inset', '0', 'important');
       dlg.style.setProperty('z-index', '2147483646', 'important');
-    } catch (e) {}
+    } catch (e) { }
     _setText('pmConfirmMsg', msg);
     _setText('pmConfirmSub', sub || '');
     var okBtn = document.getElementById('pmConfirmOk');
     if (okBtn) {
-      okBtn.textContent  = okLabel || '確認';
+      okBtn.textContent = okLabel || '確認';
       okBtn.style.background = danger !== false ? 'var(--pm-red)' : 'var(--pm-blue)';
       okBtn.onclick = function () { self._closeConfirm(); if (onOk) onOk(); };
     }
@@ -1337,7 +1367,7 @@
 
   /* ── ACTIONS ────────────────────────────────────────────────── */
   PhotoManagerModule.prototype._handleSetThumbnail = function (record) {
-    var self  = this;
+    var self = this;
     var DevPS = global.DevicePhotoStore;
     if (!DevPS) return;
     this._showToast('info', 'サムネイル作成中... / Đang tạo thumbnail...');
@@ -1349,7 +1379,7 @@
   };
 
   PhotoManagerModule.prototype._handleMoveToTrash = function (ids) {
-    var self  = this;
+    var self = this;
     var DevPS = global.DevicePhotoStore;
     if (!DevPS) return;
     this._showConfirm(
@@ -1358,9 +1388,9 @@
       'ゴミ箱へ / Xóa',
       function () {
         // Optimistic UI
-        ids.forEach(function(id) {
-            var it = self._allPhotos.find(function(p){ return String(p.id) === String(id); });
-            if (it) it.state = 'trash';
+        ids.forEach(function (id) {
+          var it = self._allPhotos.find(function (p) { return String(p.id) === String(id); });
+          if (it) it.state = 'trash';
         });
         self._clearSelection();
         self._applyFilters();
@@ -1375,14 +1405,14 @@
   };
 
   PhotoManagerModule.prototype._handleRestore = function (ids) {
-    var self     = this;
-    var DevPS    = global.DevicePhotoStore;
+    var self = this;
+    var DevPS = global.DevicePhotoStore;
     if (!DevPS) return;
 
     // Optimistic UI
-    ids.forEach(function(id) {
-       var it = self._allPhotos.find(function(p){ return String(p.id) === String(id); });
-       if (it) it.state = 'active';
+    ids.forEach(function (id) {
+      var it = self._allPhotos.find(function (p) { return String(p.id) === String(id); });
+      if (it) it.state = 'active';
     });
     self._clearSelection();
     self._applyFilters();
@@ -1396,7 +1426,7 @@
   };
 
   PhotoManagerModule.prototype._handlePermanentDelete = function (ids) {
-    var self  = this;
+    var self = this;
     var DevPS = global.DevicePhotoStore;
     if (!DevPS) return;
     this._showConfirm(
@@ -1405,7 +1435,7 @@
       '完全削除 / Xóa vĩnh viễn',
       function () {
         // Optimistic UI
-        self._allPhotos = self._allPhotos.filter(function(p) { return ids.indexOf(p.id) === -1 && ids.indexOf(String(p.id)) === -1; });
+        self._allPhotos = self._allPhotos.filter(function (p) { return ids.indexOf(p.id) === -1 && ids.indexOf(String(p.id)) === -1; });
         self._clearSelection();
         self._applyFilters();
 
@@ -1429,7 +1459,7 @@
     toast.innerHTML = '<i class="fas ' + (icons[type] || 'fa-info-circle') + '"></i> ' + msg;
     container.appendChild(toast);
     setTimeout(function () {
-      toast.style.opacity    = '0';
+      toast.style.opacity = '0';
       toast.style.transition = 'opacity .3s';
       setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 350);
     }, 3500);
@@ -1447,22 +1477,22 @@
     }
   };
 
-  PhotoManagerModule.prototype._getFullUrl = function(p) {
+  PhotoManagerModule.prototype._getFullUrl = function (p) {
     if (!p) return '';
     var DevPS = global.DevicePhotoStore;
     if (DevPS && typeof DevPS.getFullUrl === 'function') return DevPS.getFullUrl(p);
     return p.public_url || '';
   };
 
-  PhotoManagerModule.prototype._downloadFile = function(url, filename) {
+  PhotoManagerModule.prototype._downloadFile = function (url, filename) {
     if (!url) return Promise.resolve();
     var self = this;
     return fetch(url)
-      .then(function(res) {
+      .then(function (res) {
         if (!res.ok) throw new Error('Network err');
         return res.blob();
       })
-      .then(function(blob) {
+      .then(function (blob) {
         var blobUrl = window.URL.createObjectURL(blob);
         var a = document.createElement('a');
         a.style.display = 'none';
@@ -1470,43 +1500,43 @@
         a.download = filename || 'photo.jpg';
         document.body.appendChild(a);
         a.click();
-        setTimeout(function() {
+        setTimeout(function () {
           window.URL.revokeObjectURL(blobUrl);
           if (a.parentNode) a.parentNode.removeChild(a);
         }, 100);
       })
-      .catch(function(err) {
+      .catch(function (err) {
         var a = document.createElement('a');
         a.href = url;
         a.target = '_blank';
         document.body.appendChild(a);
         a.click();
-        setTimeout(function() { if(a.parentNode) a.parentNode.removeChild(a); }, 100);
+        setTimeout(function () { if (a.parentNode) a.parentNode.removeChild(a); }, 100);
       });
   };
 
-  PhotoManagerModule.prototype._handleBulkDownload = function(ids) {
-    if(!ids || !ids.length) return;
+  PhotoManagerModule.prototype._handleBulkDownload = function (ids) {
+    if (!ids || !ids.length) return;
     var self = this;
     self._showToast('info', '順番にダウンロードします... / Chuẩn bị tải xuống...');
-    
+
     // Dùng Promise.all thay vì setTimeout tuần tự để giữ active click user gesture, tránh browser popup blocker ngăn chặn
-    var dlPromises = ids.map(function(id, index) {
-        var rec = self._filtered.find(function(p) { return String(p.id) === String(id); });
-        if (rec) {
-            var url = self._getFullUrl(rec);
-            if (url) {
-                return self._downloadFile(url, rec.original_filename || ('photo_' + index + '.jpg'));
-            }
+    var dlPromises = ids.map(function (id, index) {
+      var rec = self._filtered.find(function (p) { return String(p.id) === String(id); });
+      if (rec) {
+        var url = self._getFullUrl(rec);
+        if (url) {
+          return self._downloadFile(url, rec.original_filename || ('photo_' + index + '.jpg'));
         }
-        return Promise.resolve();
+      }
+      return Promise.resolve();
     });
 
-    Promise.all(dlPromises).then(function() {
-        self._clearSelection();
-        self._showToast('success', ids.length + '件のダウンロードを完了しました / Đã tải xong ' + ids.length + ' ảnh');
-    }).catch(function(err) {
-        self._showToast('error', 'Lỗi khi tải ảnh: ' + err.message);
+    Promise.all(dlPromises).then(function () {
+      self._clearSelection();
+      self._showToast('success', ids.length + '件のダウンロードを完了しました / Đã tải xong ' + ids.length + ' ảnh');
+    }).catch(function (err) {
+      self._showToast('error', 'Lỗi khi tải ảnh: ' + err.message);
     });
   };
 
@@ -1521,17 +1551,17 @@
     if (pmOverlay) {
       var touchStartX = 0;
       var touchStartY = 0;
-      pmOverlay.addEventListener('touchstart', function(e) {
-        if(e.touches.length === 1) {
+      pmOverlay.addEventListener('touchstart', function (e) {
+        if (e.touches.length === 1) {
           touchStartX = e.touches[0].clientX;
           touchStartY = e.touches[0].clientY;
         }
-      }, {passive: true});
-      pmOverlay.addEventListener('touchmove', function(e) {
+      }, { passive: true });
+      pmOverlay.addEventListener('touchmove', function (e) {
         if (!touchStartX || !touchStartY || e.touches.length !== 1) return;
         var deltaX = e.touches[0].clientX - touchStartX;
         var deltaY = e.touches[0].clientY - touchStartY;
-        
+
         // Vuốt dứt khoát sang phải (>80px), không bị cuộn dọc (|Y| < 50px), và xuất phát gần lề (<80px)
         if (deltaX > 80 && Math.abs(deltaY) < 50 && touchStartX < 80) {
           // Tránh xung đột nếu các Modal con bên trong đang mở
@@ -1541,11 +1571,11 @@
           if (lb && !lb.classList.contains('pm-hidden')) return;
           if (tp && !tp.classList.contains('pm-hidden')) return;
           if (cp && !cp.classList.contains('pm-hidden')) return;
-          
+
           self.close();
           touchStartX = 0; // Hủy để không trigger nhiều lần
         }
-      }, {passive: true});
+      }, { passive: true });
     }
 
     /* Mobile Hamburger Menu */
@@ -1553,18 +1583,18 @@
     var navBd = document.getElementById('pmNavBackdrop');
     var leftNav = document.getElementById('pmLeftNav');
     if (hamBtn && leftNav && navBd) {
-      hamBtn.addEventListener('click', function() {
+      hamBtn.addEventListener('click', function () {
         leftNav.classList.add('pm-show');
         navBd.classList.add('pm-show');
       });
-      navBd.addEventListener('click', function() {
+      navBd.addEventListener('click', function () {
         leftNav.classList.remove('pm-show');
         navBd.classList.remove('pm-show');
       });
       // Đóng sidebar khi chọn một item trên mobile
       var navItems = leftNav.querySelectorAll('.pm-leftnav-item');
-      navItems.forEach(function(item) {
-        item.addEventListener('click', function() {
+      navItems.forEach(function (item) {
+        item.addEventListener('click', function () {
           if (window.innerWidth <= 1024) {
             leftNav.classList.remove('pm-show');
             navBd.classList.remove('pm-show');
@@ -1604,7 +1634,7 @@
     /* Filter chips */
     document.querySelectorAll('#pmFilterChips .pm-filter-chip').forEach(function (chip) {
       chip.addEventListener('click', function () {
-        var state  = chip.dataset.state;
+        var state = chip.dataset.state;
         var active = chip.classList.contains('pm-active');
         document.querySelectorAll('#pmFilterChips .pm-filter-chip').forEach(function (c) { c.classList.remove('pm-active'); });
         if (!active) {
@@ -1620,8 +1650,8 @@
     /* Sort */
     var sortSelect = document.getElementById('pmSortSelect');
     if (sortSelect) sortSelect.addEventListener('change', function () {
-      var parts     = this.value.split('-');
-      self._sort    = { field: parts[0], dir: parts[1] || 'desc' };
+      var parts = this.value.split('-');
+      self._sort = { field: parts[0], dir: parts[1] || 'desc' };
       self._applyFilters();
     });
 
@@ -1647,7 +1677,7 @@
     });
 
     /* Upload button – mở popup upload, không đóng Photo Manager (v8.4.6-4) */
-    
+
 
     // Refresh button (v8.4.6-4)
     var refreshBtn = document.getElementById('pmRefreshBtn');
@@ -1696,7 +1726,7 @@
 
       try { pu.open(openOpts); }
       catch (e) {
-        try { pu.open(); } catch (e2) {}
+        try { pu.open(); } catch (e2) { }
       }
 
       // Không tự refresh sau mỗi lần gửi ảnh.
@@ -1709,9 +1739,9 @@
     if (storageBtn) storageBtn.addEventListener('click', function () { self._openStorageModal(); });
 
     /* Storage modal buttons */
-    var storageClose  = document.getElementById('pmStorageClose');
+    var storageClose = document.getElementById('pmStorageClose');
     var storageClose2 = document.getElementById('pmStorageCloseBtn2');
-    if (storageClose)  storageClose.addEventListener('click',  function () { self._closeStorageModal(); });
+    if (storageClose) storageClose.addEventListener('click', function () { self._closeStorageModal(); });
     if (storageClose2) storageClose2.addEventListener('click', function () { self._closeStorageModal(); });
 
     var emptyTrashBtn = document.getElementById('pmEmptyTrashBtn');
@@ -1725,7 +1755,7 @@
         '空にする / Dọn',
         function () {
           // Optimistic UI
-          self._allPhotos = self._allPhotos.filter(function(p) { return p.state !== 'trash'; });
+          self._allPhotos = self._allPhotos.filter(function (p) { return p.state !== 'trash'; });
           self._applyFilters();
 
           var DevPS = global.DevicePhotoStore;
@@ -1755,7 +1785,7 @@
           '削除 / Xóa',
           function () {
             // Optimistic UI
-            self._allPhotos = self._allPhotos.filter(function(p) { return p.state !== 'trash'; });
+            self._allPhotos = self._allPhotos.filter(function (p) { return p.state !== 'trash'; });
             self._applyFilters();
 
             DevPS.emptyTrash(opts).then(function (r) {
@@ -1774,14 +1804,14 @@
     /* Selection Mode Toggle Button */
     var enableSelModeBtn = document.getElementById('pmEnableSelectModeBtn');
     if (enableSelModeBtn) {
-      enableSelModeBtn.addEventListener('click', function() {
+      enableSelModeBtn.addEventListener('click', function () {
         self._selMode = !self._selMode;
         if (!self._selMode) {
           self._clearSelection();
           var sbg = document.querySelector('.pm-selection-mode');
           if (sbg) sbg.classList.remove('pm-selection-mode');
         } else {
-          document.querySelectorAll('.pm-grid').forEach(function(g) {
+          document.querySelectorAll('.pm-grid').forEach(function (g) {
             if (!g.classList.contains('pm-hidden')) g.classList.add('pm-selection-mode');
           });
           self._updateSelectionBar();
@@ -1792,7 +1822,7 @@
     /* Selection bar */
     var selDownload = document.getElementById('pmSelDownload');
     if (selDownload) {
-      selDownload.addEventListener('click', function() {
+      selDownload.addEventListener('click', function () {
         self._handleBulkDownload(Array.from(self._selected));
       });
     }
@@ -1844,7 +1874,7 @@
       var rec = self._filtered[self._lbIndex];
       var url = self._getFullUrl(rec);
       if (!rec || !url) return;
-      
+
       self._showToast('info', 'ダウンロード中... / Đang tải ảnh xuống...');
       self._downloadFile(url, rec.original_filename || 'photo.jpg');
     });
@@ -1853,9 +1883,9 @@
     document.addEventListener('keydown', function (e) {
       var lb = document.getElementById('pmLightbox');
       if (!lb || lb.classList.contains('pm-hidden')) return;
-      if (e.key === 'ArrowLeft')  { self._lbIndex--; self._renderLightboxSlide(); }
+      if (e.key === 'ArrowLeft') { self._lbIndex--; self._renderLightboxSlide(); }
       if (e.key === 'ArrowRight') { self._lbIndex++; self._renderLightboxSlide(); }
-      if (e.key === 'Escape')     { self._closeLightbox(); }
+      if (e.key === 'Escape') { self._closeLightbox(); }
     });
 
     /* Info panel */
@@ -1892,7 +1922,7 @@
     var transferConfirm = document.getElementById('pmTransferConfirmBtn');
     if (transferConfirm) transferConfirm.addEventListener('click', function () {
       if (!self._transferTarget || !self._transferIds) return;
-      var DevPS    = global.DevicePhotoStore;
+      var DevPS = global.DevicePhotoStore;
       if (!DevPS) return;
       var promises = self._transferIds.map(function (id) {
         return DevPS.transferToDevice(id, self._transferTarget.type, self._transferTarget.id);
@@ -1909,7 +1939,7 @@
     var confirmCancel = document.getElementById('pmConfirmCancelBtn');
     if (confirmCancel) confirmCancel.addEventListener('click', function () { self._closeConfirm(); });
 
-    
+
 
     // Click device link -> mở nhanh Detail Panel (v8.4.6-4)
     if (!self._deviceLinkBound) {
@@ -1917,11 +1947,11 @@
       document.addEventListener('click', function (e) {
         var a = e.target && e.target.closest ? e.target.closest('.pm-device-link') : null;
         if (!a) return;
-        
+
         // Ngăn chặn sự xâm nhập thô bạo từ bên ngoài nếu ta đang ân ái bên trong pmOverlay
         var ov = document.getElementById('pmOverlay');
         if (ov && !ov.classList.contains('pm-hidden') && ov.contains(e.target)) {
-             return; 
+          return;
         }
 
         e.preventDefault();
@@ -1959,7 +1989,7 @@
 
   /* ── Transfer search results ────────────────────────────── */
   PhotoManagerModule.prototype._renderTransferResults = function (query) {
-    var self    = this;
+    var self = this;
     var results = document.getElementById('pmTransferResults');
     if (!results) return;
     if (!query.trim()) { results.innerHTML = ''; return; }
@@ -1967,7 +1997,7 @@
     if (global.DataManager && typeof global.DataManager.getAllItems === 'function') {
       items = global.DataManager.getAllItems() || [];
     }
-    var q       = query.toLowerCase();
+    var q = query.toLowerCase();
     var matched = items.filter(function (it) {
       var code = (it.MoldCode || it.CutterNo || '').toLowerCase();
       var name = (it.MoldName || it.CutterName || '').toLowerCase();
@@ -1979,12 +2009,12 @@
       return;
     }
     results.innerHTML = matched.map(function (it) {
-      var code = it.MoldCode || it.CutterNo   || '';
+      var code = it.MoldCode || it.CutterNo || '';
       var name = it.MoldName || it.CutterName || '';
-      var id   = String(it.MoldID || it.CutterID || '');
+      var id = String(it.MoldID || it.CutterID || '');
       var type = it.type || 'mold';
       return '<div class="pm-transfer-item" data-id="' + id + '" data-type="' + type + '" data-code="' + code + '">' +
-             (type === 'mold' ? '🔧 ' : '✂️ ') + '<strong>' + code + '</strong> ' + name + '</div>';
+        (type === 'mold' ? '🔧 ' : '✂️ ') + '<strong>' + code + '</strong> ' + name + '</div>';
     }).join('');
 
     results.querySelectorAll('.pm-transfer-item').forEach(function (item) {
@@ -1996,7 +2026,7 @@
     });
   };
 
-  
+
 
   /* CACHE + THUMB + INCREMENTAL RENDER (v8.4.6-4) */
   PhotoManagerModule.prototype._getCacheKey = function () {
@@ -2011,7 +2041,7 @@
       if (!this._photoCache) this._photoCache = new Map();
       if (key) this._photoCache.delete(String(key));
       else this._photoCache.clear();
-    } catch (e) {}
+    } catch (e) { }
   };
 
   PhotoManagerModule.prototype._getCacheEntry = function (key) {
@@ -2019,14 +2049,14 @@
       if (!this._photoCache) this._photoCache = new Map();
       var k = String(key || this._getCacheKey());
       var ent = this._photoCache.get(k);
-      
+
       var age = 0;
       if (ent) {
         age = Date.now() - Number(ent.ts || 0);
         if (age <= (this._cacheTtlMs || (10 * 60 * 1000)) && Array.isArray(ent.photos)) return ent;
         this._photoCache.delete(k);
       }
-      
+
       // Try sessionStorage
       var sessStr = sessionStorage.getItem('mcs_pm_cache_' + k);
       if (sessStr) {
@@ -2058,7 +2088,7 @@
       } catch (e2) {
         console.warn('SessionStorage limit reached or blocked');
       }
-    } catch (e) {}
+    } catch (e) { }
   };
 
   PhotoManagerModule.prototype._getThumbUrl = function (p) {
@@ -2113,17 +2143,17 @@
       c.style.setProperty('bottom', '12px', 'important');
       c.style.setProperty('z-index', '2147483647', 'important');
       c.style.setProperty('pointer-events', 'none', 'important');
-    } catch (e) {}
+    } catch (e) { }
   };
 
   PhotoManagerModule.prototype._invalidateImageCache = function () {
     try {
       if (this.imgMem && this.imgMem.forEach) {
         this.imgMem.forEach(function (v) {
-          try { if (v && v.objUrl) URL.revokeObjectURL(v.objUrl); } catch (e) {}
+          try { if (v && v.objUrl) URL.revokeObjectURL(v.objUrl); } catch (e) { }
         });
       }
-    } catch (e) {}
+    } catch (e) { }
     try { this.imgMem = new Map(); } catch (e) { this.imgMem = null; }
 
     // Xóa Cache Storage (nếu trình duyệt hỗ trợ)
@@ -2132,7 +2162,7 @@
         window.caches.delete(this._imgCacheNameFull || 'mcs-photo-full-v1');
         window.caches.delete(this._imgCacheNameThumb || 'mcs-photo-thumb-v1');
       }
-    } catch (e) {}
+    } catch (e) { }
   };
 
   PhotoManagerModule.prototype._imgMemGet = function (url) {
@@ -2144,7 +2174,7 @@
 
       var age = Date.now() - Number(ent.ts || 0);
       if (age > Number(this.imgMemTtlMs || 0)) {
-        try { if (ent.objUrl) URL.revokeObjectURL(ent.objUrl); } catch (e) {}
+        try { if (ent.objUrl) URL.revokeObjectURL(ent.objUrl); } catch (e) { }
         this.imgMem.delete(url);
         return null;
       }
@@ -2167,7 +2197,7 @@
         });
         if (oldestKey) {
           var ov = this.imgMem.get(oldestKey);
-          try { if (ov && ov.objUrl) URL.revokeObjectURL(ov.objUrl); } catch (e) {}
+          try { if (ov && ov.objUrl) URL.revokeObjectURL(ov.objUrl); } catch (e) { }
           this.imgMem.delete(oldestKey);
         }
       }
@@ -2199,7 +2229,7 @@
 
             fetch(url).then(function (r) {
               if (!r) throw new Error('HTTP ERR');
-              try { cache.put(url, r.clone()).catch(function () {}); } catch (e) {}
+              try { cache.put(url, r.clone()).catch(function () { }); } catch (e) { }
               return r.blob();
             }).then(resolve).catch(reject);
           }).catch(function () {
@@ -2221,7 +2251,7 @@
       if (!imgEl) return;
 
       if (!url) {
-        try { imgEl.removeAttribute('src'); } catch (e) {}
+        try { imgEl.removeAttribute('src'); } catch (e) { }
         return;
       }
 
@@ -2241,7 +2271,7 @@
         if (!imgEl.dataset || imgEl.dataset.pmSrc !== url) return;
         imgEl.src = url;
       });
-    } catch (e) {}
+    } catch (e) { }
   };
 
   PhotoManagerModule.prototype._prefetchFull = function (url) {
@@ -2252,8 +2282,8 @@
       var self = this;
       this._fetchBlobWithCache(url, this._imgCacheNameFull).then(function (blob) {
         self._imgMemPut(url, blob);
-      }).catch(function () {});
-    } catch (e) {}
+      }).catch(function () { });
+    } catch (e) { }
   };
 
   PhotoManagerModule.prototype._pmSetBaseZ = function (mode) {
@@ -2276,7 +2306,7 @@
         ov.style.zIndex = String(TOP_OV);
         ct.style.zIndex = String(TOP_CT);
       }
-    } catch (e) {}
+    } catch (e) { }
   };
 
   PhotoManagerModule.prototype._pmIsDetailPanelOpen = function () {
@@ -2311,14 +2341,14 @@
         if (t === 'mold') item = { MoldID: id, MoldCode: id, type: 'mold' };
         else item = { CutterID: id, CutterNo: id, type: 'cutter' };
       }
-      
+
       this._pmSetBaseZ('behind');
 
       setTimeout(function () {
         try {
           // Nếu vì lý do nào đó DetailPanel không mở được thì trả PM về top
           if (!this._pmIsDetailPanelOpen()) this._pmSetBaseZ('top');
-        } catch (e) {}
+        } catch (e) { }
       }.bind(this), 120);
 
       document.dispatchEvent(new CustomEvent('openDetailPanel', { detail: { item: item, type: t } }));
@@ -2341,7 +2371,7 @@
 
     var content = document.getElementById('pmContent');
     if (content) {
-      try { content.scrollTop = 0; } catch (e) {}
+      try { content.scrollTop = 0; } catch (e) { }
     }
   };
 
@@ -2390,7 +2420,7 @@
 
           var total = (self._filtered || []).length;
           if ((self._renderedUntil || 0) < total) self._renderMore();
-        } catch (e) {}
+        } catch (e) { }
       }, 120);
     }, { passive: true });
   };
@@ -2467,8 +2497,8 @@
             // fallback xuống img
             var url = URL.createObjectURL(blob);
             var img = new Image();
-            img.onload = function () { try { URL.revokeObjectURL(url); } catch (e) {} resolve(img); };
-            img.onerror = function () { try { URL.revokeObjectURL(url); } catch (e) {} reject(new Error('Cannot decode image')); };
+            img.onload = function () { try { URL.revokeObjectURL(url); } catch (e) { } resolve(img); };
+            img.onerror = function () { try { URL.revokeObjectURL(url); } catch (e) { } reject(new Error('Cannot decode image')); };
             img.src = url;
           });
           return;
@@ -2476,8 +2506,8 @@
 
         var url2 = URL.createObjectURL(blob);
         var img2 = new Image();
-        img2.onload = function () { try { URL.revokeObjectURL(url2); } catch (e) {} resolve(img2); };
-        img2.onerror = function () { try { URL.revokeObjectURL(url2); } catch (e) {} reject(new Error('Cannot decode image')); };
+        img2.onload = function () { try { URL.revokeObjectURL(url2); } catch (e) { } resolve(img2); };
+        img2.onerror = function () { try { URL.revokeObjectURL(url2); } catch (e) { } reject(new Error('Cannot decode image')); };
         img2.src = url2;
       } catch (e) { reject(e); }
     });
@@ -2507,10 +2537,10 @@
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, tw, th);
     ctx.imageSmoothingEnabled = true;
-    try { ctx.imageSmoothingQuality = 'high'; } catch (e) {}
+    try { ctx.imageSmoothingQuality = 'high'; } catch (e) { }
     ctx.drawImage(bmp, 0, 0, tw, th);
 
-    try { if (bmp && typeof bmp.close === 'function') bmp.close(); } catch (e) {}
+    try { if (bmp && typeof bmp.close === 'function') bmp.close(); } catch (e) { }
 
     var outBlob = await this._canvasToBlob(canvas, 'image/jpeg', quality);
 
@@ -2682,7 +2712,7 @@
                 msg: (e && (e.message || e.error_description)) ? String(e.message || e.error_description) : String(e || '')
               });
             }
-          } catch (e2) {}
+          } catch (e2) { }
         } finally {
           done++;
           setProgressText();
@@ -2716,10 +2746,10 @@
           'Tạo thumbnail có lỗi',
           'Lỗi: ' + fail + ' ảnh.' + (detail ? ('\n\n' + detail) : ''),
           'Đóng',
-          function () {},
+          function () { },
           false
         );
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // Render lại để thumbnail xuất hiện
@@ -2748,7 +2778,7 @@
       var a = Array.prototype.slice.call(arguments);
       a.unshift('[PhotoManager v8.4.6-4]');
       console.log.apply(console, a);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   function _pmTrim(v) {
@@ -2764,14 +2794,14 @@
           anon: _pmTrim(global.MCSupabaseConfig.supabaseAnonKey)
         };
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // fallback đọc localStorage (mcs.supabase.url / mcs.supabase.anon)
     try {
       var u = _pmTrim(localStorage.getItem('mcs.supabase.url'));
       var a = _pmTrim(localStorage.getItem('mcs.supabase.anon'));
       if (u && a) return { url: u, anon: a };
-    } catch (e2) {}
+    } catch (e2) { }
 
     // fallback SupabaseConfig.get()
     try {
@@ -2779,7 +2809,7 @@
         var c = global.SupabaseConfig.get();
         if (c && c.supabaseUrl && c.supabaseAnonKey) return { url: _pmTrim(c.supabaseUrl), anon: _pmTrim(c.supabaseAnonKey) };
       }
-    } catch (e3) {}
+    } catch (e3) { }
 
     return null;
   }
@@ -2804,7 +2834,7 @@
     // cache riêng của PhotoManager
     try {
       if (_pmSupabaseClient && typeof _pmSupabaseClient.from === 'function') return _pmSupabaseClient;
-    } catch (e0) {}
+    } catch (e0) { }
 
     var DevPS = global.DevicePhotoStore;
 
@@ -2814,7 +2844,7 @@
         var c1 = DevPS.getClient();
         if (c1 && typeof c1.from === 'function') return c1;
       }
-    } catch (e1) {}
+    } catch (e1) { }
 
     // 2) DevicePhotoStore._getClient() (bản mới v8.4.3-7 bạn đang dùng)
     try {
@@ -2822,20 +2852,20 @@
         var c2 = DevPS._getClient();
         if (c2 && typeof c2.from === 'function') return c2;
       }
-    } catch (e2) {}
+    } catch (e2) { }
 
     // 3) DevicePhotoStore.client / _client (nếu có)
     try {
       if (DevPS && DevPS.client && typeof DevPS.client.from === 'function') return DevPS.client;
-    } catch (e3) {}
+    } catch (e3) { }
     try {
       if (DevPS && DevPS._client && typeof DevPS._client.from === 'function') return DevPS._client;
-    } catch (e4) {}
+    } catch (e4) { }
 
     // 4) window.supabaseClient
     try {
       if (global.supabaseClient && typeof global.supabaseClient.from === 'function') return global.supabaseClient;
-    } catch (e5) {}
+    } catch (e5) { }
 
     // 5) tự tạo client từ config (MCSupabaseConfig/localStorage)
     var c3 = _pmBuildClientFromCfg();
@@ -2862,9 +2892,9 @@
 
     return null;
   }
-/* ──────────────────────────────────────────────────────────
-     UTILITIES
-  ────────────────────────────────────────────────────────── */
+  /* ──────────────────────────────────────────────────────────
+       UTILITIES
+    ────────────────────────────────────────────────────────── */
   function _esc(str) {
     var div = document.createElement('div');
     div.textContent = String(str);

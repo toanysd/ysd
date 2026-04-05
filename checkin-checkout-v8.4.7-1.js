@@ -64,7 +64,7 @@ Ghi chú:
       if (!Array.isArray(global.DataManager.data.statuslogs)) global.DataManager.data.statuslogs = [];
       global.DataManager.data.statuslogs.unshift(obj);
       if (typeof global.DataManager.recompute === 'function') global.DataManager.recompute();
-    } catch (e0) {}
+    } catch (e0) { }
   }
 
   function runDeleteQueue() {
@@ -111,7 +111,7 @@ Ghi chú:
 
     try {
       if (url && url.indexOf('/api/deletelog') >= 0) url = url.replace('/api/deletelog', '/api/delete-log');
-    } catch (e0) {}
+    } catch (e0) { }
 
     var payload = { filename: 'statuslogs.csv', logId: String(logId || '').trim() };
 
@@ -164,11 +164,11 @@ Ghi chú:
   }
   function storageSet(key, val) {
     if (!storageOk()) return;
-    try { localStorage.setItem(key, String(val)); } catch (e) {}
+    try { localStorage.setItem(key, String(val)); } catch (e) { }
   }
   function storageRemove(key) {
     if (!storageOk()) return;
-    try { localStorage.removeItem(key); } catch (e) {}
+    try { localStorage.removeItem(key); } catch (e) { }
   }
 
   function getDefaultEmpId() {
@@ -278,7 +278,7 @@ Ghi chú:
     try {
       var el = document.getElementById('notification-toast-container');
       if (el) el.style.zIndex = '900000';
-    } catch (e0) {}
+    } catch (e0) { }
   }
 
   function showToast(type, msgJa, msgVi) {
@@ -293,14 +293,14 @@ Ghi chú:
         if (cls === 'error' && typeof global.notify.error === 'function') return global.notify.error(msg);
         if (typeof global.notify.info === 'function') return global.notify.info(msg);
       }
-    } catch (e0) {}
+    } catch (e0) { }
 
     try {
       if (global.NotificationModule && typeof global.NotificationModule.show === 'function') {
         global.NotificationModule.show(msg, cls);
         return;
       }
-    } catch (e1) {}
+    } catch (e1) { }
 
     // Fallback DOM toast (z-index sẽ chỉnh bằng CSS ở bước sau)
     var id = 'cio-toast';
@@ -317,7 +317,7 @@ Ghi chú:
 
     clearTimeout(el._t);
     el._t = setTimeout(function () {
-      try { el.classList.add('hidden'); } catch (e2) {}
+      try { el.classList.add('hidden'); } catch (e2) { }
     }, 1600);
   }
 
@@ -392,7 +392,7 @@ Ghi chú:
       document.body.classList.add('cio-modal-open');
       document.body.style.overflow = 'hidden';
       document.body.style.touchAction = 'none';
-    } catch (e) {}
+    } catch (e) { }
   }
 
   function unlockBody() {
@@ -400,7 +400,7 @@ Ghi chú:
       document.body.classList.remove('cio-modal-open');
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // ----------------------------- Data helpers -----------------------------
@@ -587,11 +587,11 @@ Ghi chú:
         '<td class="cio-td-note">' + escapeHtml(note) + '</td>' +
         '<td class="cio-col-extra"><span class="cio-sync-pill ' + escapeHtml(syncCls) + '">' + escapeHtml(syncText) + '</span></td>' +
         '<td class="cio-col-extra">' +
-          (canDelete
-            ? ('<button type="button" class="cio-del-btn" data-del-id="' + escapeHtml(delId) + '"><div class="ja">削除</div><div class="vi">Xóa</div></button>')
-            : '-') +
+        (canDelete
+          ? ('<button type="button" class="cio-del-btn" data-del-id="' + escapeHtml(delId) + '"><div class="ja">削除</div><div class="vi">Xóa</div></button>')
+          : '-') +
         '</td>' +
-      '</tr>';
+        '</tr>';
     });
 
     return html;
@@ -613,99 +613,99 @@ Ghi chú:
 
     return (
       '<div class="cio-topbar">' +
-        '<div class="cio-top-title">' +
-          '<div class="ja">' + escapeHtml(code) + '</div>' +
-          '<div class="vi">' + escapeHtml(JV('入出庫', 'Xuất nhập kho')) + '</div>' +
-        '</div>' +
-        '<div class="cio-top-actions">' +
-          '<button type="button" class="cio-top-btn" id="cio-close"><span class="ja">×</span><span class="vi">Đóng</span></button>' +
-        '</div>' +
+      '<div class="cio-top-title">' +
+      '<div class="ja">' + escapeHtml(code) + '</div>' +
+      '<div class="vi">' + escapeHtml(JV('入出庫', 'Xuất nhập kho')) + '</div>' +
+      '</div>' +
+      '<div class="cio-top-actions">' +
+      '<button type="button" class="cio-top-btn" id="cio-close"><span class="ja">×</span><span class="vi">Đóng</span></button>' +
+      '</div>' +
       '</div>' +
 
       '<div class="cio-body">' +
-        '<div class="cio-desktop">' +
+      '<div class="cio-desktop">' +
 
-          // Controls first in DOM (mobile: controls on top)
-          '<div class="cio-col cio-col-controls">' +
-            '<div class="cio-card">' +
-              '<div class="cio-card-head">' +
-                '<div class="cio-card-title"><div class="ja">端末</div><div class="vi">Thiết bị</div></div>' +
-                '<div class="cio-status-pill" id="cio-status"></div>' +
-              '</div>' +
-              '<div class="cio-card-body">' +
-                '<div class="cio-hero">' +
-                  '<div class="cio-hero-code">' + escapeHtml(JV('入出庫', 'Xuất nhập kho') + ': ' + code) + '</div>' +
-                  (idNameLine ? ('<div class="cio-hero-name">' + escapeHtml(idNameLine) + '</div>') : '') +
-                '</div>' +
+      // Controls first in DOM (mobile: controls on top)
+      '<div class="cio-col cio-col-controls">' +
+      '<div class="cio-card">' +
+      '<div class="cio-card-head">' +
+      '<div class="cio-card-title"><div class="ja">端末</div><div class="vi">Thiết bị</div></div>' +
+      '<div class="cio-status-pill" id="cio-status"></div>' +
+      '</div>' +
+      '<div class="cio-card-body">' +
+      '<div class="cio-hero">' +
+      '<div class="cio-hero-code">' + escapeHtml(JV('入出庫', 'Xuất nhập kho') + ': ' + code) + '</div>' +
+      (idNameLine ? ('<div class="cio-hero-name">' + escapeHtml(idNameLine) + '</div>') : '') +
+      '</div>' +
 
-                // Fields (order: Emp -> Dest -> Note)
-                '<div class="cio-fields cio-fields-v846">' +
-                  '<div class="cio-field">' +
-                    '<label class="cio-label">' + escapeHtml(JV('社員', 'Nhân viên')) + '</label>' +
-                    '<button type="button" class="cio-picker-btn" id="cio-emp-btn">' +
-                      '<span class="cio-picker-btn-text" id="cio-emp-text">' + escapeHtml(JV('選択', 'Chọn nhân viên')) + '</span>' +
-                      '<span class="cio-picker-btn-sub" id="cio-emp-sub"></span>' +
-                    '</button>' +
-                    '<label class="cio-default-row"><input type="checkbox" id="cio-emp-default" /> <span>' + escapeHtml(JV('既定', 'Đặt làm mặc định')) + '</span></label>' +
-                  '</div>' +
+      // Fields (order: Emp -> Dest -> Note)
+      '<div class="cio-fields cio-fields-v846">' +
+      '<div class="cio-field">' +
+      '<label class="cio-label">' + escapeHtml(JV('社員', 'Nhân viên')) + '</label>' +
+      '<button type="button" class="cio-picker-btn" id="cio-emp-btn">' +
+      '<span class="cio-picker-btn-text" id="cio-emp-text">' + escapeHtml(JV('選択', 'Chọn nhân viên')) + '</span>' +
+      '<span class="cio-picker-btn-sub" id="cio-emp-sub"></span>' +
+      '</button>' +
+      '<label class="cio-default-row"><input type="checkbox" id="cio-emp-default" /> <span>' + escapeHtml(JV('既定', 'Đặt làm mặc định')) + '</span></label>' +
+      '</div>' +
 
-                  '<div class="cio-field">' +
-                    '<label class="cio-label">' + escapeHtml(JV('行先', 'Điểm đến')) + '</label>' +
-                    '<button type="button" class="cio-picker-btn" id="cio-dest-btn">' +
-                      '<span class="cio-picker-btn-text" id="cio-dest-text">' + escapeHtml(JV('選択', 'Chọn điểm đến')) + '</span>' +
-                      '<span class="cio-picker-btn-sub" id="cio-dest-sub"></span>' +
-                    '</button>' +
-                    '<label class="cio-default-row"><input type="checkbox" id="cio-dest-default" /> <span>' + escapeHtml(JV('既定', 'Đặt làm mặc định')) + '</span></label>' +
-                  '</div>' +
+      '<div class="cio-field">' +
+      '<label class="cio-label">' + escapeHtml(JV('行先', 'Điểm đến')) + '</label>' +
+      '<button type="button" class="cio-picker-btn" id="cio-dest-btn">' +
+      '<span class="cio-picker-btn-text" id="cio-dest-text">' + escapeHtml(JV('選択', 'Chọn điểm đến')) + '</span>' +
+      '<span class="cio-picker-btn-sub" id="cio-dest-sub"></span>' +
+      '</button>' +
+      '<label class="cio-default-row"><input type="checkbox" id="cio-dest-default" /> <span>' + escapeHtml(JV('既定', 'Đặt làm mặc định')) + '</span></label>' +
+      '</div>' +
 
-                  '<div class="cio-field">' +
-                    '<label class="cio-label">' + escapeHtml(JV('メモ', 'Ghi chú')) + '</label>' +
-                    '<input id="cio-note" class="cio-control" type="text" placeholder="..." />' +
-                  '</div>' +
-                '</div>' +
+      '<div class="cio-field">' +
+      '<label class="cio-label">' + escapeHtml(JV('メモ', 'Ghi chú')) + '</label>' +
+      '<input id="cio-note" class="cio-control" type="text" placeholder="..." />' +
+      '</div>' +
+      '</div>' +
 
-                // Stamp buttons moved below fields
-                '<div class="cio-stamp cio-stamp-v846">' +
-                  '<button type="button" class="cio-stamp-btn in" id="cio-stamp-in"><div class="ja">IN</div><div class="vi">Nhập kho</div></button>' +
-                  '<button type="button" class="cio-stamp-btn out" id="cio-stamp-out"><div class="ja">OUT</div><div class="vi">Xuất kho</div></button>' +
-                  '<button type="button" class="cio-stamp-btn relocate" id="cio-stamp-relocate"><div class="ja">位置変更</div><div class="vi">Thay đổi vị trí</div></button>' +
-                '</div>' +
+      // Stamp buttons moved below fields
+      '<div class="cio-stamp cio-stamp-v846">' +
+      '<button type="button" class="cio-stamp-btn in" id="cio-stamp-in"><div class="ja">IN</div><div class="vi">Nhập kho</div></button>' +
+      '<button type="button" class="cio-stamp-btn out" id="cio-stamp-out"><div class="ja">OUT</div><div class="vi">Xuất kho</div></button>' +
+      '<button type="button" class="cio-stamp-btn relocate" id="cio-stamp-relocate"><div class="ja">位置変更</div><div class="vi">Thay đổi vị trí</div></button>' +
+      '</div>' +
 
-              '</div>' +
-            '</div>' +
-          '</div>' +
+      '</div>' +
+      '</div>' +
+      '</div>' +
 
-          // History second in DOM (mobile: below controls)
-          '<div class="cio-col cio-col-history">' +
-            '<div class="cio-card cio-history-card">' +
-              '<div class="cio-card-head">' +
-                '<div class="cio-card-title"><div class="ja">履歴</div><div class="vi">Lịch sử</div></div>' +
-                  '<div class="cio-card-right">' +
-                    '<button type="button" class="cio-mini-btn" id="cio-history-unlock">' +
-                      '<span class="ja">解除</span><span class="vi">Unlock</span>' +
-                    '</button>' +
-                  '<input id="cio-history-search" class="cio-search" type="text" placeholder="Search..." autocomplete="off" />' +
-                '</div>' +
-              '</div>' +
-              '<div class="cio-history-scroll">' +
-                '<table class="cio-history-table" id="cio-history-table">' +
-                  '<thead><tr>' +
-                    '<th><div class="ja">時刻</div><div class="vi">Thời gian</div></th>' +
-                    '<th><div class="ja">入出</div><div class="vi">IN/OUT</div></th>' +
-                    '<th><div class="ja">行先</div><div class="vi">Điểm đến</div></th>' +
-                    '<th><div class="ja">社員</div><div class="vi">Nhân viên</div></th>' +
-                    '<th><div class="ja">メモ</div><div class="vi">Ghi chú</div></th>' +
-                    '<th class="cio-col-extra"><div class="ja">同期</div><div class="vi">Đồng bộ</div></th>' +
-                    '<th class="cio-col-extra"><div class="ja">操作</div><div class="vi">Xóa</div></th>' +
-                  '</tr></thead>'+
-                  '<tbody id="cio-history-tbody">' + (buildHistoryRowsHtml(item) || '') + '</tbody>' +
-                '</table>' +
-                '<div class="cio-empty hidden" id="cio-history-empty">' + escapeHtml(JV('履歴なし', 'Chưa có lịch sử')) + '</div>' +
-              '</div>' +
-            '</div>' +
-          '</div>' +
+      // History second in DOM (mobile: below controls)
+      '<div class="cio-col cio-col-history">' +
+      '<div class="cio-card cio-history-card">' +
+      '<div class="cio-card-head">' +
+      '<div class="cio-card-title"><div class="ja">履歴</div><div class="vi">Lịch sử</div></div>' +
+      '<div class="cio-card-right">' +
+      '<button type="button" class="cio-mini-btn" id="cio-history-unlock">' +
+      '<span class="ja">解除</span><span class="vi">Unlock</span>' +
+      '</button>' +
+      '<input id="cio-history-search" class="cio-search" type="text" placeholder="Search..." autocomplete="off" />' +
+      '</div>' +
+      '</div>' +
+      '<div class="cio-history-scroll">' +
+      '<table class="cio-history-table" id="cio-history-table">' +
+      '<thead><tr>' +
+      '<th><div class="ja">時刻</div><div class="vi">Thời gian</div></th>' +
+      '<th><div class="ja">入出</div><div class="vi">IN/OUT</div></th>' +
+      '<th><div class="ja">行先</div><div class="vi">Điểm đến</div></th>' +
+      '<th><div class="ja">社員</div><div class="vi">Nhân viên</div></th>' +
+      '<th><div class="ja">メモ</div><div class="vi">Ghi chú</div></th>' +
+      '<th class="cio-col-extra"><div class="ja">同期</div><div class="vi">Đồng bộ</div></th>' +
+      '<th class="cio-col-extra"><div class="ja">操作</div><div class="vi">Xóa</div></th>' +
+      '</tr></thead>' +
+      '<tbody id="cio-history-tbody">' + (buildHistoryRowsHtml(item) || '') + '</tbody>' +
+      '</table>' +
+      '<div class="cio-empty hidden" id="cio-history-empty">' + escapeHtml(JV('履歴なし', 'Chưa có lịch sử')) + '</div>' +
+      '</div>' +
+      '</div>' +
+      '</div>' +
 
-        '</div>' +
+      '</div>' +
       '</div>'
     );
   }
@@ -757,7 +757,7 @@ Ghi chú:
     if (sub) sub.textContent = id;
   }
 
-  
+
   // ----------------------------- Confirm dialog -----------------------------
 
   var confirmDialog = { open: false, onOk: null, onCancel: null };
@@ -793,47 +793,47 @@ Ghi chú:
 
     var html = '';
     html += '<div class="cio-dest-sheet-card cio-picker-card" role="dialog" aria-modal="true">';
-    html +=   '<div class="cio-dest-sheet-head">';
-    html +=     '<div class="cio-dest-sheet-title">';
-    html +=       '<div class="ja">' + escapeHtml(titleJa) + '</div>';
-    html +=       '<div class="vi">' + escapeHtml(titleVi) + '</div>';
-    html +=     '</div>';
-    html +=     '<button type="button" class="cio-mini-btn" id="cio-confirm-close">';
-    html +=       '<span class="ja">閉じる</span><span class="vi">Đóng</span>';
-    html +=     '</button>';
-    html +=   '</div>';
+    html += '<div class="cio-dest-sheet-head">';
+    html += '<div class="cio-dest-sheet-title">';
+    html += '<div class="ja">' + escapeHtml(titleJa) + '</div>';
+    html += '<div class="vi">' + escapeHtml(titleVi) + '</div>';
+    html += '</div>';
+    html += '<button type="button" class="cio-mini-btn" id="cio-confirm-close">';
+    html += '<span class="ja">閉じる</span><span class="vi">Đóng</span>';
+    html += '</button>';
+    html += '</div>';
 
-    html +=   '<div class="cio-dest-sheet-body">';
-    html +=     '<div class="cio-picker-help">';
+    html += '<div class="cio-dest-sheet-body">';
+    html += '<div class="cio-picker-help">';
     if (msgJa) html += '<div class="cio-picker-help-line"><div class="ja">' + escapeHtml(msgJa) + '</div></div>';
     if (msgVi) html += '<div class="cio-picker-help-line cio-attn"><div class="vi">' + escapeHtml(msgVi) + '</div></div>';
-    html +=     '</div>';
+    html += '</div>';
 
     html += '<div class="cio-confirm-actions">';
-    html +=   '<button type="button" class="cio-confirm-btn cio-confirm-cancel" id="cio-confirm-cancel">' +
-                '<div class="ja">' + escapeHtml(cancelJa) + '</div>' +
-                '<div class="vi">' + escapeHtml(cancelVi) + '</div>' +
-              '</button>';
-    html +=   '<button type="button" class="cio-confirm-btn cio-confirm-danger" id="cio-confirm-ok">' +
-                '<div class="ja">' + escapeHtml(okJa) + '</div>' +
-                '<div class="vi">' + escapeHtml(okVi) + '</div>' +
-              '</button>';
+    html += '<button type="button" class="cio-confirm-btn cio-confirm-cancel" id="cio-confirm-cancel">' +
+      '<div class="ja">' + escapeHtml(cancelJa) + '</div>' +
+      '<div class="vi">' + escapeHtml(cancelVi) + '</div>' +
+      '</button>';
+    html += '<button type="button" class="cio-confirm-btn cio-confirm-danger" id="cio-confirm-ok">' +
+      '<div class="ja">' + escapeHtml(okJa) + '</div>' +
+      '<div class="vi">' + escapeHtml(okVi) + '</div>' +
+      '</button>';
     html += '</div>';
 
 
-    html +=   '</div>';
+    html += '</div>';
     html += '</div>';
 
     cf.innerHTML = html;
     cf.classList.remove('hidden');
 
     function cancel() {
-      try { if (confirmDialog.onCancel) confirmDialog.onCancel(); } catch (e0) {}
+      try { if (confirmDialog.onCancel) confirmDialog.onCancel(); } catch (e0) { }
       closeConfirmDialog();
     }
 
     function ok() {
-      try { if (confirmDialog.onOk) confirmDialog.onOk(); } catch (e1) {}
+      try { if (confirmDialog.onOk) confirmDialog.onOk(); } catch (e1) { }
       closeConfirmDialog();
     }
 
@@ -858,7 +858,7 @@ Ghi chú:
     });
   }
 
-// ----------------------------- Picker -----------------------------
+  // ----------------------------- Picker -----------------------------
   function closePicker() {
     picker.open = false;
     picker.kind = '';
@@ -887,9 +887,9 @@ Ghi chú:
 
       quickHtml += (
         '<button type="button" class="cio-quick-dest" data-pick-id="' + escapeHtml(d.id) + '" title="' + escapeHtml(full) + '">' +
-          '<span class="cio-quick-no">' + escapeHtml(String(i + 1)) + '</span>' +
-          '<span class="cio-quick-name">' + escapeHtml(display) + '</span>' +
-          ((kind === 'emp') ? ('<span class="cio-quick-tooltip">' + escapeHtml(full) + '</span>') : '') +
+        '<span class="cio-quick-no">' + escapeHtml(String(i + 1)) + '</span>' +
+        '<span class="cio-quick-name">' + escapeHtml(display) + '</span>' +
+        ((kind === 'emp') ? ('<span class="cio-quick-tooltip">' + escapeHtml(full) + '</span>') : '') +
         '</button>'
       );
     });
@@ -898,22 +898,22 @@ Ghi chú:
 
     return (
       '<div class="cio-dest-sheet-card cio-picker-card" role="dialog" aria-modal="true">' +
-        '<div class="cio-dest-sheet-head">' +
-          '<div class="cio-dest-sheet-title">' +
-            '<div class="ja">' + escapeHtml(titleJa) + '</div>' +
-            '<div class="vi">' + escapeHtml(titleVi) + '</div>' +
-          '</div>' +
-          '<button type="button" class="cio-mini-btn" id="cio-picker-close"><span class="ja">×</span><span class="vi">Đóng</span></button>' +
-        '</div>' +
+      '<div class="cio-dest-sheet-head">' +
+      '<div class="cio-dest-sheet-title">' +
+      '<div class="ja">' + escapeHtml(titleJa) + '</div>' +
+      '<div class="vi">' + escapeHtml(titleVi) + '</div>' +
+      '</div>' +
+      '<button type="button" class="cio-mini-btn" id="cio-picker-close"><span class="ja">×</span><span class="vi">Đóng</span></button>' +
+      '</div>' +
 
-        '<div class="cio-dest-sheet-body">' +
-          (helpHtml ? ('<div class="cio-picker-help">' + helpHtml + '</div>') : '') +
-          '<div class="cio-dest-quick" id="cio-pick-quick">' + quickHtml + '</div>' +
-          '<div class="cio-dest-all">' +
-            '<label class="cio-label">' + escapeHtml(allLabel) + '</label>' +
-            '<div id="cio-pick-all"></div>' +
-          '</div>' +
-        '</div>' +
+      '<div class="cio-dest-sheet-body">' +
+      (helpHtml ? ('<div class="cio-picker-help">' + helpHtml + '</div>') : '') +
+      '<div class="cio-dest-quick" id="cio-pick-quick">' + quickHtml + '</div>' +
+      '<div class="cio-dest-all">' +
+      '<label class="cio-label">' + escapeHtml(allLabel) + '</label>' +
+      '<div id="cio-pick-all"></div>' +
+      '</div>' +
+      '</div>' +
       '</div>'
     );
   }
@@ -987,7 +987,7 @@ Ghi chú:
     // close by click outside
     pk.addEventListener('click', function (e) {
       if (e.target === pk) {
-        try { if (picker.onCancel) picker.onCancel(); } catch (e0) {}
+        try { if (picker.onCancel) picker.onCancel(); } catch (e0) { }
         closePicker();
       }
     }, { once: true });
@@ -996,7 +996,7 @@ Ghi chú:
     var closeBtn = document.getElementById('cio-picker-close');
     if (closeBtn) {
       closeBtn.addEventListener('click', function () {
-        try { if (picker.onCancel) picker.onCancel(); } catch (e1) {}
+        try { if (picker.onCancel) picker.onCancel(); } catch (e1) { }
         closePicker();
       });
     }
@@ -1015,18 +1015,18 @@ Ghi chú:
           if (backBtn) {
             backBtn.addEventListener('click', function () {
               closePicker();
-              try { options.onBack(); } catch (e0) {}
+              try { options.onBack(); } catch (e0) { }
             });
           }
         }
-      } catch (e4) {}
+      } catch (e4) { }
     }
 
     // esc
     document.addEventListener('keydown', function escOnce(e) {
       if (e.key === 'Escape' || e.key === 'Esc') {
         document.removeEventListener('keydown', escOnce);
-        try { if (picker.onCancel) picker.onCancel(); } catch (e2) {}
+        try { if (picker.onCancel) picker.onCancel(); } catch (e2) { }
         closePicker();
       }
     });
@@ -1040,7 +1040,7 @@ Ghi chú:
           onPickerSelected(id);
         });
       });
-    } catch (e3) {}
+    } catch (e3) { }
 
     renderPickerDropdown(kind);
     bindLongPressTooltip(pk);
@@ -1093,7 +1093,7 @@ Ghi chú:
 
     try {
       if (cb) cb(pickedId);
-    } catch (e0) {}
+    } catch (e0) { }
   }
 
 
@@ -1103,7 +1103,7 @@ Ghi chú:
       if (global.DataManager && global.DataManager.PendingCache && typeof global.DataManager.PendingCache.add === 'function') {
         return global.DataManager.PendingCache.add(logData);
       }
-    } catch (e0) {}
+    } catch (e0) { }
 
     try {
       if (global.DataManager && global.DataManager.data) {
@@ -1117,7 +1117,7 @@ Ghi chú:
         if (typeof global.DataManager.recompute === 'function') global.DataManager.recompute();
         return pending;
       }
-    } catch (e1) {}
+    } catch (e1) { }
 
     return null;
   }
@@ -1128,7 +1128,7 @@ Ghi chú:
       if (localId && global.DataManager && global.DataManager.PendingCache && typeof global.DataManager.PendingCache.remove === 'function') {
         global.DataManager.PendingCache.remove(String(localId));
       }
-    } catch (e0) {}
+    } catch (e0) { }
 
     try {
       if (global.DataManager && global.DataManager.data && Array.isArray(global.DataManager.data.statuslogs)) {
@@ -1145,7 +1145,7 @@ Ghi chú:
         if (serverObj) global.DataManager.data.statuslogs.unshift(serverObj);
         if (typeof global.DataManager.recompute === 'function') global.DataManager.recompute();
       }
-    } catch (e1) {}
+    } catch (e1) { }
   }
 
   function markPendingError(pendingObj, errMsg) {
@@ -1155,7 +1155,7 @@ Ghi chú:
         pendingObj.syncErrorAt = new Date().toISOString();
       }
       if (global.DataManager && typeof global.DataManager.recompute === 'function') global.DataManager.recompute();
-    } catch (e0) {}
+    } catch (e0) { }
   }
 
   var backendWarmed = false;
@@ -1169,9 +1169,9 @@ Ghi chú:
       var api = String(cfg.apiUrl || '');
       var healthUrl = api.replace('/api/checklog', '/api/health');
       if (healthUrl.indexOf('/api/health') >= 0) {
-        fetch(healthUrl, { method: 'GET' }).catch(function () {});
+        fetch(healthUrl, { method: 'GET' }).catch(function () { });
       }
-    } catch (e0) {}
+    } catch (e0) { }
   }
 
   function sleep(ms) {
@@ -1247,7 +1247,7 @@ Ghi chú:
       document.dispatchEvent(new CustomEvent('detailchanged', {
         detail: { item: currentItem, itemType: k.itemType, itemId: k.id, source: source || 'checkin-stamp' }
       }));
-    } catch (e0) {}
+    } catch (e0) { }
   }
 
   // ----------------------------- Actions -----------------------------
@@ -1262,19 +1262,19 @@ Ghi chú:
     }
 
     var help;
-      if (o.fromAction === 'out') {
-        help = helpHtmlJV(
-          '社員を選んで続行します。その後、行先を選択します。閉じる/キャンセルで戻ります',
-          'Chọn nhân viên để tiếp tục, sau đó sẽ chọn nơi đến, bấm đóng/hủy để quay lại',
-          true
-        );
-      } else {
-        help = helpHtmlJV(
-          '社員を選ぶとすぐ実行します。閉じる/キャンセルで戻ります',
-          'Chọn nhân viên để thực hiện ngay, bấm đóng/hủy để quay lại',
-          true
-        );
-      }
+    if (o.fromAction === 'out') {
+      help = helpHtmlJV(
+        '社員を選んで続行します。その後、行先を選択します。閉じる/キャンセルで戻ります',
+        'Chọn nhân viên để tiếp tục, sau đó sẽ chọn nơi đến, bấm đóng/hủy để quay lại',
+        true
+      );
+    } else {
+      help = helpHtmlJV(
+        '社員を選ぶとすぐ実行します。閉じる/キャンセルで戻ります',
+        'Chọn nhân viên để thực hiện ngay, bấm đóng/hủy để quay lại',
+        true
+      );
+    }
 
     openPicker('emp', {
       fromAction: (o.fromAction || ''),
@@ -1368,17 +1368,17 @@ Ghi chú:
       }
 
       syncLog('check-in', currentItem, logData, pending)
-        .then(function () { 
-            if (typeof window.hideGlobalSync === 'function') window.hideGlobalSync();
-            showToast('success', '', 'Đã IN'); 
+        .then(function () {
+          if (typeof window.hideGlobalSync === 'function') window.hideGlobalSync();
+          showToast('success', '', 'Đã IN');
         })
-        .catch(function () { 
-            if (typeof window.hideGlobalSync === 'function') window.hideGlobalSync();
-            showToast('error', '', 'Lỗi đồng bộ (đã lưu tạm)'); 
+        .catch(function () {
+          if (typeof window.hideGlobalSync === 'function') window.hideGlobalSync();
+          showToast('error', '', 'Lỗi đồng bộ (đã lưu tạm)');
         });
       try {
         document.dispatchEvent(new CustomEvent('data-manager-updated', { detail: { source: 'checkinout', table: 'statuslogs' } }));
-      } catch (e0) {}
+      } catch (e0) { }
 
     }, function () {
       // cancel
@@ -1414,17 +1414,17 @@ Ghi chú:
       }
 
       syncLog('check-out', currentItem, logData, pending)
-        .then(function () { 
-            if (typeof window.hideGlobalSync === 'function') window.hideGlobalSync();
-            showToast('success', '', 'Đã OUT'); 
+        .then(function () {
+          if (typeof window.hideGlobalSync === 'function') window.hideGlobalSync();
+          showToast('success', '', 'Đã OUT');
         })
-        .catch(function () { 
-            if (typeof window.hideGlobalSync === 'function') window.hideGlobalSync();
-            showToast('error', '', 'Lỗi đồng bộ (đã lưu tạm)'); 
+        .catch(function () {
+          if (typeof window.hideGlobalSync === 'function') window.hideGlobalSync();
+          showToast('error', '', 'Lỗi đồng bộ (đã lưu tạm)');
         });
       try {
         document.dispatchEvent(new CustomEvent('data-manager-updated', { detail: { source: 'checkinout', table: 'statuslogs' } }));
-      } catch (e0) {}
+      } catch (e0) { }
 
     }, function () {
       // cancel
@@ -1437,18 +1437,18 @@ Ghi chú:
     if (!id) return { id: '', display: JV('未設定', 'Chưa thiết lập') };
     var dm = global.DataManager && global.DataManager.data;
     if (!dm) return { id: id, display: id };
-    
+
     var arr = safeArray(dm.racklayers);
-    var found = arr.find(function(x) { return String(x.RackLayerID || '').trim() === id; });
+    var found = arr.find(function (x) { return String(x.RackLayerID || '').trim() === id; });
     if (!found) return { id: id, display: id };
-    
+
     var rackId = String(found.RackID || '');
     var lNo = String(found.RackLayerNumber || '');
     var lNote = String(found.RackLayerNotes || '');
     var rArr = safeArray(dm.racks);
-    var rFound = rArr.find(function(x) { return String(x.RackID || '').trim() === rackId; });
+    var rFound = rArr.find(function (x) { return String(x.RackID || '').trim() === rackId; });
     var rLoc = rFound ? String(rFound.RackLocation || '') : '';
-    
+
     var res = (rackId && lNo) ? (rackId + '-' + lNo) : id;
     if (rLoc || lNote) {
       res += ' (' + (rLoc ? rLoc : '') + (rLoc && lNote ? ' / ' : '') + (lNote ? lNote : '') + ')';
@@ -1468,7 +1468,7 @@ Ghi chú:
     var btnClose = document.getElementById('cio-relocate-close');
     var btnCancel = document.getElementById('cio-relocate-cancel');
     var btnSubmit = document.getElementById('cio-relocate-submit');
-    
+
     var selRack = document.getElementById('cio-relocate-rack');
     var selLayer = document.getElementById('cio-relocate-layer');
     var iptQuick = document.getElementById('cio-relocate-quick-input');
@@ -1477,7 +1477,7 @@ Ghi chú:
     var racks = data ? safeArray(data.racks) : [];
     var layers = data ? safeArray(data.racklayers) : [];
 
-    racks.forEach(function(r) {
+    racks.forEach(function (r) {
       var op = document.createElement('option');
       op.value = r.RackID;
       op.textContent = r.RackID + (r.RackLocation ? ' - ' + r.RackLocation : '');
@@ -1489,8 +1489,8 @@ Ghi chú:
       selLayer.innerHTML = '<option value="">- Chọn -</option>';
       document.getElementById('cio-relocate-layer-note').textContent = '';
       if (!rId) return;
-      var fLayers = layers.filter(function(x) { return String(x.RackID) === rId; });
-      fLayers.forEach(function(l) {
+      var fLayers = layers.filter(function (x) { return String(x.RackID) === rId; });
+      fLayers.forEach(function (l) {
         var op = document.createElement('option');
         op.value = l.RackLayerID;
         op.textContent = 'Tầng ' + (l.RackLayerNumber || l.RackLayerID) + (l.RackLayerNotes ? ' (' + l.RackLayerNotes + ')' : '');
@@ -1498,17 +1498,17 @@ Ghi chú:
       });
     }
 
-    selRack.addEventListener('change', function() {
+    selRack.addEventListener('change', function () {
       updateLayers();
     });
 
-    selLayer.addEventListener('change', function() {
+    selLayer.addEventListener('change', function () {
       var lId = selLayer.value;
-      var f = layers.find(function(x) { return String(x.RackLayerID) === lId; });
+      var f = layers.find(function (x) { return String(x.RackLayerID) === lId; });
       document.getElementById('cio-relocate-layer-note').textContent = f && f.RackLayerNotes ? f.RackLayerNotes : '';
     });
 
-    iptQuick.addEventListener('input', function() {
+    iptQuick.addEventListener('input', function () {
       var val = iptQuick.value.trim();
       var match = null;
       for (var i = 0; i < layers.length; i++) {
@@ -1540,7 +1540,7 @@ Ghi chú:
     if (btnCancel) btnCancel.addEventListener('click', closeR);
 
     if (btnSubmit) {
-      btnSubmit.addEventListener('click', function() {
+      btnSubmit.addEventListener('click', function () {
         var targetLayer = selLayer.value;
         if (!targetLayer) {
           showToast('error', '', 'Vui lòng chọn Vị trí mới');
@@ -1552,7 +1552,7 @@ Ghi chú:
 
         btnSubmit.disabled = true;
         btnSubmit.innerHTML = '保存中...';
-        
+
         submitRelocate(item, empId, targetLayer, note, checkin, closeR);
       });
     }
@@ -1571,7 +1571,7 @@ Ghi chú:
       if (!dm) return null;
       if (Array.isArray(dm.weblocationlog)) return dm.weblocationlog;
       if (Array.isArray(dm.locationlog)) return dm.locationlog;
-    } catch (e0) {}
+    } catch (e0) { }
     return null;
   }
 
@@ -1593,7 +1593,7 @@ Ghi chú:
       }
 
       return pending;
-    } catch (e0) {}
+    } catch (e0) { }
 
     return null;
   }
@@ -1625,7 +1625,7 @@ Ghi chú:
       if (global.DataManager && typeof global.DataManager.recompute === 'function') {
         global.DataManager.recompute();
       }
-    } catch (e0) {}
+    } catch (e0) { }
   }
 
   function markPendingLocationError(pendingObj, errMsg) {
@@ -1638,7 +1638,7 @@ Ghi chú:
       if (global.DataManager && typeof global.DataManager.recompute === 'function') {
         global.DataManager.recompute();
       }
-    } catch (e0) {}
+    } catch (e0) { }
   }
 
   function updateRackLayerLocalEverywhere(item, key, rackLayerId) {
@@ -1652,7 +1652,7 @@ Ghi chú:
         item.rackNo = cleanLayer;
         item.displayRackLocation = cleanLayer;
       }
-    } catch (e0) {}
+    } catch (e0) { }
 
     try {
       var dm = global.DataManager && global.DataManager.data ? global.DataManager.data : null;
@@ -1680,7 +1680,7 @@ Ghi chú:
       if (typeof global.DataManager.recompute === 'function') {
         global.DataManager.recompute();
       }
-    } catch (e1) {}
+    } catch (e1) { }
   }
 
   function createLocationLogData(item, empId, targetLayer, note) {
@@ -1708,24 +1708,24 @@ Ghi chú:
         keepalive: true,
         body: JSON.stringify(payload)
       })
-      .then(function (res) {
-        return res.json().catch(function () { return null; }).then(function (json) {
-          if (!res.ok) {
-            throw new Error((json && json.message) ? json.message : ('HTTP ' + res.status));
+        .then(function (res) {
+          return res.json().catch(function () { return null; }).then(function (json) {
+            if (!res.ok) {
+              throw new Error((json && json.message) ? json.message : ('HTTP ' + res.status));
+            }
+            if (!json || !json.success) {
+              throw new Error((json && json.message) ? json.message : 'Sync failed');
+            }
+            return json;
+          });
+        })
+        .catch(function (err) {
+          if (n < 2) {
+            return sleep(900).then(function () { return attempt(n + 1); });
           }
-          if (!json || !json.success) {
-            throw new Error((json && json.message) ? json.message : 'Sync failed');
-          }
-          return json;
+          markPendingLocationError(pendingLocationObj, err && err.message ? err.message : 'Sync error');
+          throw err;
         });
-      })
-      .catch(function (err) {
-        if (n < 2) {
-          return sleep(900).then(function () { return attempt(n + 1); });
-        }
-        markPendingLocationError(pendingLocationObj, err && err.message ? err.message : 'Sync error');
-        throw err;
-      });
     }
 
     return attempt(0);
@@ -1795,7 +1795,7 @@ Ghi chú:
       document.dispatchEvent(new CustomEvent('data-manager-updated', {
         detail: { source: 'checkinout-relocate', table: 'locationlog', pending: true }
       }));
-    } catch (e0) {}
+    } catch (e0) { }
 
     syncRelocateRequest(url, payload, pendingLocation)
       .then(function (json) {
@@ -1811,7 +1811,7 @@ Ghi chú:
           document.dispatchEvent(new CustomEvent('data-manager-updated', {
             detail: { source: 'checkinout-relocate', table: 'locationlog', pending: false }
           }));
-        } catch (e1) {}
+        } catch (e1) { }
 
         showToast('success', '', doCheckin
           ? JV('位置変更とチェックインを保存しました', 'Đã lưu đổi vị trí và check-in')
@@ -1831,7 +1831,7 @@ Ghi chú:
           document.dispatchEvent(new CustomEvent('data-manager-updated', {
             detail: { source: 'checkinout-relocate', table: 'locationlog', pending: false, error: true }
           }));
-        } catch (e2) {}
+        } catch (e2) { }
 
         showToast('error', '', JV('位置変更の保存に失敗しました: ', 'Lưu thay đổi vị trí thất bại: ') + (err && err.message ? err.message : 'Unknown error'));
       })
@@ -1850,66 +1850,66 @@ Ghi chú:
 
     var html = '';
     html += '<div class="cio-dest-sheet-card cio-picker-card" role="dialog" aria-modal="true" style="max-height:90vh; overflow:auto;">';
-    html +=   '<div class="cio-dest-sheet-head">';
-    html +=     '<div class="cio-dest-sheet-title">';
-    html +=       '<div class="ja">位置変更</div>';
-    html +=       '<div class="vi">Đổi vị trí (' + escapeHtml(getDeviceCode(item)) + ')</div>';
-    html +=     '</div>';
-    html +=     '<button type="button" class="cio-mini-btn" id="cio-relocate-close"><span class="ja">×</span><span class="vi">Đóng</span></button>';
-    html +=   '</div>';
-
-    html +=   '<div class="cio-dest-sheet-body" style="gap:12px;">';
-    
-    html +=     '<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px;">';
-    html +=       '<div style="font-size:11px; color:#64748b; font-weight:800; margin-bottom:4px;">現在位置 / Vị trí hiện tại:</div>';
-    html +=       '<div style="font-size:14px; font-weight:900; color:#0f172a;">' + escapeHtml(currentInfo.display) + '</div>';
-    html +=     '</div>';
-    
-    html +=     '<div class="cio-field">';
-    html +=       '<label class="cio-label">コード入力 / Quét nhanh (例 / Ví dụ: 233, 23-3)</label>';
-    html +=       '<input id="cio-relocate-quick-input" class="cio-control" type="text" placeholder="..." autocomplete="off" />';
-    html +=     '</div>';
-
-    html +=     '<div class="cio-field">';
-    html +=       '<label class="cio-label">棚 / Giá (Rack)</label>';
-    html +=       '<select id="cio-relocate-rack" class="cio-control" style="cursor:pointer;"><option value="">- Chọn -</option></select>';
-    html +=     '</div>';
-
-    html +=     '<div class="cio-field">';
-    html +=       '<label class="cio-label">段 / Tầng (Layer)</label>';
-    html +=       '<select id="cio-relocate-layer" class="cio-control" style="cursor:pointer;"><option value="">- Chọn -</option></select>';
-    html +=       '<div id="cio-relocate-layer-note" style="font-size:11px; color:#16a34a; font-weight:800; margin-top:2px; min-height:14px;"></div>';
-    html +=     '</div>';
-
-    html +=     '<div class="cio-field">';
-    html +=       '<label class="cio-label">備考 / Ghi chú (Tùy chọn)</label>';
-    html +=       '<input id="cio-relocate-note" class="cio-control" type="text" placeholder="..." />';
-    html +=     '</div>';
-    
-    html +=     '<div style="margin-top:4px;">';
-    html +=       '<label class="cio-default-row" style="cursor:pointer;">';
-    html +=         '<input type="checkbox" id="cio-relocate-auto-in" checked />';
-    html +=         '<span><div class="ja">位置変更と同時にチェックイン</div><div class="vi">Đổi vị trí đồng thời Check-in</div></span>';
-    html +=       '</label>';
-    html +=     '</div>';
-
-    html +=     '<div class="cio-confirm-actions" style="margin-top:8px;">';
-    html +=       '<button type="button" class="cio-confirm-btn cio-confirm-cancel" id="cio-relocate-cancel">';
-    html +=         '<div class="ja">キャンセル</div><div class="vi">Hủy</div>';
-    html +=       '</button>';
-    html +=       '<button type="button" class="cio-confirm-btn" id="cio-relocate-submit" style="background:var(--cio-info); color:#fff; border-color:rgba(14,165,233,0.5);">';
-    html +=         '<div class="ja">確定</div><div class="vi">Xác nhận <span style="font-size:10px">(Save)</span></div>';
-    html +=       '</button>';
-    html +=     '</div>';
-
-    html +=   '</div>';
+    html += '<div class="cio-dest-sheet-head">';
+    html += '<div class="cio-dest-sheet-title">';
+    html += '<div class="ja">位置変更</div>';
+    html += '<div class="vi">Đổi vị trí (' + escapeHtml(getDeviceCode(item)) + ')</div>';
     html += '</div>';
-    
+    html += '<button type="button" class="cio-mini-btn" id="cio-relocate-close"><span class="ja">×</span><span class="vi">Đóng</span></button>';
+    html += '</div>';
+
+    html += '<div class="cio-dest-sheet-body" style="gap:12px;">';
+
+    html += '<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px;">';
+    html += '<div style="font-size:11px; color:#64748b; font-weight:800; margin-bottom:4px;">現在位置 / Vị trí hiện tại:</div>';
+    html += '<div style="font-size:14px; font-weight:900; color:#0f172a;">' + escapeHtml(currentInfo.display) + '</div>';
+    html += '</div>';
+
+    html += '<div class="cio-field">';
+    html += '<label class="cio-label">コード入力 / Quét nhanh (例 / Ví dụ: 233, 23-3)</label>';
+    html += '<input id="cio-relocate-quick-input" class="cio-control" type="text" placeholder="..." autocomplete="off" />';
+    html += '</div>';
+
+    html += '<div class="cio-field">';
+    html += '<label class="cio-label">棚 / Giá (Rack)</label>';
+    html += '<select id="cio-relocate-rack" class="cio-control" style="cursor:pointer;"><option value="">- Chọn -</option></select>';
+    html += '</div>';
+
+    html += '<div class="cio-field">';
+    html += '<label class="cio-label">段 / Tầng (Layer)</label>';
+    html += '<select id="cio-relocate-layer" class="cio-control" style="cursor:pointer;"><option value="">- Chọn -</option></select>';
+    html += '<div id="cio-relocate-layer-note" style="font-size:11px; color:#16a34a; font-weight:800; margin-top:2px; min-height:14px;"></div>';
+    html += '</div>';
+
+    html += '<div class="cio-field">';
+    html += '<label class="cio-label">備考 / Ghi chú (Tùy chọn)</label>';
+    html += '<input id="cio-relocate-note" class="cio-control" type="text" placeholder="..." />';
+    html += '</div>';
+
+    html += '<div style="margin-top:4px;">';
+    html += '<label class="cio-default-row" style="cursor:pointer;">';
+    html += '<input type="checkbox" id="cio-relocate-auto-in" checked />';
+    html += '<span><div class="ja">位置変更と同時にチェックイン</div><div class="vi">Đổi vị trí đồng thời Check-in</div></span>';
+    html += '</label>';
+    html += '</div>';
+
+    html += '<div class="cio-confirm-actions" style="margin-top:8px;">';
+    html += '<button type="button" class="cio-confirm-btn cio-confirm-cancel" id="cio-relocate-cancel">';
+    html += '<div class="ja">キャンセル</div><div class="vi">Hủy</div>';
+    html += '</button>';
+    html += '<button type="button" class="cio-confirm-btn" id="cio-relocate-submit" style="background:var(--cio-info); color:#fff; border-color:rgba(14,165,233,0.5);">';
+    html += '<div class="ja">確定</div><div class="vi">Xác nhận <span style="font-size:10px">(Save)</span></div>';
+    html += '</button>';
+    html += '</div>';
+
+    html += '</div>';
+    html += '</div>';
+
     rm.innerHTML = html;
     rm.classList.remove('hidden');
 
     // Run short timeout so focus can happen after DOM paints
-    setTimeout(function() {
+    setTimeout(function () {
       var quick = document.getElementById('cio-relocate-quick-input');
       if (quick) quick.focus();
     }, 50);
@@ -1975,11 +1975,11 @@ Ghi chú:
         '<td class="cio-td-note">' + escapeHtml(String(l.Notes || '')) + '</td>' +
         '<td class="cio-col-extra"><span class="cio-sync-pill ' + escapeHtml(syncCls) + '">' + escapeHtml(syncText) + '</span></td>' +
         '<td class="cio-col-extra">' +
-          (canDelete
-            ? ('<button type="button" class="cio-del-btn" data-del-id="' + escapeHtml(delId) + '"><div class="ja">削除</div><div class="vi">Xóa</div></button>')
-            : '-') +
+        (canDelete
+          ? ('<button type="button" class="cio-del-btn" data-del-id="' + escapeHtml(delId) + '"><div class="ja">削除</div><div class="vi">Xóa</div></button>')
+          : '-') +
         '</td>' +
-      '</tr>';
+        '</tr>';
     });
 
     tbody.innerHTML = html;
@@ -2033,6 +2033,12 @@ Ghi chú:
   }
 
   function bindEvents() {
+    var panel = document.getElementById('cio-panel');
+    if (panel && panel.dataset.boundSwipe !== '1') {
+      panel.dataset.boundSwipe = '1';
+      if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.bindSwipe(panel, close);
+    }
+
     var bd = document.getElementById('cio-backdrop');
     if (bd && bd.dataset.bound !== '1') {
       bd.dataset.bound = '1';
@@ -2060,7 +2066,7 @@ Ghi chú:
     var stampIn = document.getElementById('cio-stamp-in');
     var stampOut = document.getElementById('cio-stamp-out');
     var stampRelocate = document.getElementById('cio-stamp-relocate');
-    
+
     if (stampIn && stampIn.dataset.bound !== '1') {
       stampIn.dataset.bound = '1';
       stampIn.addEventListener('click', doStampIn);
@@ -2113,21 +2119,21 @@ Ghi chú:
     }
 
     var unlockBtn = document.getElementById('cio-history-unlock');
-      if (unlockBtn && unlockBtn.dataset.bound !== '1') {
-        unlockBtn.dataset.bound = '1';
-        unlockBtn.addEventListener('click', function () {
-          historyUnlocked = !historyUnlocked;
+    if (unlockBtn && unlockBtn.dataset.bound !== '1') {
+      unlockBtn.dataset.bound = '1';
+      unlockBtn.addEventListener('click', function () {
+        historyUnlocked = !historyUnlocked;
 
-          var panel = document.getElementById('cio-panel');
-          if (panel) panel.classList.toggle('cio-history-unlocked', historyUnlocked);
+        var panel = document.getElementById('cio-panel');
+        if (panel) panel.classList.toggle('cio-history-unlocked', historyUnlocked);
 
-          unlockBtn.innerHTML = historyUnlocked
-            ? '<span class="ja">施錠</span><span class="vi">Lock</span>'
-            : '<span class="ja">解除</span><span class="vi">Unlock</span>';
-        });
-      }
+        unlockBtn.innerHTML = historyUnlocked
+          ? '<span class="ja">施錠</span><span class="vi">Lock</span>'
+          : '<span class="ja">解除</span><span class="vi">Unlock</span>';
+      });
+    }
 
-    
+
     var tbody = document.getElementById('cio-history-tbody');
     if (tbody && tbody.dataset.boundDel !== '1') {
       tbody.dataset.boundDel = '1';
@@ -2167,12 +2173,12 @@ Ghi chú:
             runDeleteQueue();
 
           },
-          onCancel: function () {}
+          onCancel: function () { }
         });
       });
     }
 
-bindDefaultEmpCheckbox();
+    bindDefaultEmpCheckbox();
     bindDefaultDestCheckbox();
   }
 
@@ -2188,6 +2194,8 @@ bindDefaultEmpCheckbox();
     currentItem = item;
     currentPreferredMode = preferredMode || 'stamp';
     opened = true;
+
+    if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.push('cioPanel', close);
 
     var panel = document.getElementById('cio-panel');
     var bd = document.getElementById('cio-backdrop');
@@ -2217,7 +2225,7 @@ bindDefaultEmpCheckbox();
         var outBtn = document.getElementById('cio-stamp-out');
         if (outBtn) outBtn.classList.add('pulse');
       }
-    } catch (e0) {}
+    } catch (e0) { }
 
     // history empty state
     try {
@@ -2226,7 +2234,7 @@ bindDefaultEmpCheckbox();
       if (tbody && (!tbody.innerHTML || !tbody.innerHTML.trim())) {
         if (empty) empty.classList.remove('hidden');
       }
-    } catch (e1) {}
+    } catch (e1) { }
 
     bindEvents();
 
@@ -2234,7 +2242,7 @@ bindDefaultEmpCheckbox();
       try {
         var s = document.getElementById('cio-history-search');
         if (s && !isMobile()) s.focus();
-      } catch (e2) {}
+      } catch (e2) { }
     }, 0);
   }
 
@@ -2258,6 +2266,7 @@ bindDefaultEmpCheckbox();
   }
 
   function close() {
+    if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('cioPanel');
     closePicker();
 
     opened = false;
@@ -2281,7 +2290,7 @@ bindDefaultEmpCheckbox();
     try {
       if (document.body && document.body.dataset && document.body.dataset.cioQuickBound) return;
       if (document.body && document.body.dataset) document.body.dataset.cioQuickBound = '1';
-    } catch (e0) {}
+    } catch (e0) { }
 
     document.addEventListener('quick-action', function (e) {
       try {
@@ -2291,25 +2300,25 @@ bindDefaultEmpCheckbox();
         if (!action) return;
         var a = String(action).toLowerCase().trim();
         if (a === 'inout' || a === 'stamp') {
-          try { e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation(); } catch (e1) {}
+          try { e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation(); } catch (e1) { }
           openSmart(item);
           return;
         }
         if (a === 'checkin' || a === 'check-in' || a === 'in') {
-          try { e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation(); } catch (e2) {}
+          try { e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation(); } catch (e2) { }
           openModal('check-in', item);
           return;
         }
         if (a === 'checkout' || a === 'check-out' || a === 'out') {
-          try { e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation(); } catch (e3) {}
+          try { e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation(); } catch (e3) { }
           openModal('check-out', item);
           return;
         }
         if (a === 'move' || a === 'relocate' || a === 'location') {
-          try { e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation(); } catch (e4) {}
+          try { e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation(); } catch (e4) { }
           openInternal('stamp', item);
           setTimeout(function () {
-            try { doStampRelocate(); } catch (e5) {}
+            try { doStampRelocate(); } catch (e5) { }
           }, 0);
           return;
         }
@@ -2327,9 +2336,9 @@ bindDefaultEmpCheckbox();
     close: close
   };
 
-  try { bindQuickActionCapture(); } catch (e0) {}
+  try { bindQuickActionCapture(); } catch (e0) { }
   global.CheckInOut = CheckInOut;
 
-  try { console.log('[CheckInOut]', VERSION, 'loaded'); } catch (e1) {}
+  try { console.log('[CheckInOut]', VERSION, 'loaded'); } catch (e1) { }
 
 })(window);

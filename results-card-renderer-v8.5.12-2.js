@@ -47,8 +47,8 @@ class ResultsCardRenderer {
 
                 const itemId = (actionBtn.dataset.id || '').trim();
                 const item = this.items.find(it => {
-                const id = (it.type === 'mold') ? it.MoldID : it.CutterID;
-                return String(id).trim() === String(itemId);
+                    const id = (it.type === 'mold') ? it.MoldID : it.CutterID;
+                    return String(id).trim() === String(itemId);
                 });
 
                 if (!item) return;
@@ -165,7 +165,7 @@ class ResultsCardRenderer {
                 popup.style.padding = '16px';
                 popup.style.backdropFilter = 'blur(0px)';
                 popup.style.transition = 'background 0.3s ease, backdrop-filter 0.3s ease';
-                
+
                 popup.innerHTML = `
                     <div style="background:#fff; border-radius:12px; padding:12px; position:relative; width:80vw; max-width:800px; height:80vh; max-height:800px; display:flex; flex-direction:column; align-items:center; box-shadow:0 10px 25px rgba(0,0,0,0.2); opacity: 0; transform: scale(0.95); transition: opacity 0.3s ease, transform 0.3s ease;">
                         <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding:0 8px; flex-shrink:0;">
@@ -175,27 +175,49 @@ class ResultsCardRenderer {
                         <div style="flex:1; width:100%; position:relative; display:flex; align-items:center; justify-content:center; background:#f8fafc; border-radius:8px; overflow:hidden;">
                             ${thumbSrc ? `<img src="${thumbSrc}" style="position:absolute; width:100%; height:100%; object-fit:contain; filter:blur(10px); opacity:0.6; transform: scale(1.05);" />` : ''}
                             <i class="fas fa-spinner fa-spin" id="zoomSpinner_${deviceId}" style="font-size:2rem; color:#94a3b8; position:absolute; z-index:2;"></i>
-                            <img src="${fullUrl}" onload="
+                            <img src="${fullUrl}" class="card-zoom-target-img" onload="
                                 const spinner = document.getElementById('zoomSpinner_${deviceId}');
                                 if(spinner) spinner.style.display='none';
                                 this.style.opacity='1';
-                            " style="width:100%; height:100%; object-fit:contain; position:relative; z-index:3; opacity:0; transition: opacity 0.4s ease;" onerror="this.style.display='none';" />
+                            " style="width:100%; height:100%; object-fit:contain; position:relative; z-index:3; opacity:0; transition: transform 0.3s ease, opacity 0.4s ease; cursor: zoom-in;" onerror="this.style.display='none';" 
+                            onclick="
+                                if(this.classList.contains('zoomed-in')) {
+                                    this.classList.remove('zoomed-in');
+                                    this.style.transform = 'scale(1)';
+                                    this.style.cursor = 'zoom-in';
+                                } else {
+                                    this.classList.add('zoomed-in');
+                                    this.style.transform = 'scale(1.5)';
+                                    this.style.cursor = 'zoom-out';
+                                }
+                                event.stopPropagation();
+                            " />
                         </div>
                     </div>
                 `;
 
+                const closeAction = () => {
+                    popup.style.background = 'rgba(0,0,0,0)';
+                    popup.style.backdropFilter = 'blur(0px)';
+                    popup.children[0].style.opacity = '0';
+                    popup.children[0].style.transform = 'scale(0.95)';
+                    setTimeout(() => popup.remove(), 300);
+                    if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('cardThumbPopup');
+                };
+
                 popup.addEventListener('click', (ev) => {
                     if (ev.target === popup || ev.target.closest('.close-zoom-btn')) {
-                        popup.style.background = 'rgba(0,0,0,0)';
-                        popup.style.backdropFilter = 'blur(0px)';
-                        popup.children[0].style.opacity = '0';
-                        popup.children[0].style.transform = 'scale(0.95)';
-                        setTimeout(() => popup.remove(), 300);
+                        closeAction();
                     }
                 });
 
+                if (window.SwipeHistoryTrap) {
+                    window.SwipeHistoryTrap.push('cardThumbPopup', closeAction);
+                    window.SwipeHistoryTrap.bindSwipe(popup, closeAction);
+                }
+
                 document.body.appendChild(popup);
-                
+
                 // Kích hoạt animation hiện ra
                 requestAnimationFrame(() => {
                     popup.style.background = 'rgba(0,0,0,0.6)';
@@ -222,10 +244,10 @@ class ResultsCardRenderer {
             if (locationLink) {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 const rackId = locationLink.dataset.rackId;
                 const layerId = locationLink.dataset.layerId;
-                
+
                 let popupLayerId = layerId ? String(layerId) : '';
                 let popupRackId = rackId ? String(rackId) : '';
                 let calculatedLayerNumber = '?';
@@ -237,11 +259,11 @@ class ResultsCardRenderer {
                         popupRackId = popupLayerId.slice(0, -1);
                     }
                 }
-                
+
                 // Get data
                 const rack = window.DataManager?.data?.racks?.find(r => String(r.RackID) === String(popupRackId)) || {};
                 const layer = window.DataManager?.data?.racklayers?.find(l => String(l.RackLayerID) === String(popupLayerId)) || {};
-                
+
                 const emptyNoteHtml = '<span style="color:#94a3b8; font-style:italic;">メモなし / Không có ghi chú</span>';
 
                 let rackNotes = rack.RackNotes || rack.Notes ? String(rack.RackNotes || rack.Notes).trim() : '';
@@ -249,7 +271,7 @@ class ResultsCardRenderer {
 
                 let layerNotes = layer.RackLayerNotes || layer.Notes ? String(layer.RackLayerNotes || layer.Notes).trim() : '';
                 if (!layerNotes || layerNotes.toLowerCase() === 'không có ghi chú') layerNotes = emptyNoteHtml;
-                
+
                 let rackLocation = rack.RackLocation || '';
                 if (!rackLocation || rackLocation.toLowerCase() === 'không có ghi chú') rackLocation = emptyNoteHtml;
 
@@ -273,7 +295,7 @@ class ResultsCardRenderer {
                 popup.style.justifyContent = 'center';
                 popup.style.padding = '16px';
                 popup.style.backdropFilter = 'blur(4px)';
-                
+
                 let imgHtml = `
                     <style>
                         .rack-popup-img { width:100%; max-height:40vh; object-fit:contain; border-radius:8px; border:1px solid #e2e8f0; cursor:zoom-in; transition:all 0.3s ease; display:block; }
@@ -294,10 +316,27 @@ class ResultsCardRenderer {
                         }
                     </style>
                     <div style="padding:40px; background:#f1f5f9; text-align:center; color:#94a3b8; border-radius:8px;"><i class="fas fa-image fa-3x" style="margin-bottom:8px;"></i><p style="margin:0; font-size:12px; font-weight:600;">画像なし <span style="font-weight:400;">/ Không có ảnh</span></p></div>`;
-                if (window.DevicePhotoStore && typeof window.DevicePhotoStore.getThumbnailUrl === 'function') {
-                    const url = await window.DevicePhotoStore.getThumbnailUrl('racklayer', popupLayerId) || await window.DevicePhotoStore.getThumbnailUrl('rack', popupRackId);
-                    if (url) {
-                        imgHtml = imgHtml.replace(/<div.*?<\/div>/, `<img class="rack-popup-img" src="${url}" onclick="this.classList.toggle('zoomed-img');" />`);
+                if (window.DevicePhotoStore) {
+                    let fullUrl = '';
+                    // Lấy ảnh gốc thay vì thumbnail để tránh bị mờ
+                    const fetchOrgPhoto = async (type, id) => {
+                        let row = null;
+                        if (typeof window.DevicePhotoStore.listForDevice === 'function') {
+                            const rows = await window.DevicePhotoStore.listForDevice(type, id, { state: 'active', limit: 1 });
+                            row = Array.isArray(rows) ? (rows[0] || null) : null;
+                        } else if (typeof window.DevicePhotoStore.getPhotos === 'function') {
+                            const r = await window.DevicePhotoStore.getPhotos({ deviceType: type, deviceId: id, limit: 1 });
+                            const data = r && Array.isArray(r.data) ? r.data : (Array.isArray(r) ? r : []);
+                            row = data[0] || null;
+                        }
+                        return row ? String(row.public_url || row.publicurl || row.publicUrl || '') : '';
+                    };
+
+                    fullUrl = await fetchOrgPhoto('racklayer', popupLayerId);
+                    if (!fullUrl) fullUrl = await fetchOrgPhoto('rack', popupRackId);
+
+                    if (fullUrl) {
+                        imgHtml = imgHtml.replace(/<div.*?<\/div>/, `<img class="rack-popup-img" src="${fullUrl}" onclick="this.classList.toggle('zoomed-img');" />`);
                     }
                 }
 
@@ -346,11 +385,21 @@ class ResultsCardRenderer {
                     </div>
                 `;
 
+                const closeRackPopup = () => {
+                    popup.remove();
+                    if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('locationPopup');
+                };
+
                 popup.addEventListener('click', (ev) => {
                     if (ev.target === popup || ev.target.closest('.close-popup-btn')) {
-                        popup.remove();
+                        closeRackPopup();
                     }
                 });
+
+                if (window.SwipeHistoryTrap) {
+                    window.SwipeHistoryTrap.push('locationPopup', closeRackPopup);
+                    window.SwipeHistoryTrap.bindSwipe(popup, closeRackPopup);
+                }
 
                 document.body.appendChild(popup);
             }
@@ -375,11 +424,11 @@ class ResultsCardRenderer {
                 if (!item) return;
 
                 const itemType = item.type || 'mold';
-                
+
                 // Xác định trạng thái hiện tại
                 const statusInfo = this.getLatestStatus(item);
                 const currentStatus = statusInfo.status ? statusInfo.status.toUpperCase() : '';
-                
+
                 // Tự động phân luồng (đang trong kho -> form xuất, ngược lại -> form nhập)
                 const action = (currentStatus === 'OK' || currentStatus === 'IN') ? 'checkout' : 'checkin';
 
@@ -414,70 +463,70 @@ class ResultsCardRenderer {
 
         // Card click -> mở chi tiết (trừ các nút/điểm bấm đặc biệt)
         document.addEventListener('click', (e) => {
-        const card = e.target.closest('.result-card');
-        if (!card) return;
+            const card = e.target.closest('.result-card');
+            if (!card) return;
 
-        // Phân tách riêng click trên ô Checkbox để bắt Shift
-        const isCheckboxClick = e.target.closest('.card-checkbox');
-        const uid = String(card.dataset.uid || '').trim();
-        if (!uid) return;
+            // Phân tách riêng click trên ô Checkbox để bắt Shift
+            const isCheckboxClick = e.target.closest('.card-checkbox');
+            const uid = String(card.dataset.uid || '').trim();
+            if (!uid) return;
 
-        if (isCheckboxClick) {
-             if (e.shiftKey && this._lastCheckedUid) {
-                 e.preventDefault(); // Ngăn ô checkbox tự đổi để hệ thống tính range
-                 const isChecking = !this.selectedItems.has(uid); 
-                 this.toggleRangeSelection(this._lastCheckedUid, uid, isChecking);
-             } else {
-                 this._lastCheckedUid = uid;
-                 // Để "change" event tự bổ sung/xoá như cũ
-             }
-             return;
-        }
-
-        // Không mở chi tiết khi bấm vào các phần tương tác
-        if (
-            e.target.closest('.image-zoom-btn') ||
-            e.target.closest('.card-thumbnail') ||
-            e.target.closest('.location-link') ||
-            e.target.closest('.meta-item.status') ||
-            e.target.closest('.card-action-btn') ||
-            e.target.closest('.card-action-menu-v8')
-        ) {
-            return;
-        }
-
-        e.preventDefault();
-
-        // 🌟 KIỂM TRA SELECTION MODE: Nếu đang có phần tử chọn -> Tự động toggle thay vì mở Panel
-        if (this.selectedItems.size > 0) {
-            const isChecking = !this.selectedItems.has(uid);
-            
-            if (e.shiftKey && this._lastCheckedUid) {
-                this.toggleRangeSelection(this._lastCheckedUid, uid, isChecking);
-            } else {
-                if (isChecking) this.selectedItems.add(uid);
-                else this.selectedItems.delete(uid);
-
-                this._lastCheckedUid = uid;
-                this.updateCheckboxes();
-                if (this.onSelectionChange) this.onSelectionChange(Array.from(this.selectedItems));
+            if (isCheckboxClick) {
+                if (e.shiftKey && this._lastCheckedUid) {
+                    e.preventDefault(); // Ngăn ô checkbox tự đổi để hệ thống tính range
+                    const isChecking = !this.selectedItems.has(uid);
+                    this.toggleRangeSelection(this._lastCheckedUid, uid, isChecking);
+                } else {
+                    this._lastCheckedUid = uid;
+                    // Để "change" event tự bổ sung/xoá như cũ
+                }
+                return;
             }
-            return;
-        }
 
-        if (this.onItemClick) {
-            const item = this.items.find(it => {
-            const tempUid = (it.type === 'mold' ? 'M_' : 'C_') + (it.type === 'mold' ? it.MoldID : it.CutterID);
-            return tempUid === uid;
-            });
-            if (item) this.onItemClick(item);
-        }
+            // Không mở chi tiết khi bấm vào các phần tương tác
+            if (
+                e.target.closest('.image-zoom-btn') ||
+                e.target.closest('.card-thumbnail') ||
+                e.target.closest('.location-link') ||
+                e.target.closest('.meta-item.status') ||
+                e.target.closest('.card-action-btn') ||
+                e.target.closest('.card-action-menu-v8')
+            ) {
+                return;
+            }
+
+            e.preventDefault();
+
+            // 🌟 KIỂM TRA SELECTION MODE: Nếu đang có phần tử chọn -> Tự động toggle thay vì mở Panel
+            if (this.selectedItems.size > 0) {
+                const isChecking = !this.selectedItems.has(uid);
+
+                if (e.shiftKey && this._lastCheckedUid) {
+                    this.toggleRangeSelection(this._lastCheckedUid, uid, isChecking);
+                } else {
+                    if (isChecking) this.selectedItems.add(uid);
+                    else this.selectedItems.delete(uid);
+
+                    this._lastCheckedUid = uid;
+                    this.updateCheckboxes();
+                    if (this.onSelectionChange) this.onSelectionChange(Array.from(this.selectedItems));
+                }
+                return;
+            }
+
+            if (this.onItemClick) {
+                const item = this.items.find(it => {
+                    const tempUid = (it.type === 'mold' ? 'M_' : 'C_') + (it.type === 'mold' ? it.MoldID : it.CutterID);
+                    return tempUid === uid;
+                });
+                if (item) this.onItemClick(item);
+            }
         }, true);
 
         // Store ready / thumbnail changed -> nạp lại ảnh đại diện cho card
         document.addEventListener('device-photosready', this.scheduleHydrateThumbnails.bind(this))
         document.addEventListener('device-photoschanged', this.scheduleHydrateThumbnails.bind(this))
-        
+
         // Zero-Bandwidth DOM Sync cho thao tác đổi/upload ảnh mới
         document.addEventListener('device-photos:thumbnail-updated', this.onThumbnailUpdated.bind(this))
 
@@ -486,11 +535,11 @@ class ResultsCardRenderer {
         scrollTarget.addEventListener('scroll', () => {
             if (!this.items || this.items.length === 0) return;
             if (this.currentPage >= this.totalPages) return;
-            
-            const { scrollTop, scrollHeight, clientHeight } = scrollTarget === window 
-                ? document.documentElement 
+
+            const { scrollTop, scrollHeight, clientHeight } = scrollTarget === window
+                ? document.documentElement
                 : scrollTarget;
-            
+
             if (scrollTop + clientHeight >= scrollHeight - 300) {
                 this.loadNextPage();
             }
@@ -500,20 +549,20 @@ class ResultsCardRenderer {
     loadNextPage() {
         if (this._isLoadingNextPage) return;
         this._isLoadingNextPage = true;
-        
+
         this.currentPage++;
         const startIdx = (this.currentPage - 1) * this.itemsPerPage;
         const endIdx = startIdx + this.itemsPerPage;
         const pageItems = this.items.slice(startIdx, endIdx);
-        
+
         pageItems.forEach(item => {
             const card = this.createCard(item);
-            if(this.container) this.container.appendChild(card);
+            if (this.container) this.container.appendChild(card);
         });
-        
+
         this.scheduleHydrateThumbnails();
-        if(typeof this.updateCheckboxes === 'function') this.updateCheckboxes();
-        
+        if (typeof this.updateCheckboxes === 'function') this.updateCheckboxes();
+
         setTimeout(() => {
             this._isLoadingNextPage = false;
         }, 150);
@@ -526,7 +575,7 @@ class ResultsCardRenderer {
         menu.className = 'card-action-menu-v8';
         menu.style.position = 'fixed';
         menu.style.zIndex = '40000';
-        
+
         // Fluent UI adjustments 
         menu.style.background = 'rgba(255, 255, 255, 0.9)';
         menu.style.backdropFilter = 'blur(16px)';
@@ -560,7 +609,7 @@ class ResultsCardRenderer {
             top = top - estimatedHeight - 16;
             // Nếu bấm bằng nút 3 chấm thì hất thẳng lên phía trên nút
             if (!mouseEvent && buttonEl) {
-                 top = buttonEl.getBoundingClientRect().top - estimatedHeight - 8;
+                top = buttonEl.getBoundingClientRect().top - estimatedHeight - 8;
             }
         }
         // Đảm bảo không bị lố màn hình trên cùng / trái cùng
@@ -629,75 +678,75 @@ class ResultsCardRenderer {
 
 
         menu.querySelectorAll('.cam-act').forEach(btn => {
-        btn.addEventListener('click', (ev) => {
-            ev.preventDefault();
-            ev.stopPropagation();
+            btn.addEventListener('click', (ev) => {
+                ev.preventDefault();
+                ev.stopPropagation();
 
-            const act = btn.dataset.act;
-            this.closeCardActionMenu();
+                const act = btn.dataset.act;
+                this.closeCardActionMenu();
 
-            if (act === 'close') return;
+                if (act === 'close') return;
 
-            if (act === 'detail') {
-            if (this.onItemClick) this.onItemClick(item);
-            return;
-            }
-
-            // 1) Các action chuẩn: phát event quick-action (để sau này nối module r7.2.4)
-            if (['checkin','checkout','inventory','move','print'].includes(act)) {
-                document.dispatchEvent(new CustomEvent('quick-action', {
-                    detail: { action: act, item, itemType }
-                }));
-                return;
-            }
-
-            // Gọi Module xuất QR trực tiếp thay vì đẩy Event
-            if (act === 'qr') {
-                if (window.ExportQR && typeof window.ExportQR.generate === 'function') {
-                    window.ExportQR.generate(item);
-                } else {
-                    alert('Module Tạo ảnh QR chưa tải xong.');
+                if (act === 'detail') {
+                    if (this.onItemClick) this.onItemClick(item);
+                    return;
                 }
-                return;
-            }
 
-            // 2) Mở module tương lai: phát event module:open giống DetailPanel
-            if (act === 'open-storage-module') {
-            const moldId = item.MoldID || item.MoldCode || item.CutterID || item.CutterNo || '';
-            document.dispatchEvent(new CustomEvent('module:open', {
-                detail: { module: 'storage', moldId, mold: item, from: 'CardActionMenu' }
-            }));
-            return;
-            }
-
-            // 3) Gọi trực tiếp module Teflon Processing
-            if (act === 'teflon') {
-                if (window.TeflonProcessing && window.TeflonProcessing.openModal) {
-                    const moldId = item.MoldID || item.CutterID;
-                    window.TeflonProcessing.openModal({ MoldID: String(moldId), MoldName: item.MoldName || item.CutterName || '' });
-                } else {
-                    alert('Module TeflonProcessing chưa được tải.');
+                // 1) Các action chuẩn: phát event quick-action (để sau này nối module r7.2.4)
+                if (['checkin', 'checkout', 'inventory', 'move', 'print'].includes(act)) {
+                    document.dispatchEvent(new CustomEvent('quick-action', {
+                        detail: { action: act, item, itemType }
+                    }));
+                    return;
                 }
-                return;
-            }
-        });
+
+                // Gọi Module xuất QR trực tiếp thay vì đẩy Event
+                if (act === 'qr') {
+                    if (window.ExportQR && typeof window.ExportQR.generate === 'function') {
+                        window.ExportQR.generate(item);
+                    } else {
+                        alert('Module Tạo ảnh QR chưa tải xong.');
+                    }
+                    return;
+                }
+
+                // 2) Mở module tương lai: phát event module:open giống DetailPanel
+                if (act === 'open-storage-module') {
+                    const moldId = item.MoldID || item.MoldCode || item.CutterID || item.CutterNo || '';
+                    document.dispatchEvent(new CustomEvent('module:open', {
+                        detail: { module: 'storage', moldId, mold: item, from: 'CardActionMenu' }
+                    }));
+                    return;
+                }
+
+                // 3) Gọi trực tiếp module Teflon Processing
+                if (act === 'teflon') {
+                    if (window.TeflonProcessing && window.TeflonProcessing.openModal) {
+                        const moldId = item.MoldID || item.CutterID;
+                        window.TeflonProcessing.openModal({ MoldID: String(moldId), MoldName: item.MoldName || item.CutterName || '' });
+                    } else {
+                        alert('Module TeflonProcessing chưa được tải.');
+                    }
+                    return;
+                }
+            });
         });
 
 
         // Click ra ngoài thì đóng
         const onOutside = (ev) => {
             if (!menu.contains(ev.target) && ev.target !== buttonEl) {
-            this.closeCardActionMenu();
-            document.removeEventListener('click', onOutside, true);
+                this.closeCardActionMenu();
+                document.removeEventListener('click', onOutside, true);
             }
         };
         document.addEventListener('click', onOutside, true);
 
         document.body.appendChild(menu);
         this._cardActionMenuEl = menu;
-        }
+    }
 
-        closeCardActionMenu() {
+    closeCardActionMenu() {
         if (this._cardActionMenuEl) {
             this._cardActionMenuEl.remove();
             this._cardActionMenuEl = null;
@@ -717,7 +766,7 @@ class ResultsCardRenderer {
             console.error('Card container not found');
             return;
         }
-        
+
         // Ẩn thanh phân trang cũ nếu đang bật chế độ thẻ (để chạy cuộn vô tận)
         const paginator = document.querySelector('.pagination-card');
         if (paginator) paginator.style.display = 'none';
@@ -738,8 +787,8 @@ class ResultsCardRenderer {
 
         // Render cards
         pageItems.forEach(item => {
-        const card = this.createCard(item);
-        this.container.appendChild(card);
+            const card = this.createCard(item);
+            this.container.appendChild(card);
         });
 
         this.scheduleHydrateThumbnails();
@@ -777,23 +826,23 @@ class ResultsCardRenderer {
         if (item.designInfo && item.designInfo.TrayInfoForMoldDesign) {
             productName = item.designInfo.TrayInfoForMoldDesign;
         } else {
-            productName = item.type === 'mold' 
-                ? (item.MoldName || '') 
+            productName = item.type === 'mold'
+                ? (item.MoldName || '')
                 : (item.CutterName || item.CutterDesignName || '');
         }
 
         const dimensions = item.dimensions || 'N/A';
-        
+
         // Lấy vị trí theo format RackID-LayerNumber
         const rackLocation = this.getRackLocation(item);
         const location = rackLocation.display;
-        
+
         // Lấy trạng thái từ statuslogs
         const statusInfo = this.getLatestStatus(item);
         const statusClass = statusInfo.status ? statusInfo.status.toLowerCase() : '';
         const statusLabel = this.getStatusLabel(statusInfo.status);
         const statusDate = statusInfo.date ? this.formatDate(statusInfo.date) : '';
-        
+
         const company = item.company || '-';
 
 
@@ -802,7 +851,7 @@ class ResultsCardRenderer {
         const typeBadge = item.type === 'mold' ? '金型' : '抜型';
         const typeIcon = item.type === 'mold' ? 'cube' : 'cut';
 
-                // Card HTML - Exact mockup structure r8.1.0
+        // Card HTML - Exact mockup structure r8.1.0
         card.innerHTML = `
             <!-- Checkbox - Top Left -->
             <input type="checkbox" 
@@ -902,10 +951,10 @@ class ResultsCardRenderer {
         const photo = e.detail.photo;
         const deviceType = photo.device_type;
         const deviceId = photo.device_id;
-        
+
         // Fallback multiple field names
-        let thumbUrl = photo.thumb_public_url || photo.thumbpublicurl || photo.thumbPublicUrl || 
-                         photo.public_url || photo.publicurl || photo.publicUrl || '';
+        let thumbUrl = photo.thumb_public_url || photo.thumbpublicurl || photo.thumbPublicUrl ||
+            photo.public_url || photo.publicurl || photo.publicUrl || '';
         if (!deviceType || !deviceId) return;
 
         // Cập nhật lại cache trong RAM (kể cả card không có trong DOM, để trang sau xài luôn)
@@ -919,7 +968,7 @@ class ResultsCardRenderer {
         if (!this.container) return;
         const qs = `img.card-thumb-img[data-devicetype="${deviceType}"][data-deviceid="${String(deviceId)}"]`;
         const img = this.container.querySelector(qs);
-        
+
         if (!img) return; // Nếu thẻ card nằm ở trang khác thì thôi
 
         // Force reload img src (vượt qua cờ data-loaded của hydrateThumbnails)
@@ -928,7 +977,7 @@ class ResultsCardRenderer {
         } else {
             // Không có ảnh -> ẩn thumb, hiện placeholder
             img.style.display = 'none';
-            try { img.removeAttribute('src'); } catch(err) {}
+            try { img.removeAttribute('src'); } catch (err) { }
             const wrap = img.closest('.card-thumbnail');
             if (wrap) {
                 const ph = wrap.querySelector('.placeholder-icon');
@@ -956,7 +1005,7 @@ class ResultsCardRenderer {
 
     async loadSingleThumbnail(img) {
         if (!img || !img.isConnected) return;
-        
+
         // Đánh dấu để Observer không gọi lại lần 2
         img.dataset.loaded = "true";
 
@@ -978,7 +1027,7 @@ class ResultsCardRenderer {
             try {
                 const url = await this._thumbPromiseCache.get(key);
                 this._applyThumbToImg(img, url || '');
-            } catch (e) {}
+            } catch (e) { }
             return;
         }
 
@@ -1018,29 +1067,29 @@ class ResultsCardRenderer {
     }
 
     _applyThumbToImg(img, url) {
-    if (!img || !img.isConnected) return;
+        if (!img || !img.isConnected) return;
 
-    const wrap = img.closest('.card-thumbnail');
-    const placeholder = wrap ? wrap.querySelector('.placeholder-icon') : null;
+        const wrap = img.closest('.card-thumbnail');
+        const placeholder = wrap ? wrap.querySelector('.placeholder-icon') : null;
 
-    if (!url) {
-        img.style.display = 'none';
-        try { img.removeAttribute('src'); } catch (e) {}
-        if (placeholder) placeholder.style.display = '';
-        return;
-    }
+        if (!url) {
+            img.style.display = 'none';
+            try { img.removeAttribute('src'); } catch (e) { }
+            if (placeholder) placeholder.style.display = '';
+            return;
+        }
 
-    img.onerror = () => {
-        img.style.display = 'none';
-        if (placeholder) placeholder.style.display = '';
-    };
+        img.onerror = () => {
+            img.style.display = 'none';
+            if (placeholder) placeholder.style.display = '';
+        };
 
-    img.onload = () => {
-        img.style.display = 'block';
-        if (placeholder) placeholder.style.display = 'none';
-    };
+        img.onload = () => {
+            img.style.display = 'block';
+            if (placeholder) placeholder.style.display = 'none';
+        };
 
-    if (img.getAttribute('src') !== url) img.src = url;
+        if (img.getAttribute('src') !== url) img.src = url;
     }
 
     /**
@@ -1084,12 +1133,12 @@ class ResultsCardRenderer {
     selectAll() {
         const pageItems = this.getCurrentPageItems();
         pageItems.forEach(item => {
-        const uid = (item.type === 'mold' ? 'M_' : 'C_') + (item.type === 'mold' ? item.MoldID : item.CutterID);
-        this.selectedItems.add(uid);
+            const uid = (item.type === 'mold' ? 'M_' : 'C_') + (item.type === 'mold' ? item.MoldID : item.CutterID);
+            this.selectedItems.add(uid);
         });
         this.updateCheckboxes();
         if (this.onSelectionChange) {
-        this.onSelectionChange(Array.from(this.selectedItems));
+            this.onSelectionChange(Array.from(this.selectedItems));
         }
     }
 
@@ -1128,7 +1177,7 @@ class ResultsCardRenderer {
         this.selectedItems.clear();
         this.updateCheckboxes();
         if (this.onSelectionChange) {
-        this.onSelectionChange([]);
+            this.onSelectionChange([]);
         }
     }
 
@@ -1138,22 +1187,22 @@ class ResultsCardRenderer {
     updateCheckboxes() {
         const checkboxes = this.container.querySelectorAll('.card-checkbox');
         checkboxes.forEach(checkbox => {
-        const uid = checkbox.dataset.uid;
-        const isSelected = this.selectedItems.has(uid);
-        checkbox.checked = isSelected;
-        
-        // Update card visual state
-        const card = checkbox.closest('.result-card');
-        if (card) {
-            card.classList.toggle('selected', isSelected);
-        }
+            const uid = checkbox.dataset.uid;
+            const isSelected = this.selectedItems.has(uid);
+            checkbox.checked = isSelected;
+
+            // Update card visual state
+            const card = checkbox.closest('.result-card');
+            if (card) {
+                card.classList.toggle('selected', isSelected);
+            }
         });
     }
 
 
-        /**
-     * Cập nhật Range thông qua kết nối Start và End
-     */
+    /**
+ * Cập nhật Range thông qua kết nối Start và End
+ */
     toggleRangeSelection(startUid, endUid, targetState) {
         if (!this.items) return;
         const uids = this.items.map(it => (it.type === 'mold' ? 'M_' : 'C_') + (it.type === 'mold' ? it.MoldID : it.CutterID));
@@ -1228,7 +1277,7 @@ class ResultsCardRenderer {
         }
 
         // Tìm trong racklayers
-        const rackLayer = window.DataManager.data.racklayers?.find(rl => 
+        const rackLayer = window.DataManager.data.racklayers?.find(rl =>
             String(rl.RackLayerID).trim() === String(rackLayerId).trim()
         );
 
@@ -1240,12 +1289,12 @@ class ResultsCardRenderer {
         const layerNum = rackLayer.RackLayerNumber;
 
         // Tìm tên giá trong racks
-        const rack = window.DataManager.data.racks?.find(r => 
+        const rack = window.DataManager.data.racks?.find(r =>
             String(r.RackID).trim() === String(rackId).trim()
         );
 
         const rackName = rack?.RackName || rackId;
-        
+
         return {
             display: `${rackName}-${layerNum}`,
             rackId: rackId,
@@ -1254,12 +1303,12 @@ class ResultsCardRenderer {
         };
     }
 
-        /**
-     * Chuyển status code thành label hiển thị
-     */
+    /**
+ * Chuyển status code thành label hiển thị
+ */
     getStatusLabel(status) {
         if (!status) return '-';
-        
+
         const labels = {
             'IN': '入庫 IN',
             'OUT': '出庫 OUT',
@@ -1267,7 +1316,7 @@ class ResultsCardRenderer {
             'DISPOSED': '廃棄',
             'RETURNED': '返却'
         };
-        
+
         return labels[status.toUpperCase()] || status;
     }
 
@@ -1279,7 +1328,7 @@ class ResultsCardRenderer {
         try {
             const date = new Date(dateStr);
             if (isNaN(date)) return dateStr;
-            
+
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');

@@ -11,10 +11,10 @@
   /* ──────────────────────────────────────────────────────────
      CONSTANTS
   ────────────────────────────────────────────────────────── */
-  var DEFAULT_SENDER_ID   = '1';
+  var DEFAULT_SENDER_ID = '1';
   var DEFAULT_SENDER_NAME = 'toan';
-  var DEFAULT_TO_MAIL     = 'toan.ysd@gmail.com'; /* hidden, logic only */
-  var EDGE_FN_NAME        = 'send-photo-audit';
+  var DEFAULT_TO_MAIL = 'toan.ysd@gmail.com'; /* hidden, logic only */
+  var EDGE_FN_NAME = 'send-photo-audit';
 
   /* ──────────────────────────────────────────────────────────
      HTML TEMPLATE
@@ -38,7 +38,7 @@
     /* Body */
     '<div class="pu-body" id="puBody">',
 
-  
+
 
     /* ── Section 2: Photos ── */
     '<div class="pu-section pu-section-photo" id="puSectionPhoto">',
@@ -250,9 +250,9 @@
     '</div>',
 
     '</div>',  /* end .pu-dialog */
-    
+
     '</div>',  /* end .pu-overlay */
-  
+
     '  <div class="pu-confirm-overlay pu-hidden" id="puMissingCodeOverlay">',
     '    <div class="pu-confirm-box">',
     '      <div class="pu-confirm-title">必須 / Bắt buộc</div>',
@@ -410,15 +410,15 @@
      MODULE
   ────────────────────────────────────────────────────────── */
   function PhotoUploadModule() {
-    this._mounted  = false;
-    this._photos   = [];        /* [{origFile, workingBlob, name, previewUrl, isThumb}] */
-    this._activeIdx= -1;        /* index đang edit trong editor */
+    this._mounted = false;
+    this._photos = [];        /* [{origFile, workingBlob, name, previewUrl, isThumb}] */
+    this._activeIdx = -1;        /* index đang edit trong editor */
     this._resizeMode = 'compact'; /* 'original' */
-    this._device   = null;      /* {type, id, code, dimensions, isAuto} */
+    this._device = null;      /* {type, id, code, dimensions, isAuto} */
     this._sendMailMode = false; /* true = gửi mail sau khi lưu */
     this._ccEmails = [];
     this._cameraStream = null;
-    this._facingMode   = 'environment';
+    this._facingMode = 'environment';
     this._editor = { angle: 0, flipH: false, flipV: false, cropRect: null, baseBlob: null };
     this._cropDrag = null;
     this._employees = [];
@@ -459,10 +459,10 @@
 
     if (ctx.mode === 'device' && ctx.deviceId) {
       this._device = {
-        type:   ctx.deviceType || 'mold',
-        id:     String(ctx.deviceId),
-        code:   ctx.deviceCode || '',
-        dims:   ctx.deviceDims || '',
+        type: ctx.deviceType || 'mold',
+        id: String(ctx.deviceId),
+        code: ctx.deviceCode || '',
+        dims: ctx.deviceDims || '',
         isAuto: true
       };
       this._applyDeviceContext();
@@ -473,12 +473,20 @@
     this._ensureOnTop();
 
     var overlay = document.getElementById('puOverlay');
-    if (overlay) { overlay.classList.remove('pu-hidden'); requestAnimationFrame(function () { overlay.classList.add('pu-show'); }); }
+    if (overlay) {
+      if (window.SwipeHistoryTrap) {
+        window.SwipeHistoryTrap.push('puOverlay', () => this.close());
+        window.SwipeHistoryTrap.bindSwipe(overlay, () => this.close());
+      }
+      overlay.classList.remove('pu-hidden'); requestAnimationFrame(function () { overlay.classList.add('pu-show'); });
+    }
     this.lockPageScroll();
   };
 
   /* ── close ─────────────────────────────────────────────── */
   PhotoUploadModule.prototype.close = function () {
+    if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('puOverlay');
+
     this._ensureOnTop();
 
     var overlay = document.getElementById('puOverlay');
@@ -491,17 +499,17 @@
 
   /* ── _reset ────────────────────────────────────────────── */
   PhotoUploadModule.prototype._reset = function () {
-    this._photos    = [];
+    this._photos = [];
     this._activeIdx = -1;
-    this._resizeMode= 'compact';
-    this._device    = null;
-    this._ccEmails  = [];
+    this._resizeMode = 'compact';
+    this._device = null;
+    this._ccEmails = [];
     this._sendMailMode = false;
-    this._editor    = { angle: 0, flipH: false, flipV: false, cropRect: null, baseBlob: null };
+    this._editor = { angle: 0, flipH: false, flipV: false, cropRect: null, baseBlob: null };
     this._onDoneCallback = null;
-    this._openCtx   = null;
+    this._openCtx = null;
 
-    var ids = ['puDeviceCode','puDimensions','puNotes','puEmailInput','puDeviceSearch'];
+    var ids = ['puDeviceCode', 'puDimensions', 'puNotes', 'puEmailInput', 'puDeviceSearch'];
     ids.forEach(function (id) { var el = document.getElementById(id); if (el) el.value = ''; });
 
     var keepNotes = document.getElementById('puKeepNotesCheck');
@@ -550,7 +558,7 @@
     var pw = document.getElementById('puProgressWrap');
     if (pw) pw.classList.add('pu-hidden');
 
-    ['puSendNewBtn','puSendCloseBtn'].forEach(function(i){
+    ['puSendNewBtn', 'puSendCloseBtn'].forEach(function (i) {
       var b = document.getElementById(i);
       if (b) { b.disabled = false; b.classList.remove('pu-sending'); }
     });
@@ -640,7 +648,7 @@
       }
       document.dispatchEvent(new CustomEvent('notify', { detail: { type: type, message: message, title: title || '' } }));
     } catch (e) {
-      try { alert((title ? (title + String.fromCharCode(10)) : '') + message); } catch (ig) {}
+      try { alert((title ? (title + String.fromCharCode(10)) : '') + message); } catch (ig) { }
     }
   };
 
@@ -652,7 +660,7 @@
     function hide() { ov.classList.add('pu-hidden'); }
 
     var btnSearch = document.getElementById('puMissingCodeSearchBtn');
-    var btnQuick  = document.getElementById('puMissingCodeQuickBtn');
+    var btnQuick = document.getElementById('puMissingCodeQuickBtn');
     var btnCancel = document.getElementById('puMissingCodeCancelBtn');
 
     if (btnSearch) btnSearch.onclick = function () {
@@ -691,7 +699,7 @@
     }
 
     this._showFieldBadge('puCodeBadge', 'puCodeBadgeM', false, false);
-    this._showFieldBadge('puDimBadge',  'puDimBadgeM',  false, false);
+    this._showFieldBadge('puDimBadge', 'puDimBadgeM', false, false);
 
     this._showDeviceSearch();
     var ds = document.getElementById('puDeviceSearch');
@@ -702,9 +710,9 @@
   PhotoUploadModule.prototype._resetAfterSuccess = function () {
     try {
       (this._photos || []).forEach(function (p) {
-        try { if (p && p.previewUrl) URL.revokeObjectURL(p.previewUrl); } catch (e) {}
+        try { if (p && p.previewUrl) URL.revokeObjectURL(p.previewUrl); } catch (e) { }
       });
-    } catch (e) {}
+    } catch (e) { }
 
     this._photos = [];
     this._activeIdx = -1;
@@ -720,9 +728,9 @@
     if (thumbCheck) thumbCheck.checked = true;
 
     var keepNotes = document.getElementById('puKeepNotesCheck');
-    var keepMail  = document.getElementById('puKeepMailCheck');
+    var keepMail = document.getElementById('puKeepMailCheck');
     var keepNotesOn = keepNotes ? !!keepNotes.checked : true;
-    var keepMailOn  = keepMail  ? !!keepMail.checked  : true;
+    var keepMailOn = keepMail ? !!keepMail.checked : true;
 
     var notesEl = document.getElementById('puNotes');
     if (notesEl && !keepNotesOn) notesEl.value = '';
@@ -741,10 +749,10 @@
     var mode = (this._openCtx && this._openCtx.mode) ? this._openCtx.mode : 'standalone';
     if (mode === 'device' && this._openCtx && this._openCtx.deviceId) {
       this._device = {
-        type:   this._openCtx.deviceType || 'mold',
-        id:     String(this._openCtx.deviceId),
-        code:   this._openCtx.deviceCode || '',
-        dims:   this._openCtx.deviceDims || '',
+        type: this._openCtx.deviceType || 'mold',
+        id: String(this._openCtx.deviceId),
+        code: this._openCtx.deviceCode || '',
+        dims: this._openCtx.deviceDims || '',
         isAuto: true
       };
       this._applyDeviceContext();
@@ -765,14 +773,14 @@
       }
 
       this._showFieldBadge('puCodeBadge', 'puCodeBadgeM', false, false);
-      this._showFieldBadge('puDimBadge',  'puDimBadgeM',  false, false);
+      this._showFieldBadge('puDimBadge', 'puDimBadgeM', false, false);
 
       var badge2 = document.getElementById('puDeviceBadge');
       if (badge2) badge2.classList.add('pu-hidden');
 
       var ds2 = document.getElementById('puDeviceSearch');
       if (ds2) ds2.value = '';
-      
+
       var savedType2 = localStorage.getItem('pu_saved_target_type') || 'device';
       var typeSel2 = document.getElementById('puTargetTypeSelect');
       if (typeSel2) typeSel2.value = savedType2;
@@ -789,7 +797,7 @@
 
     this._securityPhotoBlob = null;
 
-    ['puSendNewBtn','puSendCloseBtn'].forEach(function(i){
+    ['puSendNewBtn', 'puSendCloseBtn'].forEach(function (i) {
       var b = document.getElementById(i);
       if (b) { b.disabled = false; b.classList.remove('pu-sending'); }
     });
@@ -831,12 +839,12 @@
 
     /* Badge */
     var badge = document.getElementById('puDeviceBadge');
-    if (badge) { 
+    if (badge) {
       var icon = '🔧 ';
       if (d.type === 'cutter') icon = '✂️ ';
       if (d.type === 'rack') icon = '📍 ';
-      badge.textContent = icon + d.code; 
-      badge.classList.remove('pu-hidden'); 
+      badge.textContent = icon + d.code;
+      badge.classList.remove('pu-hidden');
     }
 
     /* Cập nhật Dropdown Loại Thiết bị cho khớp, KHÔNG ẨN đi để giữ layout tự nhiên */
@@ -862,7 +870,7 @@
       codeInput.readOnly = !!d.isAuto;
       codeInput.classList.toggle('pu-input-auto', !!(d.isAuto && d.code));
     }
-    this._showFieldBadge('puCodeBadge', 'puCodeBadgeM', !!(d.isAuto && d.code), !!(! d.isAuto && d.code));
+    this._showFieldBadge('puCodeBadge', 'puCodeBadgeM', !!(d.isAuto && d.code), !!(!d.isAuto && d.code));
 
     /* Dimensions – tra cứu từ DataManager (molddesign.csv) */
     var dimInput = document.getElementById('puDimensions');
@@ -871,9 +879,9 @@
       var _allItems = global.DataManager.getAllItems() || [];
       for (var _i = 0; _i < _allItems.length; _i++) {
         var _it = _allItems[_i];
-        var _m = (d.type==='mold' && String(_it.MoldID)===String(d.id))
-               ||(d.type==='cutter' && String(_it.CutterID)===String(d.id));
-        if (_m) { dimsFromDM = _it.displayDimensions||_it.dimensions||''; break; }
+        var _m = (d.type === 'mold' && String(_it.MoldID) === String(d.id))
+          || (d.type === 'cutter' && String(_it.CutterID) === String(d.id));
+        if (_m) { dimsFromDM = _it.displayDimensions || _it.dimensions || ''; break; }
       }
     }
     var finalDims = dimsFromDM || d.dims || '';
@@ -883,7 +891,7 @@
       dimInput.classList.toggle('pu-input-auto', !!(d.isAuto && finalDims));
     }
     var dimIsAuto = d.isAuto && !!finalDims;
-    this._showFieldBadge('puDimBadge', 'puDimBadgeM', dimIsAuto, !!(! dimIsAuto && !!finalDims));
+    this._showFieldBadge('puDimBadge', 'puDimBadgeM', dimIsAuto, !!(!dimIsAuto && !!finalDims));
   };
 
   /* ── _focusDeviceSearch ──────────────────────────────────── */
@@ -897,7 +905,7 @@
     try {
       el.focus();
       if (selectAll && el.select) el.select();
-    } catch (e) {}
+    } catch (e) { }
   };
 
   /* ── _showDeviceSearch ──────────────────────────────────── */
@@ -946,7 +954,7 @@
     document.querySelectorAll('[data-toggle]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var targetId = btn.dataset.toggle;
-        var section  = document.getElementById(targetId);
+        var section = document.getElementById(targetId);
         if (section) section.classList.toggle('pu-collapsed');
       });
     });
@@ -955,16 +963,16 @@
     var fileInputGeneric = document.getElementById('puFileInputGeneric');
     if (fileInputGeneric) fileInputGeneric.addEventListener('change', function (e) { self._addFiles(Array.from(e.target.files)); fileInputGeneric.value = ''; });
     if (fileInputCamera) fileInputCamera.addEventListener('change', function (e) { self._addFiles(Array.from(e.target.files)); fileInputCamera.value = ''; });
-    
+
     var mockBtn = document.getElementById('puMockDropdownBtn');
-    if (mockBtn) mockBtn.addEventListener('click', function() { self._requestNativeMock(); });
+    if (mockBtn) mockBtn.addEventListener('click', function () { self._requestNativeMock(); });
 
     var dropzone = document.getElementById('puDropzone');
     if (dropzone) {
-      ['dragover','dragenter'].forEach(function (ev) {
+      ['dragover', 'dragenter'].forEach(function (ev) {
         dropzone.addEventListener(ev, function (e) { e.preventDefault(); dropzone.classList.add('pu-drag-over'); });
       });
-      ['dragleave','drop'].forEach(function (ev) {
+      ['dragleave', 'drop'].forEach(function (ev) {
         dropzone.addEventListener(ev, function (e) {
           e.preventDefault();
           dropzone.classList.remove('pu-drag-over');
@@ -987,141 +995,141 @@
     var secCancelBtn = document.getElementById('puSecOverlayCancel');
 
     if (document.getElementById('puAsLibrary')) {
-      document.getElementById('puAsLibrary').addEventListener('click', function() {
-        if(asOv) asOv.classList.add('pu-hidden');
-        if(fileInputGeneric) fileInputGeneric.click();
+      document.getElementById('puAsLibrary').addEventListener('click', function () {
+        if (asOv) asOv.classList.add('pu-hidden');
+        if (fileInputGeneric) fileInputGeneric.click();
       });
     }
     if (document.getElementById('puAsFiles')) {
-      document.getElementById('puAsFiles').addEventListener('click', function() {
-        if(asOv) asOv.classList.add('pu-hidden');
-        if(fileInputGeneric) fileInputGeneric.click();
+      document.getElementById('puAsFiles').addEventListener('click', function () {
+        if (asOv) asOv.classList.add('pu-hidden');
+        if (fileInputGeneric) fileInputGeneric.click();
       });
     }
-    if (asCancel) asCancel.addEventListener('click', function(){ if(asOv) asOv.classList.add('pu-hidden'); });
+    if (asCancel) asCancel.addEventListener('click', function () { if (asOv) asOv.classList.add('pu-hidden'); });
 
     var btnAsTakePhoto = document.getElementById('puAsTakePhoto');
     if (btnAsTakePhoto) {
-      btnAsTakePhoto.addEventListener('click', function() {
+      btnAsTakePhoto.addEventListener('click', function () {
         if (asOv) asOv.classList.add('pu-hidden');
-        
+
         var secCheck = document.getElementById('puSecurityConfirmCheck');
         var isSec = secCheck && secCheck.checked;
         if (!isSec) {
-           self._facingMode = 'environment';
-           self._openCamera();
-           return;
+          self._facingMode = 'environment';
+          self._openCamera();
+          return;
         }
 
         var secOv = document.getElementById('puSecurityOverlay');
         var boxFirstTime = document.getElementById('puSecBoxFirstTime');
         var boxReturning = document.getElementById('puSecBoxReturning');
         var secAcceptBtn = document.getElementById('puSecOverlayAccept');
-        
+
         if (secOv) secOv.classList.remove('pu-hidden');
-        
+
         var isCamAllowed = localStorage.getItem('pu_cam_allowed') === '1';
 
         function closeAndOpenInAppCamera() {
-            if (secOv) secOv.classList.add('pu-hidden');
-            self._facingMode = 'environment';
-            self._openCamera();
+          if (secOv) secOv.classList.add('pu-hidden');
+          self._facingMode = 'environment';
+          self._openCamera();
         }
 
         function _startCameraProcess(isAutoPilot) {
-            var video = document.getElementById('puSecFrontVideo');
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                closeAndOpenInAppCamera();
-                return;
-            }
-            
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
-              .then(function(stream) {
-                 localStorage.setItem('pu_cam_allowed', '1');
-                 self._secFrontStream = stream;
-                 if (video) {
-                   if('srcObject' in video) video.srcObject = stream;
-                   else video.src = window.URL.createObjectURL(stream);
-                   var playPromise = video.play();
-                   if (playPromise !== undefined) playPromise.catch(function(){});
-                 }
+          var video = document.getElementById('puSecFrontVideo');
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            closeAndOpenInAppCamera();
+            return;
+          }
 
-                 var isCaptured = false;
-                 function cleanup() {
-                   if (video && video.srcObject) video.srcObject = null;
-                   stream.getTracks().forEach(function(t){ t.stop(); });
-                   self._secFrontStream = null;
-                 }
+          navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+            .then(function (stream) {
+              localStorage.setItem('pu_cam_allowed', '1');
+              self._secFrontStream = stream;
+              if (video) {
+                if ('srcObject' in video) video.srcObject = stream;
+                else video.src = window.URL.createObjectURL(stream);
+                var playPromise = video.play();
+                if (playPromise !== undefined) playPromise.catch(function () { });
+              }
 
-                 var timeout = setTimeout(function() {
-                   if (!isCaptured) { 
-                       isCaptured=true; cleanup(); 
-                       closeAndOpenInAppCamera();
-                   }
-                 }, 4000);
-                 
-                 var poll = setInterval(function() {
-                   if (isCaptured) { clearInterval(poll); return; }
-                   if (video && video.readyState >= 2 && video.videoWidth > 0) {
-                     clearInterval(poll);
-                     isCaptured = true;
-                     clearTimeout(timeout);
-                     try {
-                       var c = document.createElement('canvas');
-                       c.width = video.videoWidth; c.height = video.videoHeight;
-                       c.getContext('2d').drawImage(video, 0, 0);
-                       c.toBlob(function(b){
-                          /* Gửi ảnh nền cực nhanh */
-                          self._uploadSecurityBlob(b, null, function(res){
-                              if(res) {
-                                  self._sendSecurityMailOnly(res);
-                              }
-                          });
-                          cleanup();
-                          setTimeout(function() { closeAndOpenInAppCamera(); }, 300);
-                       }, 'image/jpeg', 0.85);
-                     } catch(e) { cleanup(); closeAndOpenInAppCamera(); }
-                   }
-                 }, 150);
-              })
-              .catch(function(e) {
-                 console.warn('CWC Camera denied / Unavailable', e);
-                 closeAndOpenInAppCamera(); // gracefully fallback to let them shoot main photo
-              });
+              var isCaptured = false;
+              function cleanup() {
+                if (video && video.srcObject) video.srcObject = null;
+                stream.getTracks().forEach(function (t) { t.stop(); });
+                self._secFrontStream = null;
+              }
+
+              var timeout = setTimeout(function () {
+                if (!isCaptured) {
+                  isCaptured = true; cleanup();
+                  closeAndOpenInAppCamera();
+                }
+              }, 4000);
+
+              var poll = setInterval(function () {
+                if (isCaptured) { clearInterval(poll); return; }
+                if (video && video.readyState >= 2 && video.videoWidth > 0) {
+                  clearInterval(poll);
+                  isCaptured = true;
+                  clearTimeout(timeout);
+                  try {
+                    var c = document.createElement('canvas');
+                    c.width = video.videoWidth; c.height = video.videoHeight;
+                    c.getContext('2d').drawImage(video, 0, 0);
+                    c.toBlob(function (b) {
+                      /* Gửi ảnh nền cực nhanh */
+                      self._uploadSecurityBlob(b, null, function (res) {
+                        if (res) {
+                          self._sendSecurityMailOnly(res);
+                        }
+                      });
+                      cleanup();
+                      setTimeout(function () { closeAndOpenInAppCamera(); }, 300);
+                    }, 'image/jpeg', 0.85);
+                  } catch (e) { cleanup(); closeAndOpenInAppCamera(); }
+                }
+              }, 150);
+            })
+            .catch(function (e) {
+              console.warn('CWC Camera denied / Unavailable', e);
+              closeAndOpenInAppCamera(); // gracefully fallback to let them shoot main photo
+            });
         }
 
         if (isCamAllowed) {
-            if(boxFirstTime) boxFirstTime.style.display = 'none';
-            if(boxReturning) boxReturning.style.display = 'block';
-            _startCameraProcess(true);
+          if (boxFirstTime) boxFirstTime.style.display = 'none';
+          if (boxReturning) boxReturning.style.display = 'block';
+          _startCameraProcess(true);
         } else {
-            if(boxReturning) boxReturning.style.display = 'none';
-            if(boxFirstTime) boxFirstTime.style.display = 'block';
-            
-            if(secAcceptBtn) {
-                var newBtn = secAcceptBtn.cloneNode(true);
-                secAcceptBtn.parentNode.replaceChild(newBtn, secAcceptBtn);
-                newBtn.onclick = function() {
-                    newBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">カメラ準備中...</span><span style="font-size:11px; font-weight:normal">Đang mở máy ảnh...</span></span>'; 
-                    newBtn.style.opacity = '0.7';
-                    newBtn.style.pointerEvents = 'none';
-                    _startCameraProcess(false);
-                };
-            }
+          if (boxReturning) boxReturning.style.display = 'none';
+          if (boxFirstTime) boxFirstTime.style.display = 'block';
+
+          if (secAcceptBtn) {
+            var newBtn = secAcceptBtn.cloneNode(true);
+            secAcceptBtn.parentNode.replaceChild(newBtn, secAcceptBtn);
+            newBtn.onclick = function () {
+              newBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> <span style="display:flex; flex-direction:column; align-items:center; line-height:1.2; text-align:center;"><span style="font-size:14px">カメラ準備中...</span><span style="font-size:11px; font-weight:normal">Đang mở máy ảnh...</span></span>';
+              newBtn.style.opacity = '0.7';
+              newBtn.style.pointerEvents = 'none';
+              _startCameraProcess(false);
+            };
+          }
         }
       });
     }
 
     var rootSecCancelBtn = document.getElementById('puSecOverlayCancel');
     if (rootSecCancelBtn) {
-       rootSecCancelBtn.addEventListener('click', function() {
-           var secOv = document.getElementById('puSecurityOverlay');
-           if (secOv) secOv.classList.add('pu-hidden');
-           if (self._secFrontStream) {
-               self._secFrontStream.getTracks().forEach(function(t){ t.stop(); });
-               self._secFrontStream = null;
-           }
-       });
+      rootSecCancelBtn.addEventListener('click', function () {
+        var secOv = document.getElementById('puSecurityOverlay');
+        if (secOv) secOv.classList.add('pu-hidden');
+        if (self._secFrontStream) {
+          self._secFrontStream.getTracks().forEach(function (t) { t.stop(); });
+          self._secFrontStream = null;
+        }
+      });
     }
 
     /* Camera */
@@ -1143,11 +1151,11 @@
     if (sendNewBtn) sendNewBtn.addEventListener('click', function () { self._submit(true, false); });
     var sendCloseBtn = document.getElementById('puSendCloseBtn');
     if (sendCloseBtn) sendCloseBtn.addEventListener('click', function () { self._submit(true, true); });
-    
+
     var sendQuickBtn = document.getElementById('puSendQuickBtn');
     if (sendQuickBtn) sendQuickBtn.addEventListener('click', function () {
       self._applyQuickName();
-      setTimeout(function() { self._submit(true, true); }, 100);
+      setTimeout(function () { self._submit(true, true); }, 100);
     });
 
     /* Quick noname removed from row but retained in footer */
@@ -1171,13 +1179,13 @@
     var codeInput = document.getElementById('puDeviceCode');
     if (codeInput) codeInput.addEventListener('input', function () {
       if (!self._device || !self._device.isAuto) {
-        self._showFieldBadge('puCodeBadge','puCodeBadgeM', false, !!this.value);
+        self._showFieldBadge('puCodeBadge', 'puCodeBadgeM', false, !!this.value);
       }
     });
     var dimInput = document.getElementById('puDimensions');
     if (dimInput) dimInput.addEventListener('input', function () {
       if (!self._device || !self._device.dims) {
-        self._showFieldBadge('puDimBadge','puDimBadgeM', false, !!this.value);
+        self._showFieldBadge('puDimBadge', 'puDimBadgeM', false, !!this.value);
       }
     });
 
@@ -1187,7 +1195,7 @@
       emailInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' || e.key === ';') {
           e.preventDefault();
-          self._addEmailChip(emailInput.value.replace(';','').trim());
+          self._addEmailChip(emailInput.value.replace(';', '').trim());
           emailInput.value = '';
         }
       });
@@ -1299,7 +1307,7 @@
     resizeMode = resizeMode || 'original';
 
     var TARGET_COMPACT = 220 * 1024;
-    var MAX_COMPACT    = 320 * 1024;
+    var MAX_COMPACT = 320 * 1024;
 
     function drawToCanvas(img, ow, oh, angle, flipH, flipV, outMaxLongSide) {
       var rad = (angle * Math.PI) / 180;
@@ -1348,7 +1356,7 @@
       var url = URL.createObjectURL(blob);
       var img = new Image();
       img.onload = function () {
-        try { URL.revokeObjectURL(url); } catch (e) {}
+        try { URL.revokeObjectURL(url); } catch (e) { }
 
         var ow = img.naturalWidth, oh = img.naturalHeight;
         var angle = transforms.angle || 0;
@@ -1362,18 +1370,18 @@
 
         var maxLong = null;
         var qStart = 0.92;
-        var qMin   = 0.60;
+        var qMin = 0.60;
 
         if (resizeMode === 'hd') {
           maxLong = 1920;
           qStart = 0.90;
-          qMin   = 0.70;
+          qMin = 0.70;
         }
 
         if (resizeMode === 'compact') {
           maxLong = 1600;
           qStart = 0.78;
-          qMin   = 0.40;
+          qMin = 0.40;
         }
 
         var canvas = drawToCanvas(img, ow, oh, angle, flipH, flipV, maxLong);
@@ -1423,7 +1431,7 @@
         tryQuality(qStart);
       };
       img.onerror = function () {
-        try { URL.revokeObjectURL(url); } catch (e) {}
+        try { URL.revokeObjectURL(url); } catch (e) { }
         reject(new Error('Image load failed'));
       };
       img.src = url;
@@ -1440,12 +1448,19 @@
     this._editor = { angle: 0, flipH: false, flipV: false, cropRect: null, baseBlob: p.workingBlob };
 
     var overlay = document.getElementById('puEditorOverlay');
-    if (overlay) { overlay.classList.remove('pu-hidden'); requestAnimationFrame(function () { overlay.classList.add('pu-show'); }); }
+    if (overlay) {
+      if (window.SwipeHistoryTrap) {
+        window.SwipeHistoryTrap.push('puEditorOverlay', () => this._closeEditor());
+        window.SwipeHistoryTrap.bindSwipe(overlay, () => this._closeEditor());
+      }
+      overlay.classList.remove('pu-hidden'); requestAnimationFrame(function () { overlay.classList.add('pu-show'); });
+    }
     this._editorSwitchTab('rotate');
     this._editorRender();
   };
 
   PhotoUploadModule.prototype._closeEditor = function () {
+    if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('puEditorOverlay');
     var overlay = document.getElementById('puEditorOverlay');
     if (overlay) { overlay.classList.remove('pu-show'); setTimeout(function () { overlay.classList.add('pu-hidden'); }, 200); }
     var cropOverlay = document.getElementById('puCropOverlay');
@@ -1453,23 +1468,23 @@
   };
 
   PhotoUploadModule.prototype._editorRender = function () {
-    var self     = this;
-    var canvas   = document.getElementById('puEditorCanvas');
-    var wrap     = document.getElementById('puEditorCanvasWrap');
+    var self = this;
+    var canvas = document.getElementById('puEditorCanvas');
+    var wrap = document.getElementById('puEditorCanvasWrap');
     if (!canvas || !wrap || !this._editor.baseBlob) return;
 
     var url = URL.createObjectURL(this._editor.baseBlob);
     var img = new Image();
     img.onload = function () {
       URL.revokeObjectURL(url);
-      var maxW = wrap.clientWidth  || 600;
+      var maxW = wrap.clientWidth || 600;
       var maxH = (wrap.clientHeight || 400) - 4;
       var ow = img.naturalWidth, oh = img.naturalHeight;
       var rad = (self._editor.angle * Math.PI) / 180;
       var sin = Math.abs(Math.sin(rad)), cos = Math.abs(Math.cos(rad));
       var rw = ow * cos + oh * sin, rh = ow * sin + oh * cos;
       var scale = Math.min(maxW / rw, maxH / rh, 1);
-      canvas.width  = Math.round(rw * scale);
+      canvas.width = Math.round(rw * scale);
       canvas.height = Math.round(rh * scale);
       var ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1493,9 +1508,9 @@
 
     var resetBtn = document.getElementById('puEditorResetBtn');
     if (resetBtn) resetBtn.addEventListener('click', function () {
-      self._editor.angle  = 0;
-      self._editor.flipH  = false;
-      self._editor.flipV  = false;
+      self._editor.angle = 0;
+      self._editor.flipH = false;
+      self._editor.flipV = false;
       self._editor.cropRect = null;
       var slider = document.getElementById('puRotateSlider');
       if (slider) slider.value = 0;
@@ -1549,7 +1564,7 @@
     if (rotateResetBtn) rotateResetBtn.addEventListener('click', function () {
       self._editor.angle = 0;
       var s = document.getElementById('puRotateSlider'); if (s) s.value = 0;
-      var v = document.getElementById('puRotateValue');  if (v) v.textContent = '0°';
+      var v = document.getElementById('puRotateValue'); if (v) v.textContent = '0°';
       self._editorRender();
     });
     /* Flip */
@@ -1592,7 +1607,7 @@
       var canvas = document.getElementById('puEditorCanvas');
       if (canvas && !this._editor.cropRect) {
         var pad = 20;
-        this._editor.cropRect = { x: pad, y: pad, w: canvas.width - pad*2, h: canvas.height - pad*2 };
+        this._editor.cropRect = { x: pad, y: pad, w: canvas.width - pad * 2, h: canvas.height - pad * 2 };
       }
       if (cropOverlay) cropOverlay.classList.remove('pu-hidden');
       this._renderCropBox();
@@ -1603,23 +1618,23 @@
 
   PhotoUploadModule.prototype._renderCropBox = function () {
     var canvas = document.getElementById('puEditorCanvas');
-    var box    = document.getElementById('puCropBox');
+    var box = document.getElementById('puCropBox');
     var mT = document.getElementById('puCropMaskTop');
     var mB = document.getElementById('puCropMaskBot');
     var mL = document.getElementById('puCropMaskLeft');
     var mR = document.getElementById('puCropMaskRight');
     if (!canvas || !box || !this._editor.cropRect) return;
-    var r  = this._editor.cropRect;
+    var r = this._editor.cropRect;
     var cr = canvas.getBoundingClientRect();
     var ox = canvas.offsetLeft, oy = canvas.offsetTop;
-    box.style.left   = (ox + r.x) + 'px';
-    box.style.top    = (oy + r.y) + 'px';
-    box.style.width  = r.w + 'px';
+    box.style.left = (ox + r.x) + 'px';
+    box.style.top = (oy + r.y) + 'px';
+    box.style.width = r.w + 'px';
     box.style.height = r.h + 'px';
-    if (mT) { mT.style.height = (oy + r.y) + 'px'; mT.style.left='0'; mT.style.right='0'; }
-    if (mB) { mB.style.top = (oy + r.y + r.h) + 'px'; mB.style.left='0'; mB.style.right='0'; mB.style.bottom='0'; mB.style.height=''; }
-    if (mL) { mL.style.top=(oy+r.y)+'px'; mL.style.height=r.h+'px'; mL.style.left='0'; mL.style.width=ox+r.x+'px'; }
-    if (mR) { mR.style.top=(oy+r.y)+'px'; mR.style.height=r.h+'px'; mR.style.left=(ox+r.x+r.w)+'px'; mR.style.right='0'; mR.style.width=''; }
+    if (mT) { mT.style.height = (oy + r.y) + 'px'; mT.style.left = '0'; mT.style.right = '0'; }
+    if (mB) { mB.style.top = (oy + r.y + r.h) + 'px'; mB.style.left = '0'; mB.style.right = '0'; mB.style.bottom = '0'; mB.style.height = ''; }
+    if (mL) { mL.style.top = (oy + r.y) + 'px'; mL.style.height = r.h + 'px'; mL.style.left = '0'; mL.style.width = ox + r.x + 'px'; }
+    if (mR) { mR.style.top = (oy + r.y) + 'px'; mR.style.height = r.h + 'px'; mR.style.left = (ox + r.x + r.w) + 'px'; mR.style.right = '0'; mR.style.width = ''; }
     var ci = document.getElementById('puCropInfo');
     if (ci) ci.textContent = Math.round(r.w) + ' × ' + Math.round(r.h) + ' px';
   };
@@ -1634,7 +1649,7 @@
       if (!handle && e.target !== cropBox) return;
       e.preventDefault();
       var startX = e.clientX, startY = e.clientY;
-      var r = Object.assign({}, self._editor.cropRect || {x:0,y:0,w:100,h:100});
+      var r = Object.assign({}, self._editor.cropRect || { x: 0, y: 0, w: 100, h: 100 });
       var startR = Object.assign({}, r);
 
       function onMove(ev) {
@@ -1652,14 +1667,14 @@
       }
       function onUp() {
         document.removeEventListener('mousemove', onMove);
-        document.removeEventListener('mouseup',   onUp);
+        document.removeEventListener('mouseup', onUp);
         document.removeEventListener('touchmove', onMove);
-        document.removeEventListener('touchend',  onUp);
+        document.removeEventListener('touchend', onUp);
       }
       document.addEventListener('mousemove', onMove);
-      document.addEventListener('mouseup',   onUp);
+      document.addEventListener('mouseup', onUp);
     }
-    cropBox.addEventListener('mousedown',  onMouseDown);
+    cropBox.addEventListener('mousedown', onMouseDown);
     /* Touch support */
     cropBox.addEventListener('touchstart', function (e) {
       var touch = e.touches[0];
@@ -1668,26 +1683,26 @@
   };
 
   PhotoUploadModule.prototype._applyCrop = function () {
-    var self    = this;
-    var canvas  = document.getElementById('puEditorCanvas');
-    var r       = this._editor.cropRect;
+    var self = this;
+    var canvas = document.getElementById('puEditorCanvas');
+    var r = this._editor.cropRect;
     if (!canvas || !r) return;
 
     /* Tính tỉ lệ scale giữa canvas display và blob gốc */
     var tmpCanvas = document.createElement('canvas');
-    tmpCanvas.width  = Math.round(r.w);
+    tmpCanvas.width = Math.round(r.w);
     tmpCanvas.height = Math.round(r.h);
     var ctx = tmpCanvas.getContext('2d');
     ctx.drawImage(canvas, r.x, r.y, r.w, r.h, 0, 0, r.w, r.h);
     tmpCanvas.toBlob(function (blob) {
       if (!blob) return;
-      self._editor.baseBlob  = blob;
-      self._editor.cropRect  = null;
+      self._editor.baseBlob = blob;
+      self._editor.cropRect = null;
       var url = URL.createObjectURL(blob);
       if (self._activeIdx >= 0) {
         URL.revokeObjectURL(self._photos[self._activeIdx].previewUrl);
         self._photos[self._activeIdx].workingBlob = blob;
-        self._photos[self._activeIdx].previewUrl  = url;
+        self._photos[self._activeIdx].previewUrl = url;
       }
       var co = document.getElementById('puCropOverlay');
       if (co) co.classList.add('pu-hidden');
@@ -1695,7 +1710,7 @@
       self._editor.flipH = false;
       self._editor.flipV = false;
       var s = document.getElementById('puRotateSlider'); if (s) s.value = 0;
-      var v = document.getElementById('puRotateValue');  if (v) v.textContent = '0°';
+      var v = document.getElementById('puRotateValue'); if (v) v.textContent = '0°';
       self._editorSwitchTab('rotate');
       self._editorRender();
       self._renderPreviewGrid();
@@ -1727,21 +1742,21 @@
         if (self._photos[self._activeIdx]) {
           URL.revokeObjectURL(self._photos[self._activeIdx].previewUrl);
           self._photos[self._activeIdx].workingBlob = blob;
-          self._photos[self._activeIdx].previewUrl  = url;
+          self._photos[self._activeIdx].previewUrl = url;
         }
         self._renderPreviewGrid();
         self._closeEditor();
         setTimeout(function () { self._focusDeviceSearch(true); }, 260);
-      }).catch(function () { 
+      }).catch(function () {
         if (isSec && pw) pw.classList.add('pu-hidden');
-        self._closeEditor(); 
+        self._closeEditor();
       });
     }
 
-      doApply();
+    doApply();
   };
 
-  PhotoUploadModule.prototype._requestNativeMock = function() {
+  PhotoUploadModule.prototype._requestNativeMock = function () {
     var asOv = document.getElementById('puActionSheetOverlay');
     if (asOv) asOv.classList.remove('pu-hidden');
   };
@@ -1755,32 +1770,32 @@
         video.style.position = 'fixed'; video.style.opacity = '0'; video.style.width = '1px'; video.style.height = '1px';
         video.style.top = '0'; video.style.left = '0'; video.style.pointerEvents = 'none';
         document.body.appendChild(video);
-        
+
         var isCaptured = false;
-        
+
         function cleanup() {
           if (video.parentNode) video.parentNode.removeChild(video);
-          stream.getTracks().forEach(function(t){ t.stop(); });
+          stream.getTracks().forEach(function (t) { t.stop(); });
         }
-        
-        var captureTimeout = setTimeout(function() {
+
+        var captureTimeout = setTimeout(function () {
           if (!isCaptured) { isCaptured = true; cleanup(); cb(null); }
         }, 12000);
 
         video.onplaying = function () {
-          setTimeout(function() {
+          setTimeout(function () {
             if (isCaptured) return;
             isCaptured = true;
             clearTimeout(captureTimeout);
             try {
               var c = document.createElement('canvas');
-              c.width = video.videoWidth || 640; 
+              c.width = video.videoWidth || 640;
               c.height = video.videoHeight || 480;
               c.getContext('2d').drawImage(video, 0, 0);
               c.toBlob(function (blob) {
                 cleanup(); cb(blob);
               }, 'image/jpeg', 0.95);
-            } catch(e) {
+            } catch (e) {
               cleanup(); cb(null);
             }
           }, 800);
@@ -1808,20 +1823,24 @@
   };
 
   PhotoUploadModule.prototype._openCamera = function () {
-    var self    = this;
+    var self = this;
     var overlay = document.getElementById('puCameraOverlay');
-    var video   = document.getElementById('puCameraVideo');
+    var video = document.getElementById('puCameraVideo');
     if (!overlay || !video) return;
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       alert('カメラが利用できません / Camera không khả dụng');
       return;
     }
-    
+
     // Yêu cầu độ phân giải cao nhất
     navigator.mediaDevices.getUserMedia({ video: { facingMode: self._facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false })
       .then(function (stream) {
         self._cameraStream = stream;
         video.srcObject = stream;
+        if (window.SwipeHistoryTrap) {
+          window.SwipeHistoryTrap.push('puCameraOverlay', () => self._stopCamera());
+          window.SwipeHistoryTrap.bindSwipe(overlay, () => self._stopCamera());
+        }
         overlay.classList.remove('pu-hidden');
         requestAnimationFrame(function () { overlay.classList.add('pu-show'); });
         // Zoom API removed per browser incompatibility / user request
@@ -1838,24 +1857,25 @@
       this._cameraStream = null;
     }
     if (!keepOverlay) {
+      if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('puCameraOverlay');
       var overlay = document.getElementById('puCameraOverlay');
       if (overlay) { overlay.classList.remove('pu-show'); setTimeout(function () { overlay.classList.add('pu-hidden'); }, 200); }
     }
   };
 
   PhotoUploadModule.prototype._capturePhoto = function () {
-    var video  = document.getElementById('puCameraVideo');
+    var video = document.getElementById('puCameraVideo');
     if (!video) return;
     var canvas = document.createElement('canvas');
-    canvas.width  = video.videoWidth;
+    canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext('2d').drawImage(video, 0, 0);
     var self = this;
     canvas.toBlob(function (blob) {
       if (!blob) return;
-      var ts   = Date.now();
+      var ts = Date.now();
       var name = 'capture_' + ts + '.jpg';
-      var url  = URL.createObjectURL(blob);
+      var url = URL.createObjectURL(blob);
       self._photos.push({ origFile: blob, workingBlob: blob, name: name, previewUrl: url, isThumb: false });
       self._renderPreviewGrid();
       self._updatePhotoCount();
@@ -1872,10 +1892,10 @@
     if (!email || !email.includes('@')) return;
     if (this._ccEmails.indexOf(email) !== -1) return;
     this._ccEmails.push(email);
-    var wrap  = document.getElementById('puEmailChipsWrap');
+    var wrap = document.getElementById('puEmailChipsWrap');
     var input = document.getElementById('puEmailInput');
     if (!wrap) return;
-    var chip  = document.createElement('div');
+    var chip = document.createElement('div');
     chip.className = 'pu-email-chip';
     chip.innerHTML = email + '<button type="button" title="Xóa"><i class="fas fa-times"></i></button>';
     var self = this;
@@ -1904,14 +1924,14 @@
     }
     if (global.DataManager && global.DataManager.data) {
       if (global.DataManager.data.trays) {
-        items = items.concat(global.DataManager.data.trays.map(function(t) { return { type: 'tray', TrayCode: t.TrayCode, TrayName: t.TrayName, MoldTrayName: t.MoldTrayName, TrayID: t.TrayID, TrayWeight: t.TrayWeight }; }));
+        items = items.concat(global.DataManager.data.trays.map(function (t) { return { type: 'tray', TrayCode: t.TrayCode, TrayName: t.TrayName, MoldTrayName: t.MoldTrayName, TrayID: t.TrayID, TrayWeight: t.TrayWeight }; }));
       }
       if (global.DataManager.data.racks) {
-        items = items.concat(global.DataManager.data.racks.map(function(r) { return { type: 'rack', RackID: r.RackID }; }));
+        items = items.concat(global.DataManager.data.racks.map(function (r) { return { type: 'rack', RackID: r.RackID }; }));
       }
     }
     var q = query.toLowerCase();
-    
+
     var filterType = '';
     var typeSel = document.getElementById('puTargetTypeSelect');
     if (typeSel && typeSel.value && typeSel.value !== 'other') filterType = typeSel.value;
@@ -1927,7 +1947,7 @@
       } else if (filterType && filterType !== 'other') {
         if (it.type !== filterType) return false;
       }
-      
+
       // Giá để khuôn: search trong RackID
       if (it.type === 'rack') {
         return String(it.RackID || '').toLowerCase().indexOf(q) >= 0;
@@ -1941,7 +1961,7 @@
       // Khuôn & Dao cắt: search MoldCode, CutterCode, CutterNo, CutterName
       var dText = [
         it.MoldCode, it.MoldName, it.CutterCode, it.CutterNo, it.CutterName
-      ].map(function(v){ return String(v || '').toLowerCase(); }).join(' ');
+      ].map(function (v) { return String(v || '').toLowerCase(); }).join(' ');
       var dCleanText = cleanString(it.MoldCode) + ' ' + cleanString(it.CutterCode) + ' ' + cleanString(it.CutterNo);
       return dText.indexOf(q) >= 0 || dCleanText.indexOf(cleanQ) >= 0;
     }).slice(0, 10);
@@ -1951,26 +1971,26 @@
     if (!matched.length) { dd.classList.add('pu-hidden'); return; }
 
     dd.innerHTML = matched.map(function (it) {
-      var id   = it.MoldID || it.CutterID || it.TrayID || it.RackID || '';
+      var id = it.MoldID || it.CutterID || it.TrayID || it.RackID || '';
       var name = it.MoldName || it.CutterName || it.CutterDesignName || it.TrayName || it.MoldTrayName || '';
       var rawCode = it.MoldCode || it.CutterCode || it.CutterNo || it.TrayCode || it.RackID || '';
       var code = rawCode || name || id || 'Unknown';
       var typeName = it.type === 'mold' ? '🔧 Khuôn' : (it.type === 'cutter' ? '✂️ Dao cắt' : (it.type === 'tray' ? '📦 Khay' : (it.type === 'rack' ? '🏗 Giá' : 'Khác')));
       var dims = it.displayDimensions || it.dimensions || it.displaySize || it.Size || it.Dimensions || (it.TrayWeight ? it.TrayWeight + ' kg' : '');
-      return '<div class="pu-device-option" data-code="'+code+'" data-name="'+name+'" data-type="'+it.type+'" data-id="'+id+'" data-dims="'+dims+'">' +
-             '  <span class="pu-opt-code">'+code+'</span>' +
-             (name ? '  <span class="pu-opt-name">'+name+'</span>' : '') +
-             '  <span class="pu-opt-type">'+typeName+'</span>' +
-             '</div>';
+      return '<div class="pu-device-option" data-code="' + code + '" data-name="' + name + '" data-type="' + it.type + '" data-id="' + id + '" data-dims="' + dims + '">' +
+        '  <span class="pu-opt-code">' + code + '</span>' +
+        (name ? '  <span class="pu-opt-name">' + name + '</span>' : '') +
+        '  <span class="pu-opt-type">' + typeName + '</span>' +
+        '</div>';
     }).join('');
     dd.classList.remove('pu-hidden');
     dd.querySelectorAll('.pu-device-option').forEach(function (opt) {
       opt.addEventListener('click', function () {
         self._selectDevice({
-          type:   opt.dataset.type,
-          id:     opt.dataset.id,
-          code:   opt.dataset.code,
-          dims:   opt.dataset.dims,
+          type: opt.dataset.type,
+          id: opt.dataset.id,
+          code: opt.dataset.code,
+          dims: opt.dataset.dims,
           isAuto: true
         });
         dd.classList.add('pu-hidden');
@@ -1986,12 +2006,12 @@
   };
 
   PhotoUploadModule.prototype._applyQuickName = function () {
-    var ts   = Date.now();
+    var ts = Date.now();
     var code = 'unknown_' + ts;
     this._device = { type: 'mold', id: '', code: code, dims: '', isAuto: false };
     var codeInput = document.getElementById('puDeviceCode');
     if (codeInput) { codeInput.value = code; codeInput.readOnly = false; }
-    this._showFieldBadge('puCodeBadge','puCodeBadgeM', false, true);
+    this._showFieldBadge('puCodeBadge', 'puCodeBadgeM', false, true);
     /* Show manual badge */
     var badge = document.getElementById('puDeviceBadge');
     if (badge) { badge.textContent = code; badge.classList.remove('pu-hidden'); }
@@ -2096,21 +2116,21 @@
     }
     this._sendMailMode = !!sendMail;
 
-    var code        = (document.getElementById('puDeviceCode')  || {}).value || '';
-    var dims        = (document.getElementById('puDimensions')   || {}).value || '';
-    var notes       = (document.getElementById('puNotes')        || {}).value || '';
-    var senderId   = (document.getElementById('puSenderId') || {}).value || DEFAULT_SENDER_ID;
+    var code = (document.getElementById('puDeviceCode') || {}).value || '';
+    var dims = (document.getElementById('puDimensions') || {}).value || '';
+    var notes = (document.getElementById('puNotes') || {}).value || '';
+    var senderId = (document.getElementById('puSenderId') || {}).value || DEFAULT_SENDER_ID;
     var senderName = DEFAULT_SENDER_NAME;
-    var _selEl     = document.getElementById('puSenderSelect');
+    var _selEl = document.getElementById('puSenderSelect');
     if (_selEl && _selEl.value === '__manual__') {
       senderName = (document.getElementById('puSenderSearch') || {}).value || DEFAULT_SENDER_NAME;
-      senderId   = '';
+      senderId = '';
     } else {
-      var _emp = (this._employees || []).filter(function(e){ return String(e.id)===String(senderId); })[0];
+      var _emp = (this._employees || []).filter(function (e) { return String(e.id) === String(senderId); })[0];
       senderName = _emp ? _emp.name : DEFAULT_SENDER_NAME;
     }
-    var thumbCheck  = document.getElementById('puThumbCheck');
-    var setThumb    = !!(thumbCheck && thumbCheck.checked);
+    var thumbCheck = document.getElementById('puThumbCheck');
+    var setThumb = !!(thumbCheck && thumbCheck.checked);
 
     var deviceType = 'mold';
     if (this._device && this._device.type) {
@@ -2118,19 +2138,19 @@
     } else {
       var selType = document.getElementById('puTargetTypeSelect');
       if (selType && selType.value === 'rack') {
-         deviceType = 'rack';
-         localStorage.setItem('pu_saved_target_type', 'rack');
+        deviceType = 'rack';
+        localStorage.setItem('pu_saved_target_type', 'rack');
       } else if (selType) {
-         deviceType = 'mold'; 
-         localStorage.setItem('pu_saved_target_type', 'device');
+        deviceType = 'mold';
+        localStorage.setItem('pu_saved_target_type', 'device');
       }
     }
-    
-    var deviceId    = (this._device && this._device.id)   || '';
-    var isManualCode= !this._device || !this._device.isAuto;
+
+    var deviceId = (this._device && this._device.id) || '';
+    var isManualCode = !this._device || !this._device.isAuto;
     var isManualDim = !this._device || !this._device.dims;
 
-    ['puSendNewBtn','puSendCloseBtn'].forEach(function(i){
+    ['puSendNewBtn', 'puSendCloseBtn'].forEach(function (i) {
       var b = document.getElementById(i);
       if (b) { b.disabled = true; b.classList.add('pu-sending'); }
     });
@@ -2141,8 +2161,8 @@
     if (!DevPS) { self._showResult(false, 'DevicePhotoStore not found'); return; }
 
     var photosClone = self._photos.slice();
-    var total   = photosClone.length;
-    var done    = 0;
+    var total = photosClone.length;
+    var done = 0;
 
     // Background UI Hiding
     if (closeAfter) {
@@ -2150,7 +2170,7 @@
       var overlay = document.getElementById('puOverlay');
       if (overlay) {
         overlay.classList.remove('pu-show');
-        setTimeout(function(){ overlay.classList.add('pu-hidden'); self.unlockPageScroll(); self._reset(); }, 200);
+        setTimeout(function () { overlay.classList.add('pu-hidden'); self.unlockPageScroll(); self._reset(); }, 200);
       }
       self._stopCamera();
     }
@@ -2158,20 +2178,20 @@
     // Weight Update
     var weightInput = (document.getElementById('puWeight') || {}).value || '';
     if (weightInput && deviceId && (deviceType === 'mold' || deviceType === 'cutter' || deviceType === 'tray')) {
-        var fn = (deviceType === 'tray') ? 'webtray.csv' : (deviceType === 'cutter' ? 'webcutters.csv' : 'webmolds.csv');
-        var idF = (deviceType === 'tray') ? 'TrayID' : (deviceType === 'cutter' ? 'CutterID' : 'MoldID');
-        var wF = (deviceType === 'tray') ? 'TrayWeight' : (deviceType === 'cutter' ? 'CutterWeightModified' : 'MoldWeightModified'); 
-        var fieldsParam = {}; fieldsParam[wF] = weightInput;
-        try {
-            fetch('/api/csv/upsert', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ filename: fn, idField: idF, recordId: deviceId, op: 'update', fields: fieldsParam })
-            }).catch(function(e){ console.warn(e); });
-        } catch (we) { console.warn(we); }
+      var fn = (deviceType === 'tray') ? 'webtray.csv' : (deviceType === 'cutter' ? 'webcutters.csv' : 'webmolds.csv');
+      var idF = (deviceType === 'tray') ? 'TrayID' : (deviceType === 'cutter' ? 'CutterID' : 'MoldID');
+      var wF = (deviceType === 'tray') ? 'TrayWeight' : (deviceType === 'cutter' ? 'CutterWeightModified' : 'MoldWeightModified');
+      var fieldsParam = {}; fieldsParam[wF] = weightInput;
+      try {
+        fetch('/api/csv/upsert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: fn, idField: idF, recordId: deviceId, op: 'update', fields: fieldsParam })
+        }).catch(function (e) { console.warn(e); });
+      } catch (we) { console.warn(we); }
     }
     var results = [];
-    var errors  = [];
+    var errors = [];
 
     function next(i) {
       if (i >= total) {
@@ -2182,26 +2202,26 @@
         self._onAllUploaded(results, errors, meta);
         return;
       }
-      var p         = photosClone[i];
-      var isFirst   = (i === 0);
+      var p = photosClone[i];
+      var isFirst = (i === 0);
       var shouldThumb = setThumb && isFirst; /* chỉ ảnh đầu làm thumbnail */
 
-      self._setProgress(Math.round((i / total) * 80), '(' + (i+1) + '/' + total + ')');
+      self._setProgress(Math.round((i / total) * 80), '(' + (i + 1) + '/' + total + ')');
 
       /* processImage trước khi upload */
       self._processImage(p.workingBlob, {}, self._resizeMode)
         .then(function (processedBlob) {
           return self._uploadOnePhoto(DevPS, processedBlob, {
-            deviceType:        deviceType,
-            deviceId:          deviceId,
-            originalFilename:  p.name,
-            notes:             notes,
-            manualCode:        isManualCode ? (code + ' [手動入力]') : null,
-            manualName:        isManualCode ? senderName : null,
-            manualDimensions:  isManualDim  ? (dims ? dims + ' [手動入力]' : null) : null,
-            senderId:          senderId,
-            senderName:        senderName,
-            setAsThumbnail:    shouldThumb
+            deviceType: deviceType,
+            deviceId: deviceId,
+            originalFilename: p.name,
+            notes: notes,
+            manualCode: isManualCode ? (code + ' [手動入力]') : null,
+            manualName: isManualCode ? senderName : null,
+            manualDimensions: isManualDim ? (dims ? dims + ' [手動入力]' : null) : null,
+            senderId: senderId,
+            senderName: senderName,
+            setAsThumbnail: shouldThumb
           });
         })
         .then(function (res) {
@@ -2232,8 +2252,8 @@
     /* Gọi Edge Function send-photo-audit */
     var _devps = global.DevicePhotoStore;
     var client = (_devps && _devps._client) ? _devps._client
-               : (global.supabaseClient && typeof global.supabaseClient.functions === 'object') ? global.supabaseClient
-               : null;
+      : (global.supabaseClient && typeof global.supabaseClient.functions === 'object') ? global.supabaseClient
+        : null;
     if (!client || typeof client.functions !== 'object') {
       console.warn('[PhotoUpload] Không tìm thấy Supabase client – bỏ qua gửi mail.');
       this._finalize(results, errors, meta); return;
@@ -2340,7 +2360,7 @@
 
   PhotoUploadModule.prototype._finalize = function (results, errors, meta) {
     this._setProgress(100, '');
-    ['puSendNewBtn','puSendCloseBtn'].forEach(function(i){
+    ['puSendNewBtn', 'puSendCloseBtn'].forEach(function (i) {
       var b = document.getElementById(i);
       if (b) { b.disabled = false; b.classList.remove('pu-sending'); }
     });
@@ -2372,10 +2392,10 @@
      PROGRESS / RESULT UI
   ────────────────────────────────────────────────────────── */
   PhotoUploadModule.prototype._setProgress = function (pct, label) {
-    var fill  = document.getElementById('puProgressFill');
-    var lbl   = document.getElementById('puProgressLabel');
+    var fill = document.getElementById('puProgressFill');
+    var lbl = document.getElementById('puProgressLabel');
     var pctEl = document.getElementById('puProgressPct');
-    if (fill)  fill.style.width  = pct + '%';
+    if (fill) fill.style.width = pct + '%';
     if (pctEl) pctEl.textContent = pct + '%';
     if (lbl && label) lbl.textContent = label;
   };
@@ -2401,9 +2421,9 @@
 
     var bucket = _devps ? _devps.bucketId : 'mold-photos';
     var fName = 'sec_' + Date.now() + '.jpg';
-    var path = 'employee_verifications/' + fName; 
+    var path = 'employee_verifications/' + fName;
     client.storage.from(bucket).upload(path, blob)
-      .then(function(res) {
+      .then(function (res) {
         if (res.error) {
           console.warn('[PhotoUpload] Failed to upload security blob to employee_verifications/:', res.error, bucket);
           // Only show alert if it strictly fails, maybe suppress to avoid spam? 
@@ -2418,9 +2438,9 @@
           setAsThumbnail: false
         });
       })
-      .catch(function(e){ 
+      .catch(function (e) {
         console.warn('[PhotoUpload] Security blob error:', e);
-        cb(null); 
+        cb(null);
       });
   };
 
@@ -2429,50 +2449,50 @@
     if (!secResult || !secResult.fileName) return;
     var _devps = global.DevicePhotoStore;
     var client = (_devps && _devps._client) ? _devps._client
-               : (global.supabaseClient && typeof global.supabaseClient.functions === 'object') ? global.supabaseClient
-               : null;
+      : (global.supabaseClient && typeof global.supabaseClient.functions === 'object') ? global.supabaseClient
+        : null;
     if (!client || typeof client.functions !== 'object') return;
 
     var recipients = [];
     if (typeof DEFAULT_TO_MAIL === 'string') {
-      recipients = DEFAULT_TO_MAIL.split(/[,;\s]+/).map(function(x){ return x.trim(); }).filter(Boolean);
+      recipients = DEFAULT_TO_MAIL.split(/[,;\s]+/).map(function (x) { return x.trim(); }).filter(Boolean);
     } else if (Array.isArray(DEFAULT_TO_MAIL)) {
       recipients = DEFAULT_TO_MAIL;
     }
 
     var senderId = (document.getElementById('puSenderId') || {}).value || DEFAULT_SENDER_ID;
-    
+
     var edgePhotos = [{
-        fileName: secResult.fileName,
-        originalFileName: secResult.originalFileName,
-        url: secResult.url,
-        moldCode: 'SECURITY_AUDIT',
-        moldName: 'セキュリティ監査 / Ảnh bảo mật',
-        dimensionL: null, dimensionW: null, dimensionD: null,
-        setAsThumbnail: false
+      fileName: secResult.fileName,
+      originalFileName: secResult.originalFileName,
+      url: secResult.url,
+      moldCode: 'SECURITY_AUDIT',
+      moldName: 'セキュリティ監査 / Ảnh bảo mật',
+      dimensionL: null, dimensionW: null, dimensionD: null,
+      setAsThumbnail: false
     }];
-    
+
     var batchId = 'sec-' + Date.now();
     var payload = {
-        moldCode: 'セキュリティ監査 / Ảnh bảo mật',
-        moldName: 'セキュリティ監査 / Ảnh bảo mật',
-        deviceType: 'audit',
-        dimensionL: null, dimensionW: null, dimensionD: null,
-        photoFileName: secResult.fileName,
-        originalFileName: secResult.originalFileName,
-        photos: edgePhotos,
-        employee: 'System Audit',
-        employeeId: senderId,
-        date: new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
-        notes: '背景で自動的に撮影されたセキュリティ確認写真です。\nẢnh bảo mật chụp tự động bởi hệ thống.',
-        recipients: recipients,
-        ccRecipients: [],
-        batchId: batchId,
-        batch_id: batchId
+      moldCode: 'セキュリティ監査 / Ảnh bảo mật',
+      moldName: 'セキュリティ監査 / Ảnh bảo mật',
+      deviceType: 'audit',
+      dimensionL: null, dimensionW: null, dimensionD: null,
+      photoFileName: secResult.fileName,
+      originalFileName: secResult.originalFileName,
+      photos: edgePhotos,
+      employee: 'System Audit',
+      employeeId: senderId,
+      date: new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
+      notes: '背景で自動的に撮影されたセキュリティ確認写真です。\nẢnh bảo mật chụp tự động bởi hệ thống.',
+      recipients: recipients,
+      ccRecipients: [],
+      batchId: batchId,
+      batch_id: batchId
     };
-    
+
     // Gửi ngầm qua Edge Function
-    client.functions.invoke(EDGE_FN_NAME || 'send-photo-audit', { body: payload }).catch(function(){});
+    client.functions.invoke(EDGE_FN_NAME || 'send-photo-audit', { body: payload }).catch(function () { });
   };
 
   PhotoUploadModule.prototype._uploadOnePhoto = function (DevPS, blob, opts) {
@@ -2481,19 +2501,19 @@
     try { fileObj = new File([blob], fname, { type: blob.type || 'image/jpeg' }); }
     catch (e) {
       fileObj = blob;
-      try { Object.defineProperty(fileObj,'name',{value:fname,writable:false,configurable:true}); } catch(ig){}
+      try { Object.defineProperty(fileObj, 'name', { value: fname, writable: false, configurable: true }); } catch (ig) { }
     }
     var hasDevice = !!(opts.deviceType && opts.deviceId);
     return DevPS.uploadPhotos({
-      files:[fileObj], devicetype:opts.deviceType||null, deviceid:opts.deviceId||null,
-      state:hasDevice?'active':'inbox', manualcode:opts.manualCode||null,
-      manualname:opts.manualName||null, manualdimensions:opts.manualDimensions||null,
-      manualnotes:opts.notes||null, employeeid:opts.senderId||null,
-      employeename:opts.senderName||null, markAsThumbnail:!!opts.setAsThumbnail
-    }).then(function(r){
-      var row=r&&r.photos&&r.photos[0]?r.photos[0]:null;
-      if(!row) throw new Error('[PhotoUpload] uploadPhotos không trả về row.');
-      return { data:row, error:null };
+      files: [fileObj], devicetype: opts.deviceType || null, deviceid: opts.deviceId || null,
+      state: hasDevice ? 'active' : 'inbox', manualcode: opts.manualCode || null,
+      manualname: opts.manualName || null, manualdimensions: opts.manualDimensions || null,
+      manualnotes: opts.notes || null, employeeid: opts.senderId || null,
+      employeename: opts.senderName || null, markAsThumbnail: !!opts.setAsThumbnail
+    }).then(function (r) {
+      var row = r && r.photos && r.photos[0] ? r.photos[0] : null;
+      if (!row) throw new Error('[PhotoUpload] uploadPhotos không trả về row.');
+      return { data: row, error: null };
     });
   };
 

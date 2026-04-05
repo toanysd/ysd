@@ -34,7 +34,7 @@ Created: 2026-02-04
 
 
 
-(function() {
+(function () {
 
   'use strict';
 
@@ -314,7 +314,7 @@ Created: 2026-02-04
 
 
 
-  // MOBILE ACTIONBAR v8.4.3-5-2;
+      // MOBILE ACTIONBAR v8.4.3-5-2;
 
       this.ensurePreviewStyles();
 
@@ -333,6 +333,12 @@ Created: 2026-02-04
       this.initModules();
 
       this.loadDataReferences();
+
+      if (window.SwipeHistoryTrap) {
+
+        window.SwipeHistoryTrap.bindSwipe(this.panel, () => this.close());
+
+      }
 
       this.close(true);
 
@@ -828,7 +834,7 @@ Created: 2026-02-04
       // Mobile Swipe-to-Close Gesture
       let dpTouchStartX = 0;
       let dpTouchStartY = 0;
-      
+
       this.panel.addEventListener('touchstart', (e) => {
         if (e.touches.length === 1) {
           dpTouchStartX = e.touches[0].clientX;
@@ -840,7 +846,7 @@ Created: 2026-02-04
         if (!dpTouchStartX || !dpTouchStartY || e.touches.length !== 1) return;
         const dx = e.touches[0].clientX - dpTouchStartX;
         const dy = e.touches[0].clientY - dpTouchStartY;
-        
+
         // Vuốt phẳng sang phải (>80px), không bị cuộn dọc (|Y| < 50px), bắt đầu sát lề trái panel (<80px)
         if (dx > 80 && Math.abs(dy) < 50 && dpTouchStartX < 80) {
           // Bảo vệ scroll cho bảng
@@ -873,22 +879,22 @@ Created: 2026-02-04
 
           let tab = 'extended'; // Mặc định mở tab extended
 
-          
+
 
           if (target === 'history') { tab = 'history'; }
           else if (target === 'devices') { tab = 'devices'; }
 
           else if (target === 'teflon') { tab = 'teflon'; }
 
-          else if (target === 'storage') { 
+          else if (target === 'storage') {
 
-              // Storage usually in related or extended. We will map to extended
+            // Storage usually in related or extended. We will map to extended
 
-              tab = 'extended'; 
+            tab = 'extended';
 
           }
 
-          
+
 
           if (typeof this.switchTab === 'function') {
 
@@ -896,7 +902,7 @@ Created: 2026-02-04
 
           }
 
-          
+
 
           // Scroll specifically for extended groupings
 
@@ -908,7 +914,7 @@ Created: 2026-02-04
 
               if (!activeBody) return;
 
-              
+
 
               let keywords = [];
 
@@ -922,25 +928,25 @@ Created: 2026-02-04
 
               if (target === 'transfer') keywords = ['vận chuyển', 'giao hàng', 'vận tải'];
 
-              
+
 
               if (keywords.length > 0) {
 
-                 const headers = Array.from(activeBody.querySelectorAll('.grouped-title, .section-title, h3, h4, .ext-card-header, .dp-section-title'));
+                const headers = Array.from(activeBody.querySelectorAll('.grouped-title, .section-title, h3, h4, .ext-card-header, .dp-section-title'));
 
-                 const found = headers.find(h => keywords.some(k => (h.textContent || '').toLowerCase().includes(k)));
+                const found = headers.find(h => keywords.some(k => (h.textContent || '').toLowerCase().includes(k)));
 
-                 if (found) {
+                if (found) {
 
-                    found.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  found.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-                 } else {
+                } else {
 
-                    const wrap = activeBody.querySelector('.dp-extended-wrapper');
+                  const wrap = activeBody.querySelector('.dp-extended-wrapper');
 
-                    if(wrap) wrap.scrollTop = 0;
+                  if (wrap) wrap.scrollTop = 0;
 
-                 }
+                }
 
               }
 
@@ -1048,7 +1054,7 @@ Created: 2026-02-04
 
             let fullUrl = '';
 
-            try { fullUrl = String(img0 && img0.dataset ? (img0.dataset.dpFullUrl || '') : '').trim(); } catch (e0) {}
+            try { fullUrl = String(img0 && img0.dataset ? (img0.dataset.dpFullUrl || '') : '').trim(); } catch (e0) { }
 
 
 
@@ -1118,7 +1124,7 @@ Created: 2026-02-04
 
 
 
-              setTimeout(() => { try { URL.revokeObjectURL(blobUrl); } catch (e2) {} }, 800);
+              setTimeout(() => { try { URL.revokeObjectURL(blobUrl); } catch (e2) { } }, 800);
 
               return;
 
@@ -1220,7 +1226,7 @@ Created: 2026-02-04
 
             }
 
-          } catch (err) {}
+          } catch (err) { }
 
 
 
@@ -1292,13 +1298,13 @@ Created: 2026-02-04
 
               onDone: () => {
 
-                try { this.hydrateDesktopPhotoPreviewFromSupabase(); } catch (e) {}
+                try { this.hydrateDesktopPhotoPreviewFromSupabase(); } catch (e) { }
 
               }
 
             });
 
-          } catch (err) {}
+          } catch (err) { }
 
 
 
@@ -1384,7 +1390,7 @@ Created: 2026-02-04
 
             setTimeout(() => {
 
-              try { this.hydrateDesktopPhotoPreviewFromSupabase(); } catch (e) {}
+              try { this.hydrateDesktopPhotoPreviewFromSupabase(); } catch (e) { }
 
             }, 50);
 
@@ -1470,7 +1476,7 @@ Created: 2026-02-04
 
               if (it) this.open(it, tp, { fromPanelLink: true });
 
-            } catch (err) {}
+            } catch (err) { }
 
             return;
 
@@ -1488,7 +1494,7 @@ Created: 2026-02-04
 
               if (m) this.open(m, 'mold', { fromPanelLink: true });
 
-            } catch (err) {}
+            } catch (err) { }
 
             return;
 
@@ -1550,83 +1556,83 @@ Created: 2026-02-04
 
 
 
-// Preview actions (modal is appended to document.body, so use document-level delegation)
+      // Preview actions (modal is appended to document.body, so use document-level delegation)
 
-document.addEventListener('click', (e) => {
+      document.addEventListener('click', (e) => {
 
-  try {
+        try {
 
-    const btn = e.target && e.target.closest ? e.target.closest('[data-preview-action]') : null;
+          const btn = e.target && e.target.closest ? e.target.closest('[data-preview-action]') : null;
 
-    if (!btn) return;
-
-
-
-    const inPreview = (btn.closest && (btn.closest('.dp-preview-modal') || btn.closest('.dp-preview-modal-backdrop')));
-
-    if (!inPreview) return;
+          if (!btn) return;
 
 
 
-    e.preventDefault();
+          const inPreview = (btn.closest && (btn.closest('.dp-preview-modal') || btn.closest('.dp-preview-modal-backdrop')));
 
-    e.stopPropagation();
-
-
-
-    const key = btn.getAttribute('data-preview-action');
+          if (!inPreview) return;
 
 
 
-    if (key === 'close') {
+          e.preventDefault();
 
-      this.closePreview();
-
-      return;
-
-    }
+          e.stopPropagation();
 
 
 
-    if (key === 'open-full') {
-
-      const p = this._preview || {};
-
-      const it = p.item;
-
-      const tp = p.itemType;
-
-      this.closePreview();
-
-      if (it) this.open(it, tp, { fromPanelLink: true });
-
-      return;
-
-    }
+          const key = btn.getAttribute('data-preview-action');
 
 
 
-    if (key === 'open-full-mold') {
+          if (key === 'close') {
 
-      const p = this._preview || {};
+            this.closePreview();
 
-      const m = p.centerMold;
+            return;
 
-      this.closePreview();
+          }
 
-      if (m) this.open(m, 'mold', { fromPanelLink: true });
 
-      return;
 
-    }
+          if (key === 'open-full') {
 
-  } catch (err) {
+            const p = this._preview || {};
 
-    // ignore
+            const it = p.item;
 
-  }
+            const tp = p.itemType;
 
-}, true);
+            this.closePreview();
+
+            if (it) this.open(it, tp, { fromPanelLink: true });
+
+            return;
+
+          }
+
+
+
+          if (key === 'open-full-mold') {
+
+            const p = this._preview || {};
+
+            const m = p.centerMold;
+
+            this.closePreview();
+
+            if (m) this.open(m, 'mold', { fromPanelLink: true });
+
+            return;
+
+          }
+
+        } catch (err) {
+
+          // ignore
+
+        }
+
+      }, true);
 
 
 
@@ -1846,17 +1852,17 @@ document.addEventListener('click', (e) => {
 
       }
 
-      
+
 
       this.currentItemType = this.normalizeItemType(item, itemType);
 
-      
+
 
       // Resolve item đầy đủ từ data nếu item từ data-item là bản rút gọn
 
       item = this.resolveFullItem(item, this.currentItemType);
 
-      
+
 
       this.currentItem = item;
 
@@ -1864,7 +1870,7 @@ document.addEventListener('click', (e) => {
 
       this.centerMoldReason = '';
 
-      
+
 
       if (this.currentItemType === 'mold') {
 
@@ -1878,7 +1884,7 @@ document.addEventListener('click', (e) => {
 
       }
 
-      
+
 
       this.ensureRelatedListsForOpen();
 
@@ -1888,11 +1894,13 @@ document.addEventListener('click', (e) => {
 
       this.switchTab(firstTab);
 
-      
+
+
+      if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.push('detailPanel', () => this.close());
 
       this.panel.classList.add('open');
 
-      
+
 
       if (this.backdrop) this.backdrop.classList.add('show');
 
@@ -1906,13 +1914,14 @@ document.addEventListener('click', (e) => {
 
     close(silent = false) {
 
+      if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('detailPanel');
       this.panel.classList.remove('open');
 
       try {
 
         if (this.panel) this.panel.dataset.dpTab = '';
 
-      } catch (e) {}
+      } catch (e) { }
 
 
 
@@ -1992,7 +2001,7 @@ document.addEventListener('click', (e) => {
 
       }
 
-    
+
 
 
 
@@ -2222,7 +2231,9 @@ document.addEventListener('click', (e) => {
 
         this._preview = { open: true, item: full, itemType: t, centerMold };
 
-        try { if (this.panel) this.panel.classList.add('dp-preview-open'); } catch (e) {}
+        if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.push('detailPreview', () => this.closePreview());
+
+        try { if (this.panel) this.panel.classList.add('dp-preview-open'); } catch (e) { }
 
         this.renderPreviewOverlay();
 
@@ -2237,6 +2248,8 @@ document.addEventListener('click', (e) => {
 
 
     closePreview() {
+
+      if (window.SwipeHistoryTrap) window.SwipeHistoryTrap.remove('detailPreview');
 
       try {
 
@@ -2266,7 +2279,7 @@ document.addEventListener('click', (e) => {
 
 
 
-        try { if (this.panel) this.panel.classList.remove('dp-preview-open'); } catch (e) {}
+        try { if (this.panel) this.panel.classList.remove('dp-preview-open'); } catch (e) { }
 
       } catch (e) {
 
@@ -2300,7 +2313,7 @@ document.addEventListener('click', (e) => {
 
             startY = t.clientY;
 
-          } catch (err) {}
+          } catch (err) { }
 
         }, { passive: true });
 
@@ -2324,7 +2337,7 @@ document.addEventListener('click', (e) => {
 
             }
 
-          } catch (err) {}
+          } catch (err) { }
 
         }, { passive: true });
 
@@ -2654,7 +2667,7 @@ document.addEventListener('click', (e) => {
 
           modal.dataset.dpPreviewType = tt;
 
-        } catch (e) {}
+        } catch (e) { }
 
 
 
@@ -2744,7 +2757,7 @@ document.addEventListener('click', (e) => {
 
             // Nếu store có ensureReady thì gọi
 
-            try { if (typeof window.DevicePhotoStore.ensureReady === 'function') window.DevicePhotoStore.ensureReady(); } catch (e) {}
+            try { if (typeof window.DevicePhotoStore.ensureReady === 'function') window.DevicePhotoStore.ensureReady(); } catch (e) { }
 
 
 
@@ -2770,7 +2783,7 @@ document.addEventListener('click', (e) => {
 
                 .catch(() => {
 
-                  try { heroThumb.dataset.dpHeroThumbState = "empty"; } catch (e) {}
+                  try { heroThumb.dataset.dpHeroThumbState = "empty"; } catch (e) { }
 
                 });
 
@@ -2778,7 +2791,7 @@ document.addEventListener('click', (e) => {
 
           }
 
-        } catch (e) {}
+        } catch (e) { }
 
 
 
@@ -2830,7 +2843,7 @@ document.addEventListener('click', (e) => {
 
         if (this.panel) this.panel.dataset.dpTab = String(tabName || '');
 
-      } catch (e) {}
+      } catch (e) { }
 
 
 
@@ -2900,7 +2913,7 @@ document.addEventListener('click', (e) => {
 
         case 'comments': html = this.renderCommentsTab(); break;
 
-        
+
 
         case 'extended': {
 
@@ -3002,7 +3015,7 @@ document.addEventListener('click', (e) => {
 
             </div>`;
 
-          try { console.warn('DeviceHistoryStatus render error', err); } catch (e) {}
+          try { console.warn('DeviceHistoryStatus render error', err); } catch (e) { }
 
         }
 
@@ -3146,7 +3159,7 @@ document.addEventListener('click', (e) => {
 
         }
 
-      } catch (e) {}
+      } catch (e) { }
 
       return null;
 
@@ -3238,7 +3251,7 @@ document.addEventListener('click', (e) => {
 
         }
 
-      } catch (e) {}
+      } catch (e) { }
 
       return '';
 
@@ -3280,7 +3293,7 @@ document.addEventListener('click', (e) => {
 
       const isModern = cls.includes('dp-info-grid-modern');
 
-      
+
 
       let html = `<div class="${isModern ? '' : 'info-grid-2col '}${cls}">`;
 
@@ -3290,11 +3303,11 @@ document.addEventListener('click', (e) => {
 
         const itemCls = isModern
 
-            ? (f.full ? 'dp-item-stacked info-item full-width' : 'dp-item-stacked info-item')
+          ? (f.full ? 'dp-item-stacked info-item full-width' : 'dp-item-stacked info-item')
 
-            : (f.full ? 'info-item full-width' : 'info-item');
+          : (f.full ? 'info-item full-width' : 'info-item');
 
-            
+
 
         const labelRaw = (f.label == null) ? '' : String(f.label);
 
@@ -3500,7 +3513,7 @@ document.addEventListener('click', (e) => {
 
       const c = String(cutter?.CutterChamfer || '').trim();
 
-      
+
 
       let base = '-';
 
@@ -3514,7 +3527,7 @@ document.addEventListener('click', (e) => {
 
       }
 
-      
+
 
       let tail = '';
 
@@ -3522,7 +3535,7 @@ document.addEventListener('click', (e) => {
 
       if (c) tail += `-${c}C`;
 
-      
+
 
       return base !== '-' ? base + tail : (tail ? tail.replace(/^-/, '') : '-');
 
@@ -3772,35 +3785,35 @@ document.addEventListener('click', (e) => {
 
 
 
-    parseIdList(v){
+    parseIdList(v) {
 
-        if(v == null) return [];
+      if (v == null) return [];
 
-        const s = String(v).trim();
+      const s = String(v).trim();
 
-        if(!s) return [];
+      if (!s) return [];
 
-        // tách theo: dấu phẩy, chấm phẩy, khoảng trắng, xuống dòng, dấu | /
+      // tách theo: dấu phẩy, chấm phẩy, khoảng trắng, xuống dòng, dấu | /
 
-        return s
+      return s
 
-            .split(/[\s,;|/]+/g)
+        .split(/[\s,;|/]+/g)
 
-            .map(x => String(x || '').trim())
+        .map(x => String(x || '').trim())
 
-            .filter(Boolean);
+        .filter(Boolean);
 
-        }
+    }
 
 
 
-        normId(v){
+    normId(v) {
 
-        const s = (v == null) ? '' : String(v).trim();
+      const s = (v == null) ? '' : String(v).trim();
 
-        return s;
+      return s;
 
-        }
+    }
 
     resolveFullItem(partialItem, type) {
 
@@ -3890,69 +3903,69 @@ document.addEventListener('click', (e) => {
 
 
 
-        getDesignIdsForMold(mold){
+    getDesignIdsForMold(mold) {
 
-        const out = [];
+      const out = [];
 
-        if(!mold) return out;
-
-
-
-        // 1) từ mold row
-
-        out.push(...this.parseIdList(mold.MoldDesignID));
-
-        out.push(...this.parseIdList(mold.MoldDesignId));
-
-        out.push(...this.parseIdList(mold.molddesignid));
-
-        out.push(...this.parseIdList(mold.DesignID));
+      if (!mold) return out;
 
 
 
-        // 2) từ molddesign (nếu file có cột MoldID / MoldIDs)
+      // 1) từ mold row
 
-        try{
+      out.push(...this.parseIdList(mold.MoldDesignID));
 
-            const moldId = this.normId(mold.MoldID || mold.MoldCode);
+      out.push(...this.parseIdList(mold.MoldDesignId));
 
-            const designs = Array.isArray(this.data?.molddesign) ? this.data.molddesign : [];
+      out.push(...this.parseIdList(mold.molddesignid));
 
-            for(const d of designs){
-
-            const did = this.normId(d.MoldDesignID || d.DesignID || d.molddesignid);
-
-            if(!did) continue;
+      out.push(...this.parseIdList(mold.DesignID));
 
 
 
-            const dMoldId = this.normId(d.MoldID || d.MoldId || d.MOLDID);
+      // 2) từ molddesign (nếu file có cột MoldID / MoldIDs)
 
-            const dMoldIds = []
+      try {
 
-                .concat(this.parseIdList(d.MoldIDs))
+        const moldId = this.normId(mold.MoldID || mold.MoldCode);
 
-                .concat(this.parseIdList(d.MoldIdList))
+        const designs = Array.isArray(this.data?.molddesign) ? this.data.molddesign : [];
 
-                .concat(this.parseIdList(d.MoldList));
+        for (const d of designs) {
 
+          const did = this.normId(d.MoldDesignID || d.DesignID || d.molddesignid);
 
-
-            if(moldId && (dMoldId === moldId || dMoldIds.includes(moldId))){
-
-                out.push(did);
-
-            }
-
-            }
-
-        }catch(e){ /* ignore */ }
+          if (!did) continue;
 
 
 
-        return Array.from(new Set(out.map(x => this.normId(x)).filter(Boolean)));
+          const dMoldId = this.normId(d.MoldID || d.MoldId || d.MOLDID);
+
+          const dMoldIds = []
+
+            .concat(this.parseIdList(d.MoldIDs))
+
+            .concat(this.parseIdList(d.MoldIdList))
+
+            .concat(this.parseIdList(d.MoldList));
+
+
+
+          if (moldId && (dMoldId === moldId || dMoldIds.includes(moldId))) {
+
+            out.push(did);
+
+          }
 
         }
+
+      } catch (e) { /* ignore */ }
+
+
+
+      return Array.from(new Set(out.map(x => this.normId(x)).filter(Boolean)));
+
+    }
 
     getRelatedCuttersForMold(mold) {
 
@@ -4128,59 +4141,59 @@ document.addEventListener('click', (e) => {
 
 
 
-        ensureRelatedListsForOpen(){
+    ensureRelatedListsForOpen() {
 
-        try{
+      try {
 
-            if(!this.currentItem) return;
-
-
-
-            if(this.currentItemType === 'mold'){
-
-            const mold = this.currentItem;
-
-            mold.relatedCutters = this.getRelatedCuttersForMold(mold);
-
-            }else{
-
-            const cutter = this.currentItem;
+        if (!this.currentItem) return;
 
 
 
-            // dao cắt: luôn lấy danh sách khuôn liên quan theo moldcutter.csv
+        if (this.currentItemType === 'mold') {
 
-            cutter.relatedMolds = this.getSharedMoldsForCutter(cutter) || [];
+          const mold = this.currentItem;
+
+          mold.relatedCutters = this.getRelatedCuttersForMold(mold);
+
+        } else {
+
+          const cutter = this.currentItem;
 
 
 
-            // đồng bộ centerMold: ưu tiên mold direct
+          // dao cắt: luôn lấy danh sách khuôn liên quan theo moldcutter.csv
 
-            if (cutter.relatedMolds && cutter.relatedMolds.length) {
+          cutter.relatedMolds = this.getSharedMoldsForCutter(cutter) || [];
 
-              const direct = cutter.relatedMolds.find(m => String(m.__dpLinkKind || '').toLowerCase() === 'direct');
 
-              this.centerMold = direct || cutter.relatedMolds[0];
 
-              this.centerMoldReason = direct ? 'ensureRelated:direct' : 'ensureRelated';
+          // đồng bộ centerMold: ưu tiên mold direct
 
-            } else if (this.centerMold) {
+          if (cutter.relatedMolds && cutter.relatedMolds.length) {
 
-              // nếu vẫn rỗng, fallback theo centerMold (để luôn có ít nhất 1 khuôn tham chiếu)
+            const direct = cutter.relatedMolds.find(m => String(m.__dpLinkKind || '').toLowerCase() === 'direct');
 
-              cutter.relatedMolds = [this.centerMold];
+            this.centerMold = direct || cutter.relatedMolds[0];
 
-            }
+            this.centerMoldReason = direct ? 'ensureRelated:direct' : 'ensureRelated';
 
-            }
+          } else if (this.centerMold) {
 
-        }catch(e){
+            // nếu vẫn rỗng, fallback theo centerMold (để luôn có ít nhất 1 khuôn tham chiếu)
 
-            /* ignore */
+            cutter.relatedMolds = [this.centerMold];
+
+          }
 
         }
 
-        }
+      } catch (e) {
+
+        /* ignore */
+
+      }
+
+    }
 
 
 
@@ -4272,7 +4285,7 @@ document.addEventListener('click', (e) => {
 
             const mode = action.replace('qu-', '').toUpperCase();
 
-            
+
 
             // Xử lý mode tên khác biệt (qu-weight -> WEIGHT, qu-design -> DESIGN_INFO, qu-lifecycle -> LIFECYCLE)
 
@@ -4318,7 +4331,7 @@ document.addEventListener('click', (e) => {
 
           }
 
-        } catch (e) {}
+        } catch (e) { }
 
       }
 
@@ -4344,7 +4357,7 @@ document.addEventListener('click', (e) => {
 
           }
 
-        } catch (e) {}
+        } catch (e) { }
 
       }
 
@@ -4571,7 +4584,7 @@ document.addEventListener('click', (e) => {
 
       if (!this.currentItem) return `<p class="no-data">No item selected</p>`;
 
-      
+
 
       if (this.isDesktopWide()) {
 
@@ -4990,63 +5003,63 @@ document.addEventListener('click', (e) => {
 
         '<div class="' + heroClass + '">' +
 
-          '<div class="dp-hero-grid">' +
+        '<div class="dp-hero-grid">' +
 
-            '<div class="dp-hero-col dp-hero-col-1">' +
+        '<div class="dp-hero-col dp-hero-col-1">' +
 
-              '<div class="dp-hero-line1">' + e(line1) + '</div>' +
+        '<div class="dp-hero-line1">' + e(line1) + '</div>' +
 
-              '<div class="dp-hero-line2">' +
+        '<div class="dp-hero-line2">' +
 
-                '<span class="dp-hero-id">' + e(id) + '</span>' +
+        '<span class="dp-hero-id">' + e(id) + '</span>' +
 
-                (name ? '<span class="dp-hero-dot">•</span><span class="dp-hero-name2">' + e(name) + '</span>' : '') +
+        (name ? '<span class="dp-hero-dot">•</span><span class="dp-hero-name2">' + e(name) + '</span>' : '') +
 
-              '</div>' +
+        '</div>' +
 
-            '</div>' +
+        '</div>' +
 
-            '<div class="dp-hero-col dp-hero-col-2">' +
+        '<div class="dp-hero-col dp-hero-col-2">' +
 
-              '<div class="dp-hero-kv">' +
+        '<div class="dp-hero-kv">' +
 
-                '<span class="dp-hero-k">' + labelLocation + '</span>' +
+        '<span class="dp-hero-k">' + labelLocation + '</span>' +
 
-                '<span class="dp-hero-v">' + e(locationText) + '</span>' +
+        '<span class="dp-hero-v">' + e(locationText) + '</span>' +
 
-              '</div>' +
+        '</div>' +
 
-              '<div class="dp-hero-kv">' +
+        '<div class="dp-hero-kv">' +
 
-                '<span class="dp-hero-k">' + labelCompany + '</span>' +
+        '<span class="dp-hero-k">' + labelCompany + '</span>' +
 
-                '<span class="dp-hero-v' + (companyInfo && companyInfo.needsHighlight ? ' dp-hero-v--warn' : '') + '">' + e(companyText) + '</span>' +
+        '<span class="dp-hero-v' + (companyInfo && companyInfo.needsHighlight ? ' dp-hero-v--warn' : '') + '">' + e(companyText) + '</span>' +
 
-              '</div>' +
+        '</div>' +
 
-              '<div class="dp-hero-kv">' +
+        '<div class="dp-hero-kv">' +
 
-                '<span class="dp-hero-k">' + labelStatus + '</span>' +
+        '<span class="dp-hero-k">' + labelStatus + '</span>' +
 
-                '<span class="dp-hero-v">' + e(statusText) + '</span>' +
+        '<span class="dp-hero-v">' + e(statusText) + '</span>' +
 
-              '</div>' +
+        '</div>' +
 
-              '<div class="dp-hero-kv hidden-mobile">' +
+        '<div class="dp-hero-kv hidden-mobile">' +
 
-                '<span class="dp-hero-k">' + labelConfirm + '</span>' +
+        '<span class="dp-hero-k">' + labelConfirm + '</span>' +
 
-                '<span class="dp-hero-v dp-hero-date">' + e(confirmText) + '</span>' +
+        '<span class="dp-hero-v dp-hero-date">' + e(confirmText) + '</span>' +
 
-              '</div>' +
+        '</div>' +
 
-              (returning ? '<div class="dp-hero-kv dp-hero-kv--warn"><span class="dp-hero-k">' + labelReturn + '</span><span class="dp-hero-v">' + e(returning) + '</span></div>' : '') +
+        (returning ? '<div class="dp-hero-kv dp-hero-kv--warn"><span class="dp-hero-k">' + labelReturn + '</span><span class="dp-hero-v">' + e(returning) + '</span></div>' : '') +
 
-              (disposing ? '<div class="dp-hero-kv dp-hero-kv--danger"><span class="dp-hero-k">' + labelDispose + '</span><span class="dp-hero-v">' + e(disposing) + '</span></div>' : '') +
+        (disposing ? '<div class="dp-hero-kv dp-hero-kv--danger"><span class="dp-hero-k">' + labelDispose + '</span><span class="dp-hero-v">' + e(disposing) + '</span></div>' : '') +
 
-            '</div>' +
+        '</div>' +
 
-          '</div>' +
+        '</div>' +
 
         '</div>'
 
@@ -5258,227 +5271,227 @@ document.addEventListener('click', (e) => {
 
 
 
-          '<div class="dp-hero-grid dp-preview-hero-grid">' +
+        '<div class="dp-hero-grid dp-preview-hero-grid">' +
 
 
 
 
 
-            '<div class="dp-preview-hero-thumbwrap">' +
+        '<div class="dp-preview-hero-thumbwrap">' +
 
 
 
-              '<img data-dp-preview-hero-thumb="1"' +
+        '<img data-dp-preview-hero-thumb="1"' +
 
 
 
-                ' data-dp-device-type="' + e(deviceType) + '"' +
+        ' data-dp-device-type="' + e(deviceType) + '"' +
 
 
 
-                ' data-dp-device-id="' + e(deviceId) + '"' +
+        ' data-dp-device-id="' + e(deviceId) + '"' +
 
 
 
-                ' data-dp-hero-thumb-state="loading"' +
+        ' data-dp-hero-thumb-state="loading"' +
 
 
 
-                ' src="' + transparentPixel + '" alt="" />' +
+        ' src="' + transparentPixel + '" alt="" />' +
 
 
 
-              '<div class="dp-preview-hero-thumbph">' +
+        '<div class="dp-preview-hero-thumbph">' +
 
 
 
-                '<div class="dp-preview-hero-thumbph-text">写真なし / Chưa có ảnh</div>' +
+        '<div class="dp-preview-hero-thumbph-text">写真なし / Chưa có ảnh</div>' +
 
 
 
-              '</div>' +
+        '</div>' +
 
 
 
-            '</div>' +
+        '</div>' +
 
 
 
 
 
-            '<div class="dp-preview-hero-right">' +
+        '<div class="dp-preview-hero-right">' +
 
 
 
-              '<div class="dp-preview-hero-top">' +
+        '<div class="dp-preview-hero-top">' +
 
 
 
-                '<div class="dp-hero-line1">' + e(line1) + '</div>' +
+        '<div class="dp-hero-line1">' + e(line1) + '</div>' +
 
 
 
-                '<div class="dp-hero-line2">' + line2Html + '</div>' +
+        '<div class="dp-hero-line2">' + line2Html + '</div>' +
 
 
 
-              '</div>' +
+        '</div>' +
 
 
 
 
 
-              '<div class="dp-preview-hero-bottom">' +
+        '<div class="dp-preview-hero-bottom">' +
 
 
 
-                '<div class="dp-preview-hero-kvgrid">' +
+        '<div class="dp-preview-hero-kvgrid">' +
 
 
 
 
 
-                  '<div class="dp-hero-kv">' +
+        '<div class="dp-hero-kv">' +
 
 
 
-                    '<span class="dp-hero-k">' + labelLocation + '</span>' +
+        '<span class="dp-hero-k">' + labelLocation + '</span>' +
 
 
 
-                    '<span class="dp-hero-v">' + e(locationText) + '</span>' +
+        '<span class="dp-hero-v">' + e(locationText) + '</span>' +
 
 
 
-                  '</div>' +
+        '</div>' +
 
 
 
 
 
-                  '<div class="dp-hero-kv">' +
+        '<div class="dp-hero-kv">' +
 
 
 
-                    '<span class="dp-hero-k">' + labelCompany + '</span>' +
+        '<span class="dp-hero-k">' + labelCompany + '</span>' +
 
 
 
-                    '<span class="dp-hero-v' + (companyInfo && companyInfo.needsHighlight ? ' dp-hero-v--warn' : '') + '">' + e(companyText) + '</span>' +
+        '<span class="dp-hero-v' + (companyInfo && companyInfo.needsHighlight ? ' dp-hero-v--warn' : '') + '">' + e(companyText) + '</span>' +
 
 
 
-                  '</div>' +
+        '</div>' +
 
 
 
 
 
-                  '<div class="dp-hero-kv">' +
+        '<div class="dp-hero-kv">' +
 
 
 
-                    '<span class="dp-hero-k">' + labelStatus + '</span>' +
+        '<span class="dp-hero-k">' + labelStatus + '</span>' +
 
 
 
-                    '<span class="dp-hero-v">' + e(statusText) + '</span>' +
+        '<span class="dp-hero-v">' + e(statusText) + '</span>' +
 
 
 
-                  '</div>' +
+        '</div>' +
 
 
 
 
 
-                  '<div class="dp-hero-kv">' +
+        '<div class="dp-hero-kv">' +
 
 
 
-                    '<span class="dp-hero-k">' + labelConfirm + '</span>' +
+        '<span class="dp-hero-k">' + labelConfirm + '</span>' +
 
 
 
-                    '<span class="dp-hero-v dp-hero-date">' + e(confirmText) + '</span>' +
+        '<span class="dp-hero-v dp-hero-date">' + e(confirmText) + '</span>' +
 
 
 
-                  '</div>' +
+        '</div>' +
 
 
 
 
 
-                '</div>' +
+        '</div>' +
 
 
 
 
 
-                (returning ? (
+        (returning ? (
 
 
 
-                  '<div class="dp-hero-kv dp-hero-kv--warn">' +
+          '<div class="dp-hero-kv dp-hero-kv--warn">' +
 
 
 
-                    '<span class="dp-hero-k">' + labelReturn + '</span>' +
+          '<span class="dp-hero-k">' + labelReturn + '</span>' +
 
 
 
-                    '<span class="dp-hero-v">' + e(returning) + '</span>' +
+          '<span class="dp-hero-v">' + e(returning) + '</span>' +
 
 
 
-                  '</div>'
+          '</div>'
 
 
 
-                ) : '') +
+        ) : '') +
 
 
 
 
 
-                (disposing ? (
+        (disposing ? (
 
 
 
-                  '<div class="dp-hero-kv dp-hero-kv--danger">' +
+          '<div class="dp-hero-kv dp-hero-kv--danger">' +
 
 
 
-                    '<span class="dp-hero-k">' + labelDispose + '</span>' +
+          '<span class="dp-hero-k">' + labelDispose + '</span>' +
 
 
 
-                    '<span class="dp-hero-v">' + e(disposing) + '</span>' +
+          '<span class="dp-hero-v">' + e(disposing) + '</span>' +
 
 
 
-                  '</div>'
+          '</div>'
 
 
 
-                ) : '') +
+        ) : '') +
 
 
 
 
 
-              '</div>' +
+        '</div>' +
 
 
 
-            '</div>' +
+        '</div>' +
 
 
 
 
 
-          '</div>' +
+        '</div>' +
 
 
 
@@ -5632,7 +5645,7 @@ document.addEventListener('click', (e) => {
 
           if (typeof window.DevicePhotoStore.ensureReady === 'function') window.DevicePhotoStore.ensureReady()
 
-        } catch (e) {}
+        } catch (e) { }
 
 
 
@@ -5698,7 +5711,7 @@ document.addEventListener('click', (e) => {
 
                 if (!thumbUrl) {
 
-                  try { img.removeAttribute('src'); } catch (e) {}
+                  try { img.removeAttribute('src'); } catch (e) { }
 
                   img.style.opacity = '0';
 
@@ -5838,13 +5851,13 @@ document.addEventListener('click', (e) => {
 
       const candidates = [
 
-        'PhotoUrl','PhotoURL','ImageUrl','ImageURL','photoUrl','imageUrl',
+        'PhotoUrl', 'PhotoURL', 'ImageUrl', 'ImageURL', 'photoUrl', 'imageUrl',
 
-        'Photo','Image','ImagePath','PhotoPath','photo','image',
+        'Photo', 'Image', 'ImagePath', 'PhotoPath', 'photo', 'image',
 
-        'MoldPhoto','MoldImage','CutterPhoto','CutterImage',
+        'MoldPhoto', 'MoldImage', 'CutterPhoto', 'CutterImage',
 
-        'Photo1','Photo2','Photo3','Image1','Image2','Image3'
+        'Photo1', 'Photo2', 'Photo3', 'Image1', 'Image2', 'Image3'
 
       ];
 
@@ -6078,13 +6091,13 @@ document.addEventListener('click', (e) => {
 
         const keys = [
 
-          'Price','UnitPrice','Cost','Value','Amount','JPY','Jpy','Yen',
+          'Price', 'UnitPrice', 'Cost', 'Value', 'Amount', 'JPY', 'Jpy', 'Yen',
 
-          'MoldPrice','CutterPrice','MoldValue','CutterValue',
+          'MoldPrice', 'CutterPrice', 'MoldValue', 'CutterValue',
 
-          'UnitCost','MaterialCost','PurchasePrice',
+          'UnitCost', 'MaterialCost', 'PurchasePrice',
 
-          '価格','単価','金額'
+          '価格', '単価', '金額'
 
         ];
 
@@ -6182,7 +6195,7 @@ document.addEventListener('click', (e) => {
 
       if (!isMold && row?.CutterType) {
 
-          cutterTypeBadge = `<span class="dp-badge-dim" style="background:#e0e7ff; color:#1e40af; border-color:#bfdbfe; font-size:10px; margin-left:4px; padding:1px 4px;">${this.escapeHtml(row.CutterType)}</span>`;
+        cutterTypeBadge = `<span class="dp-badge-dim" style="background:#e0e7ff; color:#1e40af; border-color:#bfdbfe; font-size:10px; margin-left:4px; padding:1px 4px;">${this.escapeHtml(row.CutterType)}</span>`;
 
       }
 
@@ -6206,21 +6219,21 @@ document.addEventListener('click', (e) => {
 
       if ('SeparateCutter' in row || 'Separate' in row || 'Betsunuki' in row || 'separate' in row || 'separateCutter' in row) {
 
-         const sepVal = String(row.SeparateCutter || row.Separate || row.Betsunuki || row.separate || row.separateCutter || '').toUpperCase();
+        const sepVal = String(row.SeparateCutter || row.Separate || row.Betsunuki || row.separate || row.separateCutter || '').toUpperCase();
 
-         if (sepVal === 'YES' || sepVal === '1' || sepVal === 'CÓ' || sepVal === 'TRUE') {
+        if (sepVal === 'YES' || sepVal === '1' || sepVal === 'CÓ' || sepVal === 'TRUE') {
 
-             separateBadge = `<span style="background:#fee2e2; color:#dc2626; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:700; border:1px solid #fca5a5; margin-left: 6px; white-space:nowrap;">別抜き YES</span>`;
+          separateBadge = `<span style="background:#fee2e2; color:#dc2626; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:700; border:1px solid #fca5a5; margin-left: 6px; white-space:nowrap;">別抜き YES</span>`;
 
-         } else if (sepVal === 'NO' || sepVal === '0' || sepVal === 'KHÔNG' || sepVal === 'FALSE') {
+        } else if (sepVal === 'NO' || sepVal === '0' || sepVal === 'KHÔNG' || sepVal === 'FALSE') {
 
-             separateBadge = `<span style="background:#f1f5f9; color:#64748b; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:700; border:1px solid #cbd5e1; margin-left: 6px; white-space:nowrap;">別抜き NO</span>`;
+          separateBadge = `<span style="background:#f1f5f9; color:#64748b; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:700; border:1px solid #cbd5e1; margin-left: 6px; white-space:nowrap;">別抜き NO</span>`;
 
-         } else {
+        } else {
 
-             separateBadge = `<span style="background:#fef3c7; color:#d97706; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:700; border:1px solid #fcd34d; margin-left: 6px; white-space:nowrap;">別抜き ${this.escapeHtml(sepVal)}</span>`;
+          separateBadge = `<span style="background:#fef3c7; color:#d97706; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:700; border:1px solid #fcd34d; margin-left: 6px; white-space:nowrap;">別抜き ${this.escapeHtml(sepVal)}</span>`;
 
-         }
+        }
 
       }
 
@@ -6371,7 +6384,7 @@ document.addEventListener('click', (e) => {
 
         const total = Array.isArray(list) ? list.length : 0;
         if (!total) return '';
-        
+
         const displayList = list.slice(0, 3);
         const remaining = total - 3;
 
@@ -6388,7 +6401,7 @@ document.addEventListener('click', (e) => {
         for (const r of displayList) {
           html += this.renderRelatedRow(r, rowItemType);
         }
-        
+
         if (remaining > 0) {
           html += `
             <button class="btn-load-more dp-action-btn" type="button" data-jump="devices" style="width:100%; border-radius:8px; display:block; padding:8px; text-align:center; background:#f1f5f9; color:#475569; font-weight:600; font-size:13px; margin-top:8px; border:1px solid #e2e8f0; cursor:pointer;">
@@ -6396,7 +6409,7 @@ document.addEventListener('click', (e) => {
             </button>
           `;
         }
-        
+
         html += `</div></div>`;
         return html;
       } catch (e) {
@@ -6494,11 +6507,11 @@ document.addEventListener('click', (e) => {
 
 
 
-    
+
 
     renderDesktopMiniSnapshotsCutter(cutter) {
 
-       return this.renderDesktopMiniSnapshots(cutter);
+      return this.renderDesktopMiniSnapshots(cutter);
 
     }
 
@@ -6532,25 +6545,25 @@ document.addEventListener('click', (e) => {
 
           <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
 
-            ${ [ 
+            ${[
 
-               {lbl: this.biLabel('最新ステータス', 'Trạng thái mới nhất'), val: this.safeText(lastStatus?.Status)},
+          { lbl: this.biLabel('最新ステータス', 'Trạng thái mới nhất'), val: this.safeText(lastStatus?.Status) },
 
-               {lbl: this.biLabel('ステータス日時', 'Thời gian trạng thái'), val: this.safeText(this.formatDate(lastStatus?.Timestamp))},
+          { lbl: this.biLabel('ステータス日時', 'Thời gian trạng thái'), val: this.safeText(this.formatDate(lastStatus?.Timestamp)) },
 
-               {lbl: this.biLabel('テフロン', 'Teflon'), val: this.safeText(teflonStatus)},
+          { lbl: this.biLabel('テフロン', 'Teflon'), val: this.safeText(teflonStatus) },
 
-               {lbl: this.biLabel('テフロン日時', 'Thời gian Teflon'), val: this.safeText(this.formatDate(teflonDate))}
+          { lbl: this.biLabel('テフロン日時', 'Thời gian Teflon'), val: this.safeText(this.formatDate(teflonDate)) }
 
-              ].map(f => {
+        ].map(f => {
 
-                 let processedLabel = f.lbl;
+          let processedLabel = f.lbl;
 
-                 if (processedLabel.includes('|||')) {
+          if (processedLabel.includes('|||')) {
 
-                    const parts = processedLabel.split('|||');
+            const parts = processedLabel.split('|||');
 
-                    processedLabel = `<div style="display:flex; flex-direction:column; line-height:1.3; gap:2px;">
+            processedLabel = `<div style="display:flex; flex-direction:column; line-height:1.3; gap:2px;">
 
                        <span style="font-weight: 700; color: #475569; font-size: 11px;">${parts[0]}</span>
 
@@ -6558,9 +6571,9 @@ document.addEventListener('click', (e) => {
 
                     </div>`;
 
-                 }
+          }
 
-                 return `
+          return `
 
                  <div class="ov-item" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; padding: 6px 10px; background: rgba(248, 250, 252, 0.6); border: 1px solid rgba(15, 23, 42, 0.06); border-radius: 12px; gap: 8px;">
 
@@ -6570,9 +6583,9 @@ document.addEventListener('click', (e) => {
 
                  </div>`;
 
-              }).join('') 
+        }).join('')
 
-            }
+        }
 
           </div>
 
@@ -6644,7 +6657,7 @@ document.addEventListener('click', (e) => {
 
       const rackLocation = rackInfo?.RackLocation ?? item?.displayRackLocation ?? item?.displayLocation ?? item?.RackLayerID ?? item?.location ?? '-';
 
-      
+
 
       const rackLocationBadgeCls = this.isDesktopWide() ? 'dp-location-badge dp-location-badge--desktop' : 'dp-location-badge';
 
@@ -6690,7 +6703,7 @@ document.addEventListener('click', (e) => {
 
               <div class="dp-storage-col">
 
-                <div class="dp-storage-label">${this.renderLabelHtml(this.biLabel('保管会社','Công ty'))}</div>
+                <div class="dp-storage-label">${this.renderLabelHtml(this.biLabel('保管会社', 'Công ty'))}</div>
 
                 <div class="${companyBadgeCls}">${e(companyInfo.nameShort || '-')}</div>
 
@@ -6700,7 +6713,7 @@ document.addEventListener('click', (e) => {
 
               <div class="dp-storage-col">
 
-                <div class="dp-storage-label">${this.renderLabelHtml(this.biLabel('棚-段','Giá - Tầng'))}</div>
+                <div class="dp-storage-label">${this.renderLabelHtml(this.biLabel('棚-段', 'Giá - Tầng'))}</div>
 
                 <div class="dp-badge-racklayer">${e(rackLayerText)}</div>
 
@@ -6710,7 +6723,7 @@ document.addEventListener('click', (e) => {
 
               <div class="dp-storage-col">
 
-                <div class="dp-storage-label">${this.renderLabelHtml(this.biLabel('状態','Trạng thái'))}</div>
+                <div class="dp-storage-label">${this.renderLabelHtml(this.biLabel('状態', 'Trạng thái'))}</div>
 
                 <div class="status-badge-compact ${e(statusInfo.class || '')}">
 
@@ -6726,7 +6739,7 @@ document.addEventListener('click', (e) => {
 
               <div class="dp-storage-col ${confirmGroupCls}">
 
-                <div class="dp-storage-label">${this.renderLabelHtml(this.biLabel('確認','Xác nhận'))}</div>
+                <div class="dp-storage-label">${this.renderLabelHtml(this.biLabel('確認', 'Xác nhận'))}</div>
 
                 <div class="date-badge-compact">
 
@@ -6770,7 +6783,7 @@ document.addEventListener('click', (e) => {
 
                     <div style="display:flex;align-items:center;justify-content:space-between;">
 
-                      <div style="font-size:10px;font-weight:700;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this.renderLabelHtml(this.biLabel('保管会社','(Công ty)'))}</div>
+                      <div style="font-size:10px;font-weight:700;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this.renderLabelHtml(this.biLabel('保管会社', '(Công ty)'))}</div>
 
                       <div style="font-size:11px;font-weight:700;max-width:60%;text-align:right;"><span class="${companyBadgeCls}">${e(companyInfo.nameShort || '-')}</span></div>
 
@@ -6778,7 +6791,7 @@ document.addEventListener('click', (e) => {
 
                     <div style="display:flex;align-items:center;justify-content:space-between;">
 
-                      <div style="font-size:10px;font-weight:700;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this.renderLabelHtml(this.biLabel('棚-段','(Giá - Tầng)'))}</div>
+                      <div style="font-size:10px;font-weight:700;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this.renderLabelHtml(this.biLabel('棚-段', '(Giá - Tầng)'))}</div>
 
                       <div style="font-size:11px;font-weight:700;max-width:60%;text-align:right;"><span class="dp-badge-racklayer">${e(rackLayerText)}</span></div>
 
@@ -6786,7 +6799,7 @@ document.addEventListener('click', (e) => {
 
                     <div style="display:flex;align-items:center;justify-content:space-between;">
 
-                      <div style="font-size:10px;font-weight:700;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this.renderLabelHtml(this.biLabel('状態','(Trạng thái)'))}</div>
+                      <div style="font-size:10px;font-weight:700;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this.renderLabelHtml(this.biLabel('状態', '(Trạng thái)'))}</div>
 
                       <div style="display:flex;justify-content:flex-end;max-width:60%;">
 
@@ -6798,7 +6811,7 @@ document.addEventListener('click', (e) => {
 
                     <div style="display:flex;align-items:center;justify-content:space-between;">
 
-                      <div style="font-size:10px;font-weight:700;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this.renderLabelHtml(this.biLabel('確認(棚)','(Xác nhận)'))}</div>
+                      <div style="font-size:10px;font-weight:700;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this.renderLabelHtml(this.biLabel('確認(棚)', '(Xác nhận)'))}</div>
 
                       <div style="display:flex;justify-content:flex-end;max-width:60%;">
 
@@ -7030,7 +7043,7 @@ document.addEventListener('click', (e) => {
 
 
 
-    
+
 
     renderOverviewSection(item, type) {
 
@@ -7042,17 +7055,17 @@ document.addEventListener('click', (e) => {
 
       const safeText = (v) => (!v || String(v).trim() === '') ? '-' : String(v).trim();
 
-      
+
 
       const design = typeof this.getMoldDesignInfoSafe === 'function' ? this.getMoldDesignInfoSafe(item, type) : null;
 
       const job = typeof this.getJobInfoSafe === 'function' ? this.getJobInfoSafe(item, type) : null;
 
-      
+
 
       const itemType = isMold ? safeText(this.pick(design, ['MoldSetupType']) || item.MoldType) : safeText(item.CutterType);
 
-      
+
 
       // Khay information
 
@@ -7064,7 +7077,7 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       const plasticType = safeText(
 
@@ -7076,7 +7089,7 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       // DIMENSIONS AND WEIGHT (MOLD)
 
@@ -7112,13 +7125,13 @@ document.addEventListener('click', (e) => {
 
 
 
-      const pieceCount = isMold 
+      const pieceCount = isMold
 
-        ? safeText(this.pick(design, ['PieceCount', 'PieceNumbers']) || item.PieceCount) 
+        ? safeText(this.pick(design, ['PieceCount', 'PieceNumbers']) || item.PieceCount)
 
         : safeText(item.BladeCount || item.Blades);
 
-        
+
 
       const pocketCount = safeText(
 
@@ -7132,9 +7145,9 @@ document.addEventListener('click', (e) => {
 
       const trayWeight = safeText(
 
-        item.trayInfo?.TrayWeight || item.trayInfo?.ActualTrayWeight || 
+        item.trayInfo?.TrayWeight || item.trayInfo?.ActualTrayWeight ||
 
-        design?.TrayWeight || design?.ProductWeight || 
+        design?.TrayWeight || design?.ProductWeight ||
 
         job?.TrayWeight || job?.ProductWeight || job?.Weight
 
@@ -7156,7 +7169,7 @@ document.addEventListener('click', (e) => {
 
           if (Array.isArray(related) && related.length) fbCutter = related[0];
 
-        } catch(e) {}
+        } catch (e) { }
 
       }
 
@@ -7164,7 +7177,7 @@ document.addEventListener('click', (e) => {
 
       const fCutY = fbCutter ? String(fbCutter.CutlineWidth ?? fbCutter.CutWidth ?? fbCutter.CutlineW ?? fbCutter.CutY ?? '').trim() : '';
 
-      
+
 
       const depth = safeText(design?.MoldDesignDepth || design?.Depth || design?.CavityDepth || item.MoldDepth);
 
@@ -7172,7 +7185,7 @@ document.addEventListener('click', (e) => {
 
       const c = (design?.ChamferC ?? design?.C ?? design?.CutC ?? design?.ProductC ?? fbCutter?.CutterChamfer ?? fbCutter?.ChamferC ?? item.CutterChamfer ?? item.ChamferC ?? '').toString().trim();
 
-      
+
 
       const baseXY = (cutX && cutY) ? `${cutX}×${cutY}` : ((fCutX && fCutY) ? `${fCutX}×${fCutY}` : '-');
 
@@ -7198,11 +7211,11 @@ document.addEventListener('click', (e) => {
 
 
 
-      const costRaw = this.pick(item, ['Cost', 'OriginalCost', 'Price', 'UnitPrice', 'NguyenGia', 'CostPrice']) || 
+      const costRaw = this.pick(item, ['Cost', 'OriginalCost', 'Price', 'UnitPrice', 'NguyenGia', 'CostPrice']) ||
 
-                      this.pick(job, ['Cost', 'Price', 'UnitPrice']) || 
+        this.pick(job, ['Cost', 'Price', 'UnitPrice']) ||
 
-                      this.pick(design, ['Cost', 'UnitPrice']);
+        this.pick(design, ['Cost', 'UnitPrice']);
 
       const costBadge = (costRaw && String(costRaw).trim() !== '') ? `<span style="font-weight:600; color:#b91c1c;">${this.safeText(costRaw)}</span>` : '-';
 
@@ -7214,11 +7227,11 @@ document.addEventListener('click', (e) => {
 
         <div style="font-size: 16px; font-weight: 800; color:#0f172a; line-height: 1.4; display: flex; align-items: center; gap: 8px;">
 
-           ${isMold 
+           ${isMold
 
-             ? `<span class="dp-badge-cutter-no" style="background:var(--dp-mold-theme); font-size: 11px; padding: 2px 6px; border-radius: 4px;">MOLD</span>` 
+          ? `<span class="dp-badge-cutter-no" style="background:var(--dp-mold-theme); font-size: 11px; padding: 2px 6px; border-radius: 4px;">MOLD</span>`
 
-             : `<span class="dp-badge-cutter-no" style="background:var(--dp-cutter-theme); font-size: 11px; padding: 2px 6px; border-radius: 4px;">CUTTER</span>`}
+          : `<span class="dp-badge-cutter-no" style="background:var(--dp-cutter-theme); font-size: 11px; padding: 2px 6px; border-radius: 4px;">CUTTER</span>`}
 
            <span style="display:inline-flex; align-items:center; gap: 6px; flex-wrap: wrap;">
 
@@ -7240,13 +7253,13 @@ document.addEventListener('click', (e) => {
 
 
 
-      const row1 = [ { label: this.biLabel('名称', 'Tên thiết bị'), rawValue: nameBadge, customClass: 'name-row' } ];
+      const row1 = [{ label: this.biLabel('名称', 'Tên thiết bị'), rawValue: nameBadge, customClass: 'name-row' }];
 
       // row2 removed as integrated into nameBadge
 
-      const row3 = [ { label: this.biLabel('トレイ情報(指示書)', 'Thông tin khay (từ chỉ thị)'), rawValue: trayInfoInstruction } ];
+      const row3 = [{ label: this.biLabel('トレイ情報(指示書)', 'Thông tin khay (từ chỉ thị)'), rawValue: trayInfoInstruction }];
 
-      const row4 = [ { label: this.biLabel('樹脂', 'Loại nhựa'), rawValue: plasticType } ];
+      const row4 = [{ label: this.biLabel('樹脂', 'Loại nhựa'), rawValue: plasticType }];
 
       const row5 = [
 
@@ -7284,19 +7297,19 @@ document.addEventListener('click', (e) => {
 
       const renderGrid = (arr, cls) => {
 
-         let html = `<div class="ov-row ${cls}">`;
+        let html = `<div class="ov-row ${cls}">`;
 
-         for (const f of arr) {
+        for (const f of arr) {
 
-           const rawLbl = String(f.label || '');
+          const rawLbl = String(f.label || '');
 
-           let processedLabel = rawLbl;
+          let processedLabel = rawLbl;
 
-           if (rawLbl.includes('|||')) {
+          if (rawLbl.includes('|||')) {
 
-              const parts = rawLbl.split('|||');
+            const parts = rawLbl.split('|||');
 
-              processedLabel = `<div style="display:flex; flex-direction:column; line-height:1.3; gap:2px;">
+            processedLabel = `<div style="display:flex; flex-direction:column; line-height:1.3; gap:2px;">
 
                  <span style="font-weight: 700; color: #475569; font-size: 11.5px;">${parts[0]}</span>
 
@@ -7304,11 +7317,11 @@ document.addEventListener('click', (e) => {
 
               </div>`;
 
-           }
+          }
 
-           let addCls = f.customClass ? ' ' + f.customClass : '';
+          let addCls = f.customClass ? ' ' + f.customClass : '';
 
-           html += `
+          html += `
 
              <div class="ov-item${addCls}">
 
@@ -7320,11 +7333,11 @@ document.addEventListener('click', (e) => {
 
            `;
 
-         }
+        }
 
-         html += `</div>`;
+        html += `</div>`;
 
-         return html;
+        return html;
 
       };
 
@@ -7520,7 +7533,7 @@ document.addEventListener('click', (e) => {
 
       const job = this.getJobInfoSafe(mold, 'mold');
 
-      
+
 
       const moldID = this.safeText(mold?.MoldID);
 
@@ -7528,7 +7541,7 @@ document.addEventListener('click', (e) => {
 
       const name = this.safeText(mold?.MoldName);
 
-      
+
 
       // Kích thước: từ mold hoặc design
 
@@ -7542,13 +7555,13 @@ document.addEventListener('click', (e) => {
 
       const dimensions = this.safeText(
 
-      mold?.displayDimensions || mold?.displaySize || mold?.Dimensions || mold?.Size ||
+        mold?.displayDimensions || mold?.displaySize || mold?.Dimensions || mold?.Size ||
 
-      this.formatLWH(design?.MoldDesignLength, design?.MoldDesignWidth, design?.MoldDesignHeight),
+        this.formatLWH(design?.MoldDesignLength, design?.MoldDesignWidth, design?.MoldDesignHeight),
 
-      '-'
+        '-'
 
-    );
+      );
 
       // Khối lượng
 
@@ -7560,7 +7573,7 @@ document.addEventListener('click', (e) => {
 
         : '-';
 
-      
+
 
       // Kiểu khuôn (MoldOrientation = hướng lắp)
 
@@ -7568,31 +7581,31 @@ document.addEventListener('click', (e) => {
 
       const installDir = this.safeText(this.pick(design, ['MoldOrientation']));
 
-      
+
 
       // Số mảnh
 
       const pieceCount = this.safeText(this.pick(design, ['PieceCount']));
 
-      
+
 
       // Pitch
 
       const pitch = this.safeText(this.pick(design, ['Pitch']) ?? mold?.Pitch);
 
-      
+
 
       // Chiều sâu
 
       const depth = this.safeText(this.pick(design, ['MoldDesignDepth']));
 
-      
+
 
       // UnderDepth
 
       const underDepth = this.safeText(this.pick(design, ['UnderDepth']));
 
-      
+
 
       // Ngày SX: lấy DeliveryDeadline từ job sớm nhất
 
@@ -7606,7 +7619,7 @@ document.addEventListener('click', (e) => {
 
       }
 
-      
+
 
       const fields = [
 
@@ -7616,7 +7629,7 @@ document.addEventListener('click', (e) => {
 
         { label: this.biLabel('金型コード', 'Mã khuôn'), rawValue: code },
 
-        
+
 
         { label: this.biLabel('寸法', 'Kích thước'), rawValue: dimensions },
 
@@ -7640,7 +7653,7 @@ document.addEventListener('click', (e) => {
 
 
 
-      
+
 
       return `<div class="modal-section">
 
@@ -7670,7 +7683,7 @@ document.addEventListener('click', (e) => {
 
       const moldDesignID = this.safeText(item?.MoldDesignID);
 
-      
+
 
       const design = this.getMoldDesignInfoSafe(item, 'cutter');
 
@@ -7680,7 +7693,7 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       const cutterType = this.safeText(item?.CutterType);
 
@@ -7698,13 +7711,13 @@ document.addEventListener('click', (e) => {
 
       const satoCodeDate = this.safeText(item?.SatoCodeDate);
 
-      
+
 
       const cutSize = this.formatCutterCutSize(item);
 
       const sharedMoldsText = this.getMoldSharedListTextForCutter(item);
 
-      
+
 
       const fields = [
 
@@ -7742,7 +7755,7 @@ document.addEventListener('click', (e) => {
 
 
 
-      
+
 
       return `<div class="modal-section">
 
@@ -7786,7 +7799,7 @@ document.addEventListener('click', (e) => {
 
 
 
-    renderMoldTechnicalInfoFull(item){
+    renderMoldTechnicalInfoFull(item) {
 
       const mold = item;
 
@@ -7956,11 +7969,11 @@ document.addEventListener('click', (e) => {
 
       const r = (d?.CornerR ?? d?.R ?? d?.CutR ?? d?.ProductR ?? '').toString().trim() ||
 
-                (fbCutter ? String(fbCutter.CutterCorner ?? fbCutter.CornerR ?? '').trim() : '');
+        (fbCutter ? String(fbCutter.CutterCorner ?? fbCutter.CornerR ?? '').trim() : '');
 
       const c = (d?.ChamferC ?? d?.C ?? d?.CutC ?? d?.ProductC ?? '').toString().trim() ||
 
-                (fbCutter ? String(fbCutter.CutterChamfer ?? fbCutter.ChamferC ?? '').trim() : '');
+        (fbCutter ? String(fbCutter.CutterChamfer ?? fbCutter.ChamferC ?? '').trim() : '');
 
 
 
@@ -8110,37 +8123,37 @@ document.addEventListener('click', (e) => {
 
         // nhóm Basic (đã show)
 
-        'CutterID','ID','CutterNo','CutterCode','CutterDesignCode','CutterName','CutterDesignName','Name',
+        'CutterID', 'ID', 'CutterNo', 'CutterCode', 'CutterDesignCode', 'CutterName', 'CutterDesignName', 'Name',
 
-        'MoldDesignID','molddesignid','DesignID','MoldDesignCode','IDMaKhuonThietKe',
+        'MoldDesignID', 'molddesignid', 'DesignID', 'MoldDesignCode', 'IDMaKhuonThietKe',
 
-        'CutterType','CutlineLength','CutlineWidth','CutLength','CutWidth','CutterCorner','CornerR','CutterChamfer','ChamferC',
+        'CutterType', 'CutlineLength', 'CutlineWidth', 'CutLength', 'CutWidth', 'CutterCorner', 'CornerR', 'CutterChamfer', 'ChamferC',
 
-        'PlasticCutType','PlasticType','BladeCount','Blades','Pitch','BladePitch','PPcushionUse','PPCushionUse','PP_Cushion',
+        'PlasticCutType', 'PlasticType', 'BladeCount', 'Blades', 'Pitch', 'BladePitch', 'PPcushionUse', 'PPCushionUse', 'PP_Cushion',
 
-        'CutterEntry','EntryDate','CreatedAt','SatoCode','SatoCodeDate',
+        'CutterEntry', 'EntryDate', 'CreatedAt', 'SatoCode', 'SatoCodeDate',
 
 
 
         // nhóm Product reference (đã dùng)
 
-        'TrayInfoForMoldDesign','CustomerTrayName','TrayName','Material','TrayWeight',
+        'TrayInfoForMoldDesign', 'CustomerTrayName', 'TrayName', 'Material', 'TrayWeight',
 
-        'PocketCount','Pockets','PocketNumbers','DraftAngle','TaperAngle','TextContent','EngravingText',
+        'PocketCount', 'Pockets', 'PocketNumbers', 'DraftAngle', 'TaperAngle', 'TextContent', 'EngravingText',
 
-        'CutlineX','CutlineY','MoldDesignDepth','CavityDepth','Depth',
+        'CutlineX', 'CutlineY', 'MoldDesignDepth', 'CavityDepth', 'Depth',
 
 
 
         // object enrich / không muốn liệt kê
 
-        'relatedMolds','relatedCutters','rackInfo','rackLayerInfo','customerInfo','companyInfo'
+        'relatedMolds', 'relatedCutters', 'rackInfo', 'rackLayerInfo', 'customerInfo', 'companyInfo'
 
       ]);
 
 
 
-      const keys = Object.keys(cutter || {}).sort((a,b)=>a.localeCompare(b));
+      const keys = Object.keys(cutter || {}).sort((a, b) => a.localeCompare(b));
 
 
 
@@ -8224,7 +8237,7 @@ document.addEventListener('click', (e) => {
 
       if (type === 'cutter') return this.renderCutterProductReferenceSection(item);
 
-      
+
 
       const mold = item;
 
@@ -8232,7 +8245,7 @@ document.addEventListener('click', (e) => {
 
       const job = this.getJobInfoSafe(mold, 'mold');
 
-      
+
 
       // 1. Tray info (TrayInfoForMoldDesign)
 
@@ -8242,7 +8255,7 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       // 2. Tên khay theo KH
 
@@ -8252,7 +8265,7 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       // 3. Loại nhựa thiết kế (DesignForPlasticType)
 
@@ -8262,7 +8275,7 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       // 4. Kích thước sản phẩm: CutlineX x CutlineY x Depth - R - C
 
@@ -8272,7 +8285,7 @@ document.addEventListener('click', (e) => {
 
       const depth = this.safeText(this.pick(design, ['MoldDesignDepth']));
 
-      
+
 
       // Fallback sang cutter nếu design trống
 
@@ -8284,31 +8297,31 @@ document.addEventListener('click', (e) => {
 
         if (Array.isArray(related) && related.length) fbCutter = related[0];
 
-      } catch (e) {}
+      } catch (e) { }
 
-      
+
 
       const fCutX = fbCutter ? String(fbCutter?.CutlineLength || '').trim() : '';
 
       const fCutY = fbCutter ? String(fbCutter?.CutlineWidth || '').trim() : '';
 
-      
+
 
       const baseXY = (cutX && cutY) ? `${cutX}×${cutY}` : (fCutX && fCutY) ? `${fCutX}×${fCutY}` : '-';
 
-      
+
 
       const r = String(this.pick(design, ['CornerR']) || (fbCutter ? fbCutter?.CutterCorner : '') || '').trim();
 
       const c = String(this.pick(design, ['ChamferC']) || (fbCutter ? fbCutter?.CutterChamfer : '') || '').trim();
 
-      
+
 
       const tailRC = [r ? `-${r}R` : '', c ? `-${c}C` : ''].filter(Boolean).join('');
 
       const trayDim = `${baseXY}${depth !== '-' ? `×${depth}` : ''}${tailRC}`;
 
-      
+
 
       // 5. Khối lượng khay
 
@@ -8318,7 +8331,7 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       // 6. Số pockets (PocketNumbers)
 
@@ -8328,7 +8341,7 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       // 7. Góc nghiêng
 
@@ -8338,13 +8351,13 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       // 8. Chữ khắc (không có trong CSV - để trống)
 
       const engraving = '-';
 
-      
+
 
       const moldDimBadge = dimensions !== '-' && dimensions !== '' ? `<span class="dp-badge-dim mold-dim">${dimensions}</span>` : '-';
 
@@ -8362,25 +8375,25 @@ document.addEventListener('click', (e) => {
 
         { label: this.biLabel('タイプ', 'Kiểu khuôn/Dao'), rawValue: itemType },
 
-        
+
 
         // 2. Thông tin khay từ chỉ thị
 
         { label: this.biLabel('トレイ情報(指示書)', 'Thông tin khay (từ chỉ thị)'), rawValue: trayInfoInstruction, full: true },
 
-        
+
 
         // 3. Loại nhựa
 
         { label: this.biLabel('樹脂', 'Loại nhựa'), rawValue: plasticType },
 
-        
+
 
         // 4. Ngày xuất hàng đầu tiên
 
         { label: this.biLabel('初回出荷日', 'Ngày xuất hàng ĐT'), rawValue: firstShipment },
 
-        
+
 
         // 5. Kích thước khuôn (badge), Khối lượng khuôn, số mảnh khuôn
 
@@ -8390,7 +8403,7 @@ document.addEventListener('click', (e) => {
 
         { label: this.biLabel('枚数', 'Số mảnh khuôn'), rawValue: pieceCount },
 
-        
+
 
         // 6. Kích thước sản phẩm (badge), khối lượng sản phẩm
 
@@ -8442,7 +8455,7 @@ document.addEventListener('click', (e) => {
 
       const job = this.getJobInfoSafe(mold, 'mold');
 
-      
+
 
       const moldID = this.safeText(mold?.MoldID);
 
@@ -8450,7 +8463,7 @@ document.addEventListener('click', (e) => {
 
       const name = this.safeText(mold?.MoldName);
 
-      
+
 
       // Kích thước: từ mold hoặc design
 
@@ -8464,13 +8477,13 @@ document.addEventListener('click', (e) => {
 
       const dimensions = this.safeText(
 
-      mold?.displayDimensions || mold?.displaySize || mold?.Dimensions || mold?.Size ||
+        mold?.displayDimensions || mold?.displaySize || mold?.Dimensions || mold?.Size ||
 
-      this.formatLWH(design?.MoldDesignLength, design?.MoldDesignWidth, design?.MoldDesignHeight),
+        this.formatLWH(design?.MoldDesignLength, design?.MoldDesignWidth, design?.MoldDesignHeight),
 
-      '-'
+        '-'
 
-    );
+      );
 
       // Khối lượng
 
@@ -8482,7 +8495,7 @@ document.addEventListener('click', (e) => {
 
         : '-';
 
-      
+
 
       // Kiểu khuôn (MoldOrientation = hướng lắp)
 
@@ -8490,31 +8503,31 @@ document.addEventListener('click', (e) => {
 
       const installDir = this.safeText(this.pick(design, ['MoldOrientation']));
 
-      
+
 
       // Số mảnh
 
       const pieceCount = this.safeText(this.pick(design, ['PieceCount']));
 
-      
+
 
       // Pitch
 
       const pitch = this.safeText(this.pick(design, ['Pitch']) ?? mold?.Pitch);
 
-      
+
 
       // Chiều sâu
 
       const depth = this.safeText(this.pick(design, ['MoldDesignDepth']));
 
-      
+
 
       // UnderDepth
 
       const underDepth = this.safeText(this.pick(design, ['UnderDepth']));
 
-      
+
 
       // Ngày SX: lấy DeliveryDeadline từ job sớm nhất
 
@@ -8528,7 +8541,7 @@ document.addEventListener('click', (e) => {
 
       }
 
-      
+
 
       const fields = [
 
@@ -8538,7 +8551,7 @@ document.addEventListener('click', (e) => {
 
         { label: this.biLabel('金型コード', 'Mã khuôn'), rawValue: code },
 
-        
+
 
         { label: this.biLabel('寸法', 'Kích thước'), rawValue: dimensions },
 
@@ -8562,7 +8575,7 @@ document.addEventListener('click', (e) => {
 
 
 
-      
+
 
       return `<div class="modal-section">
 
@@ -8592,7 +8605,7 @@ document.addEventListener('click', (e) => {
 
       const moldDesignID = this.safeText(item?.MoldDesignID);
 
-      
+
 
       const design = this.getMoldDesignInfoSafe(item, 'cutter');
 
@@ -8602,7 +8615,7 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       const cutterType = this.safeText(item?.CutterType);
 
@@ -8620,13 +8633,13 @@ document.addEventListener('click', (e) => {
 
       const satoCodeDate = this.safeText(item?.SatoCodeDate);
 
-      
+
 
       const cutSize = this.formatCutterCutSize(item);
 
       const sharedMoldsText = this.getMoldSharedListTextForCutter(item);
 
-      
+
 
       const fields = [
 
@@ -8664,7 +8677,7 @@ document.addEventListener('click', (e) => {
 
 
 
-      
+
 
       return `<div class="modal-section">
 
@@ -8708,7 +8721,7 @@ document.addEventListener('click', (e) => {
 
 
 
-    renderMoldTechnicalInfoFull(item){
+    renderMoldTechnicalInfoFull(item) {
 
       const mold = item;
 
@@ -8878,11 +8891,11 @@ document.addEventListener('click', (e) => {
 
       const r = (d?.CornerR ?? d?.R ?? d?.CutR ?? d?.ProductR ?? '').toString().trim() ||
 
-                (fbCutter ? String(fbCutter.CutterCorner ?? fbCutter.CornerR ?? '').trim() : '');
+        (fbCutter ? String(fbCutter.CutterCorner ?? fbCutter.CornerR ?? '').trim() : '');
 
       const c = (d?.ChamferC ?? d?.C ?? d?.CutC ?? d?.ProductC ?? '').toString().trim() ||
 
-                (fbCutter ? String(fbCutter.CutterChamfer ?? fbCutter.ChamferC ?? '').trim() : '');
+        (fbCutter ? String(fbCutter.CutterChamfer ?? fbCutter.ChamferC ?? '').trim() : '');
 
 
 
@@ -9032,37 +9045,37 @@ document.addEventListener('click', (e) => {
 
         // nhóm Basic (đã show)
 
-        'CutterID','ID','CutterNo','CutterCode','CutterDesignCode','CutterName','CutterDesignName','Name',
+        'CutterID', 'ID', 'CutterNo', 'CutterCode', 'CutterDesignCode', 'CutterName', 'CutterDesignName', 'Name',
 
-        'MoldDesignID','molddesignid','DesignID','MoldDesignCode','IDMaKhuonThietKe',
+        'MoldDesignID', 'molddesignid', 'DesignID', 'MoldDesignCode', 'IDMaKhuonThietKe',
 
-        'CutterType','CutlineLength','CutlineWidth','CutLength','CutWidth','CutterCorner','CornerR','CutterChamfer','ChamferC',
+        'CutterType', 'CutlineLength', 'CutlineWidth', 'CutLength', 'CutWidth', 'CutterCorner', 'CornerR', 'CutterChamfer', 'ChamferC',
 
-        'PlasticCutType','PlasticType','BladeCount','Blades','Pitch','BladePitch','PPcushionUse','PPCushionUse','PP_Cushion',
+        'PlasticCutType', 'PlasticType', 'BladeCount', 'Blades', 'Pitch', 'BladePitch', 'PPcushionUse', 'PPCushionUse', 'PP_Cushion',
 
-        'CutterEntry','EntryDate','CreatedAt','SatoCode','SatoCodeDate',
+        'CutterEntry', 'EntryDate', 'CreatedAt', 'SatoCode', 'SatoCodeDate',
 
 
 
         // nhóm Product reference (đã dùng)
 
-        'TrayInfoForMoldDesign','CustomerTrayName','TrayName','Material','TrayWeight',
+        'TrayInfoForMoldDesign', 'CustomerTrayName', 'TrayName', 'Material', 'TrayWeight',
 
-        'PocketCount','Pockets','PocketNumbers','DraftAngle','TaperAngle','TextContent','EngravingText',
+        'PocketCount', 'Pockets', 'PocketNumbers', 'DraftAngle', 'TaperAngle', 'TextContent', 'EngravingText',
 
-        'CutlineX','CutlineY','MoldDesignDepth','CavityDepth','Depth',
+        'CutlineX', 'CutlineY', 'MoldDesignDepth', 'CavityDepth', 'Depth',
 
 
 
         // object enrich / không muốn liệt kê
 
-        'relatedMolds','relatedCutters','rackInfo','rackLayerInfo','customerInfo','companyInfo'
+        'relatedMolds', 'relatedCutters', 'rackInfo', 'rackLayerInfo', 'customerInfo', 'companyInfo'
 
       ]);
 
 
 
-      const keys = Object.keys(cutter || {}).sort((a,b)=>a.localeCompare(b));
+      const keys = Object.keys(cutter || {}).sort((a, b) => a.localeCompare(b));
 
 
 
@@ -9146,7 +9159,7 @@ document.addEventListener('click', (e) => {
 
       if (type === 'cutter') return this.renderCutterProductReferenceSection(item);
 
-      
+
 
       const mold = item;
 
@@ -9154,7 +9167,7 @@ document.addEventListener('click', (e) => {
 
       const job = this.getJobInfoSafe(mold, 'mold');
 
-      
+
 
       // 1. Tray info (TrayInfoForMoldDesign)
 
@@ -9164,7 +9177,7 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       // 2. Tên khay theo KH
 
@@ -9174,7 +9187,7 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       // 3. Loại nhựa thiết kế (DesignForPlasticType)
 
@@ -9184,7 +9197,7 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       // 4. Kích thước sản phẩm: CutlineX x CutlineY x Depth - R - C
 
@@ -9194,7 +9207,7 @@ document.addEventListener('click', (e) => {
 
       const depth = this.safeText(this.pick(design, ['MoldDesignDepth']));
 
-      
+
 
       // Fallback sang cutter nếu design trống
 
@@ -9206,31 +9219,31 @@ document.addEventListener('click', (e) => {
 
         if (Array.isArray(related) && related.length) fbCutter = related[0];
 
-      } catch (e) {}
+      } catch (e) { }
 
-      
+
 
       const fCutX = fbCutter ? String(fbCutter?.CutlineLength || '').trim() : '';
 
       const fCutY = fbCutter ? String(fbCutter?.CutlineWidth || '').trim() : '';
 
-      
+
 
       const baseXY = (cutX && cutY) ? `${cutX}×${cutY}` : (fCutX && fCutY) ? `${fCutX}×${fCutY}` : '-';
 
-      
+
 
       const r = String(this.pick(design, ['CornerR']) || (fbCutter ? fbCutter?.CutterCorner : '') || '').trim();
 
       const c = String(this.pick(design, ['ChamferC']) || (fbCutter ? fbCutter?.CutterChamfer : '') || '').trim();
 
-      
+
 
       const tailRC = [r ? `-${r}R` : '', c ? `-${c}C` : ''].filter(Boolean).join('');
 
       const trayDim = `${baseXY}${depth !== '-' ? `×${depth}` : ''}${tailRC}`;
 
-      
+
 
       // 5. Khối lượng khay
 
@@ -9240,7 +9253,7 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       // 6. Số pockets (PocketNumbers)
 
@@ -9250,7 +9263,7 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       // 7. Góc nghiêng
 
@@ -9260,13 +9273,13 @@ document.addEventListener('click', (e) => {
 
       );
 
-      
+
 
       // 8. Chữ khắc (không có trong CSV - để trống)
 
       const engraving = '-';
 
-      
+
 
       const fields = [
 
@@ -9288,7 +9301,7 @@ document.addEventListener('click', (e) => {
 
       ];
 
-      
+
 
       return `<div class="modal-section">
 
@@ -9624,7 +9637,7 @@ document.addEventListener('click', (e) => {
 
       const moldNotes = isMold ? String(item?.MoldNotes || '').trim() : '';
 
-      
+
 
       // Lấy ghi chú mới nhất từ usercomments.csv
 
@@ -9660,9 +9673,9 @@ document.addEventListener('click', (e) => {
 
         }
 
-      } catch (e) {}
+      } catch (e) { }
 
-      
+
 
       let html = `<div class="modal-section">
 
@@ -9674,7 +9687,7 @@ document.addEventListener('click', (e) => {
 
         </div>`;
 
-      
+
 
       if (returning) {
 
@@ -9688,7 +9701,7 @@ document.addEventListener('click', (e) => {
 
       }
 
-      
+
 
       if (disposing) {
 
@@ -9702,7 +9715,7 @@ document.addEventListener('click', (e) => {
 
       }
 
-      
+
 
       if (moldNotes) {
 
@@ -9716,7 +9729,7 @@ document.addEventListener('click', (e) => {
 
       }
 
-      
+
 
       if (latestComment) {
 
@@ -9730,7 +9743,7 @@ document.addEventListener('click', (e) => {
 
       }
 
-      
+
 
       if (!returning && !disposing && !moldNotes && !latestComment) {
 
@@ -9738,7 +9751,7 @@ document.addEventListener('click', (e) => {
 
       }
 
-      
+
 
       html += `</div>`;
 
@@ -9752,7 +9765,7 @@ document.addEventListener('click', (e) => {
 
     renderAdditionalDataSection(item, type) {
 
-      if(type === 'mold'){
+      if (type === 'mold') {
 
         const mold = item;
 
@@ -9856,7 +9869,7 @@ document.addEventListener('click', (e) => {
 
           const s = (v == null) ? '' : String(v).trim().toLowerCase();
 
-          if(!s || s === '-' ) return false;
+          if (!s || s === '-') return false;
 
           return s === '1' || s === 'yes' || s === 'true' || s.includes('有') || s.includes('あり') || s.includes('○') || s.includes('はい');
 
@@ -9932,7 +9945,7 @@ document.addEventListener('click', (e) => {
 
         `;
 
-    }
+      }
 
 
 
@@ -10174,77 +10187,77 @@ document.addEventListener('click', (e) => {
 
 
 
-formatHistoryDetail(entry) {
+    formatHistoryDetail(entry) {
 
-  const e = (v) => this.escapeHtml(v);
-
-
-
-  const extras = [];
-
-  try {
-
-    let rack = '';
-
-    const cand = [
-
-      entry?.RackLayerID, entry?.ToRackLayerID, entry?.FromRackLayerID,
-
-      entry?.NewLocation, entry?.OldLocation,
-
-      entry?.To, entry?.From, entry?.Location,
-
-      entry?.NewRackLayerID, entry?.OldRackLayerID
-
-    ];
-
-    for (const c of cand) {
-
-      if (!c) continue;
-
-      const x = this.getRackLayerText({ displayRackLocation: c, RackLayerID: c, location: c });
-
-      if (x) { rack = x; break; }
-
-    }
-
-    if (rack) extras.push(`棚-段 / Giá - Tầng: <b>${e(rack)}</b>`);
+      const e = (v) => this.escapeHtml(v);
 
 
 
-    let companyName = '';
+      const extras = [];
 
-    const cId = entry?.CompanyID ?? entry?.StorageCompanyID ?? entry?.StorageCompany ?? entry?.Company;
+      try {
 
-    if (cId) {
+        let rack = '';
 
-      const list = Array.isArray(this.data?.companies) ? this.data.companies : [];
+        const cand = [
 
-      const found = list.find(c => String(c?.CompanyID ?? '').trim() === String(cId).trim());
+          entry?.RackLayerID, entry?.ToRackLayerID, entry?.FromRackLayerID,
 
-      companyName = found?.CompanyShortName || found?.CompanyName || String(cId).trim();
+          entry?.NewLocation, entry?.OldLocation,
 
-    }
+          entry?.To, entry?.From, entry?.Location,
 
-    if (companyName) extras.push(`会社 / Công ty: <b>${e(companyName)}</b>`);
+          entry?.NewRackLayerID, entry?.OldRackLayerID
 
-  } catch (err) {}
+        ];
+
+        for (const c of cand) {
+
+          if (!c) continue;
+
+          const x = this.getRackLayerText({ displayRackLocation: c, RackLayerID: c, location: c });
+
+          if (x) { rack = x; break; }
+
+        }
+
+        if (rack) extras.push(`棚-段 / Giá - Tầng: <b>${e(rack)}</b>`);
 
 
 
-  const extraHtml = extras.length ? `<div class="dp-history-extra">${extras.join(' · ')}</div>` : '';
+        let companyName = '';
+
+        const cId = entry?.CompanyID ?? entry?.StorageCompanyID ?? entry?.StorageCompany ?? entry?.Company;
+
+        if (cId) {
+
+          const list = Array.isArray(this.data?.companies) ? this.data.companies : [];
+
+          const found = list.find(c => String(c?.CompanyID ?? '').trim() === String(cId).trim());
+
+          companyName = found?.CompanyShortName || found?.CompanyName || String(cId).trim();
+
+        }
+
+        if (companyName) extras.push(`会社 / Công ty: <b>${e(companyName)}</b>`);
+
+      } catch (err) { }
 
 
 
-  if (entry.type === 'STATUS') {
+      const extraHtml = extras.length ? `<div class="dp-history-extra">${extras.join(' · ')}</div>` : '';
 
-    const who = this.getEmployeeName(entry.EmployeeID || entry.Employee || entry.CreatedBy || entry.CreatedByEmployeeID);
 
-    const dest = entry.destinationInfo ? (entry.destinationInfo.DestinationName || entry.destinationInfo.Name || '') : '';
 
-    const note = entry.Note || entry.Notes || '';
+      if (entry.type === 'STATUS') {
 
-    return `
+        const who = this.getEmployeeName(entry.EmployeeID || entry.Employee || entry.CreatedBy || entry.CreatedByEmployeeID);
+
+        const dest = entry.destinationInfo ? (entry.destinationInfo.DestinationName || entry.destinationInfo.Name || '') : '';
+
+        const note = entry.Note || entry.Notes || '';
+
+        return `
 
       <div><b>${e(entry.Status || entry.Action || '')}</b> ${dest ? `→ ${e(dest)}` : ''}</div>
 
@@ -10254,21 +10267,21 @@ formatHistoryDetail(entry) {
 
     `;
 
-  }
+      }
 
 
 
-  if (entry.type === 'LOCATION') {
+      if (entry.type === 'LOCATION') {
 
-    const from = entry.OldLocation || entry.From || entry.FromRackLayerID || '';
+        const from = entry.OldLocation || entry.From || entry.FromRackLayerID || '';
 
-    const to = entry.NewLocation || entry.To || entry.ToRackLayerID || '';
+        const to = entry.NewLocation || entry.To || entry.ToRackLayerID || '';
 
-    const who = this.getEmployeeName(entry.EmployeeID || entry.Employee || entry.CreatedBy || entry.CreatedByEmployeeID);
+        const who = this.getEmployeeName(entry.EmployeeID || entry.Employee || entry.CreatedBy || entry.CreatedByEmployeeID);
 
-    const note = entry.Note || entry.Notes || '';
+        const note = entry.Note || entry.Notes || '';
 
-    return `
+        return `
 
       <div><b>MOVE</b> ${from ? e(from) : ''} ${to ? `→ ${e(to)}` : ''}</div>
 
@@ -10278,19 +10291,19 @@ formatHistoryDetail(entry) {
 
     `;
 
-  }
+      }
 
 
 
-  if (entry.type === 'SHIP') {
+      if (entry.type === 'SHIP') {
 
-    const who = this.getEmployeeName(entry.EmployeeID || entry.Employee || entry.CreatedBy || entry.CreatedByEmployeeID);
+        const who = this.getEmployeeName(entry.EmployeeID || entry.Employee || entry.CreatedBy || entry.CreatedByEmployeeID);
 
-    const dest = entry.destinationInfo ? (entry.destinationInfo.DestinationName || entry.destinationInfo.Name || '') : (entry.Destination || entry.DestinationID || '');
+        const dest = entry.destinationInfo ? (entry.destinationInfo.DestinationName || entry.destinationInfo.Name || '') : (entry.Destination || entry.DestinationID || '');
 
-    const note = entry.Note || entry.Notes || '';
+        const note = entry.Note || entry.Notes || '';
 
-    return `
+        return `
 
       <div><b>SHIP</b> ${dest ? `→ ${e(dest)}` : ''}</div>
 
@@ -10300,19 +10313,19 @@ formatHistoryDetail(entry) {
 
     `;
 
-  }
+      }
 
 
 
-  if (entry.type === 'TEFLON') {
+      if (entry.type === 'TEFLON') {
 
-    const who = this.getEmployeeName(entry.EmployeeID || entry.Employee || entry.CreatedBy || entry.CreatedByEmployeeID);
+        const who = this.getEmployeeName(entry.EmployeeID || entry.Employee || entry.CreatedBy || entry.CreatedByEmployeeID);
 
-    const status = entry.TeflonStatus || entry.Status || '';
+        const status = entry.TeflonStatus || entry.Status || '';
 
-    const note = entry.Note || entry.Notes || '';
+        const note = entry.Note || entry.Notes || '';
 
-    return `
+        return `
 
       <div><b>TEFLON</b> ${status ? `- ${e(status)}` : ''}</div>
 
@@ -10322,13 +10335,13 @@ formatHistoryDetail(entry) {
 
     `;
 
-  }
+      }
 
 
 
-  const msg = entry.Title || entry.Action || entry.Status || entry.type || '';
+      const msg = entry.Title || entry.Action || entry.Status || entry.type || '';
 
-  return `
+      return `
 
     <div><b>${e(msg)}</b></div>
 
@@ -10336,7 +10349,7 @@ formatHistoryDetail(entry) {
 
   `;
 
-}
+    }
 
 
 
@@ -12000,7 +12013,7 @@ formatHistoryDetail(entry) {
 
 
 
-    
+
 
   }
 
@@ -12198,7 +12211,7 @@ formatHistoryDetail(entry) {
 
       const spin = bd.querySelector('.mcs-qv-spin');
 
-      if (img) { try { img.removeAttribute('src'); } catch (e) {} img.style.display = 'none'; }
+      if (img) { try { img.removeAttribute('src'); } catch (e) { } img.style.display = 'none'; }
 
       if (spin) { spin.textContent = 'Loading...'; spin.style.display = 'block'; }
 
